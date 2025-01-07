@@ -1,7 +1,7 @@
 import React from "react";
 import { GiBowTie } from "react-icons/gi";
 
-const Logo = ({ scale }: { scale: string }) => {
+const Logo = ({ scale }: { scale: "small" | "medium" | "big" }) => {
   return (
     <div
       className={`w-72 h-72 bg-black dark:bg-white flex items-center justify-center rounded-full overflow-hidden ${
