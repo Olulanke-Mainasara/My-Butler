@@ -24,7 +24,7 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
           <AppSidebar />
           <main className="w-full flex flex-col relative">
             <div
-              className={`flex justify-between items-center absolute z-10 top-0 w-full ${
+              className={`flex justify-between items-center absolute z-50 top-0 w-full ${
                 pathname !== "/" ? "p-3" : "pr-3"
               }`}
             >

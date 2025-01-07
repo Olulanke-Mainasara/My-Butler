@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Carousel,
   CarouselContent,
@@ -11,7 +11,6 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Outfits = () => {
-  const [brand, setBrand] = useState();
   const ismobile = useIsMobile();
 
   return (

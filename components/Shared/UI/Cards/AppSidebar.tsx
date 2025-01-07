@@ -30,7 +30,7 @@ const items = [
   },
   {
     title: "Calendar",
-    url: "/calender",
+    url: "/calendar",
     icon: Calendar,
   },
   {

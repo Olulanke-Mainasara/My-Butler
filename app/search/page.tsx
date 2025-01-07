@@ -1,11 +1,9 @@
 "use client";
 
 import { SearchIcon } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 
 const Search = () => {
-  const [searchText, setSearchText] = useState("");
-
   return (
     <div className="pt-16 md:pt-12 flex flex-col gap-8 h-full">
       <div className="flex flex-col items-center gap-4">
