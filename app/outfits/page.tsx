@@ -14,11 +14,11 @@ const Outfits = () => {
   const ismobile = useIsMobile();
 
   return (
-    <div className="pt-16 md:pt-12 flex flex-col h-full">
-      <h1 className="text-center text-4xl xl:text-8xl">Line-ups</h1>
+    <div className="pt-4 flex flex-col h-full">
+      <h1 className="text-center text-4xl md:text-6xl xl:text-8xl">Line-ups</h1>
 
-      <section className="flex flex-col xl:flex-row items-center h-full w-full gap-6 md:gap-8 xl:gap-16 p-6 xl:p-12">
-        <div className="xl:basis-1/6 w-3/5 flex items-center">
+      <section className="flex flex-col xl:flex-row items-center h-full w-full gap-6 md:gap-8 xl:gap-16 p-6 xl:p-12 xl:pl-6">
+        <div className="xl:basis-[10.7%] w-3/5 flex items-center">
           <div className="xl:h-44 w-full">
             <Carousel
               opts={{

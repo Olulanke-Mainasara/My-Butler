@@ -5,7 +5,11 @@ import { Suspense } from "react";
 
 export default function HomePage() {
   return (
-    <Suspense fallback={<div></div>}>
+    <Suspense
+      fallback={
+        <div className="absolute inset-0 bg-white dark:bg-background"></div>
+      }
+    >
       <Home />
     </Suspense>
   );

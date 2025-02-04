@@ -13,8 +13,12 @@ import {
   SidebarMenuItem,
 } from "@/components/Shad-UI/sidebar";
 import { ThemeToggler } from "../Buttons/ThemeToggler";
-import { Link } from "next-view-transitions";
 import { usePathname } from "next/navigation";
+import { useSidebar } from "@/components/Shad-UI/sidebar";
+import { useTransitionRouter } from "next-view-transitions";
+import { supabase } from "@/lib/supabase";
+import { useContext } from "react";
+import { authContext } from "@/components/Providers/AllProviders";
 
 // Menu items.
 const items = [
@@ -46,7 +50,21 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const user = useContext(authContext);
   const pathname = usePathname();
+  const router = useTransitionRouter();
+  const { toggleSidebar } = useSidebar();
+
+  const handleSignout = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.log("Error signing out:", error.message);
+    } else {
+      console.log("Sign out successful");
+      router.push("/");
+    }
+  };
 
   return (
     <Sidebar className="opacity-100">
@@ -69,13 +87,32 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild size={"lg"}>
-                    <Link href={item.url}>
+                    <button
+                      onClick={() => {
+                        toggleSidebar();
+                        router.push(`${item.url}`);
+                      }}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
-                    </Link>
+                    </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {user && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild size={"lg"}>
+                    <button
+                      onClick={() => {
+                        toggleSidebar();
+                        handleSignout();
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

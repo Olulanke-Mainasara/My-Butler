@@ -1,3 +1,4 @@
+import { Stars } from "lucide-react";
 import {
   GiBigGear,
   GiNewspaper,
@@ -5,7 +6,6 @@ import {
   GiPhotoCamera,
   GiShirt,
   GiShoppingCart,
-  GiStarShuriken,
   GiTicket,
 } from "react-icons/gi";
 
@@ -14,7 +14,7 @@ export const navigation = [
     id: "1",
     name: "",
     href: "/butler",
-    icon: <GiStarShuriken />,
+    icon: <Stars size={30} />,
   },
   {
     id: "2",
