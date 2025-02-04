@@ -19,7 +19,7 @@ type Message = {
   content: string;
 };
 
-export const getAssistantResponse = async (
+const getAssistantResponse = async (
   messages: { role: string; content: string }[]
 ): Promise<{ role: string; content: string }[] | null> => {
   try {
