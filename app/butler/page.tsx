@@ -5,11 +5,11 @@ import { ArrowRight, Stars } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase";
 import { authContext } from "@/components/Providers/AllProviders";
-import Conversation from "./[chat]/page";
 import Image from "next/image";
 import logoLight from "@/public/logoLight.png";
 import logoDark from "@/public/logoDark.png";
 import { useTheme } from "next-themes";
+import Chat from "@/components/Page-Components/Chat";
 
 const Butler = () => {
   const [prompt, setPrompt] = React.useState<string>("");
@@ -63,7 +63,7 @@ const Butler = () => {
   };
 
   if (anonymous) {
-    return <Conversation prompt={prompt} />;
+    return <Chat prompt={prompt} />;
   }
 
   return (
