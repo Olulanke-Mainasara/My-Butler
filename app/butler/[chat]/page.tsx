@@ -3,7 +3,7 @@
 import Chat from "@/components/Page-Components/Chat";
 
 const Conversation = () => {
-  <Chat />;
+  return <Chat />;
 };
 
 export default Conversation;

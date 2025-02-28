@@ -1,59 +1,45 @@
 "use client";
 
-import { BellIcon, Calendar, Home, Search, Settings } from "lucide-react";
-
+import React from "react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/Shad-UI/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/Shad-UI/dropdown-menu";
 import { ThemeToggler } from "../Buttons/ThemeToggler";
-import { usePathname } from "next/navigation";
 import { useSidebar } from "@/components/Shad-UI/sidebar";
-import { useTransitionRouter } from "next-view-transitions";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase";
 import { useContext } from "react";
 import { authContext } from "@/components/Providers/AllProviders";
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "/?splashed=true",
-    icon: Home,
-  },
-  {
-    title: "Notifications",
-    url: "/notifications",
-    icon: BellIcon,
-  },
-  {
-    title: "Calendar",
-    url: "/calendar",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "/search",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
-];
+import Image from "next/image";
+import logoDark from "@/public/logoDark.png";
+import logoLight from "@/public/logoLight.png";
+import { groupedNavigation } from "@/static-data/icons";
+import { ChevronUp, LogIn } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function AppSidebar() {
   const user = useContext(authContext);
-  const pathname = usePathname();
   const router = useTransitionRouter();
+  const { theme } = useTheme();
   const { toggleSidebar } = useSidebar();
+  const isMobile = useIsMobile();
 
   const handleSignout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -61,62 +47,113 @@ export function AppSidebar() {
     if (error) {
       console.log("Error signing out:", error.message);
     } else {
-      console.log("Sign out successful");
+      toggleSidebar();
       router.push("/");
     }
   };
 
   return (
-    <Sidebar className="opacity-100">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>
-            {pathname !== "/" ? (
-              <p>
-                My <span className="text-brand tracking-widest">Butler</span>
-              </p>
-            ) : (
-              <p>
-                Hi <span className="text-brand tracking-widest">Maina</span>
-              </p>
-            )}{" "}
-            <ThemeToggler />
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild size={"lg"}>
-                    <button
+    <Sidebar>
+      <SidebarHeader className="flex flex-row items-center justify-between pt-4">
+        <div className="flex items-center gap-2">
+          <Image
+            src={theme === "dark" ? logoDark : logoLight}
+            className="w-10 h-10"
+            alt="logo"
+          />
+          <p className="text-2xl">My Butler</p>
+        </div>
+        <div className="flex gap-5 items-center">
+          <ThemeToggler />
+        </div>
+      </SidebarHeader>
+      <SidebarSeparator className="bg-darkBackground dark:bg-lightBackground w-full ml-0" />
+      <SidebarContent className="sm:justify-center gap-0 px-0">
+        {groupedNavigation.map((group) => (
+          <SidebarGroup key={group.id} className="pt-0 px-0">
+            <SidebarGroupLabel className="tracking-normal text-base text-neutral-500">
+              {group.title}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.links.map((link) => (
+                  <SidebarMenuItem key={link.title}>
+                    <SidebarMenuButton
+                      asChild
+                      size={isMobile ? "default" : "sm"}
                       onClick={() => {
                         toggleSidebar();
-                        router.push(`${item.url}`);
+                        router.push(`${link.url}`);
                       }}
                     >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-              {user && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild size={"lg"}>
-                    <button
-                      onClick={() => {
-                        toggleSidebar();
-                        handleSignout();
-                      }}
-                    >
-                      Sign out
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                      <Link href={link.url}>
+                        <span className="text-brandLight dark:text-brandDark text-sm">
+                          {React.cloneElement(link.icon, { size: 20 })}
+                        </span>
+                        <span>{link.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            {group.id !== "4" && (
+              <SidebarSeparator className="bg-transparent dark:bg-transparent opacity-50" />
+            )}
+          </SidebarGroup>
+        ))}
       </SidebarContent>
+      <SidebarSeparator className="bg-darkBackground dark:bg-lightBackground w-full ml-0" />
+      <SidebarFooter className="pb-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton className="h-10">
+                    <Image
+                      src={theme === "dark" ? logoDark : logoLight}
+                      className="w-10 h-10"
+                      alt="logo"
+                    />{" "}
+                    {user?.user_metadata.first_name +
+                      " " +
+                      user?.user_metadata.last_name}
+                    <ChevronUp className="ml-auto" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  className="w-[--radix-popper-anchor-width]"
+                >
+                  <DropdownMenuItem onClick={() => router.push("/settings")}>
+                    <span>Account</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignout}>
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <SidebarMenuButton
+                asChild
+                size={"default"}
+                variant={"outline"}
+                onClick={() => {
+                  toggleSidebar();
+                  router.push("/auth/login");
+                }}
+                className="h-10 rounded-full bg-darkBackground text-white dark:bg-white dark:text-black justify-center hover:bg-neutral-700 hover:text-white transition-colors dark:hover:bg-neutral-700 dark:hover:text-white"
+              >
+                <Link href="/auth/login">
+                  <LogIn />
+                  <span>Login</span>
+                </Link>
+              </SidebarMenuButton>
+            )}
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

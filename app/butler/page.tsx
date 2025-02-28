@@ -80,18 +80,24 @@ const Butler = () => {
       </div>
 
       <div className="flex justify-center">
-        <div className="border border-black dark:border-white w-[90%] xl:w-3/5 max-w-3xl rounded-full flex items-center justify-center overflow-hidden px-4 gap-4">
-          <Stars size={30} className={`${loading ? "animate-pulse" : ""}`} />
+        <div className="border border-black dark:border-white w-[90%] xl:w-3/5 max-w-3xl rounded-full flex items-center justify-center overflow-hidden px-2 pl-4 gap-4">
+          <Stars
+            size={30}
+            className={`${
+              loading ? "animate-pulse" : ""
+            } text-brandLight dark:text-brandDark`}
+          />
           <input
             type="text"
             placeholder="Ask Butler"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            autoFocus
             className="py-4 w-full outline-none bg-transparent placeholder:text-neutral-600 placeholder:dark:text-neutral-400"
           />
           <button
-            className="w-10 h-10 p-2 text-black bg-white hover:text-white hover:bg-black border border-black dark:border-white flex items-center justify-center transition-colors rounded-full"
+            className="w-10 h-10 p-2 text-white bg-darkBackground hover:text-black hover:bg-lightBackground border border-black dark:bg-lightBackground dark:text-black dark:border-white dark:hover:bg-darkBackground dark:hover:text-white flex items-center justify-center transition-colors rounded-full"
             onClick={handleSubmit}
           >
             <ArrowRight />

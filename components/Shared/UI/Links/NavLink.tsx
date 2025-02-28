@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "next-view-transitions";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Button = {
   id: string;
@@ -18,6 +19,8 @@ const NavLink = ({
   index: number;
   shouldSplash: boolean;
 }) => {
+  const ismobile = useIsMobile();
+
   const positionClasses: { [key: string]: string } = {
     "1": "col-start-2 flex justify-center row-span-2",
     "2": "row-span-2 flex items-center justify-end p-4",
@@ -50,11 +53,12 @@ const NavLink = ({
     >
       <Link
         href={button.href}
-        className={`w-14 h-14 sm:w-16 sm:h-16 border border-black dark:border-white rounded-full text-3xl sm:text-4xl flex items-center justify-center bg-white text-black ${
+        suppressHydrationWarning
+        className={`w-14 h-14 sm:w-16 sm:h-16 border bg-lightBackground dark:bg-darkBackground text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors border-black dark:border-white rounded-full flex items-center justify-center ${
           anchorPositionClasses[button.id] || ""
         }`}
       >
-        {button.icon}
+        {React.cloneElement(button.icon, { size: ismobile ? 25 : 29 })}
       </Link>
     </motion.div>
   );

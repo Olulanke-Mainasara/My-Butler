@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <Suspense
       fallback={
-        <div className="absolute inset-0 bg-white dark:bg-background"></div>
+        <div className="absolute inset-0 bg-lightBackground dark:bg-darkBackground"></div>
       }
     >
       <Home />

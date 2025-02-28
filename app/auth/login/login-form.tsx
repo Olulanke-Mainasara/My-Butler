@@ -9,7 +9,7 @@ import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase";
-import { Icons } from "../icons";
+import { Icons } from "@/components/Shared/UI/icons";
 
 export function LoginForm({
   className,
@@ -135,7 +135,7 @@ export function LoginForm({
               </div>
             </div>
           </form>
-          <div className="relative hidden bg-neutral-100 md:block dark:bg-neutral-800">
+          <div className="relative hidden bg-lightBackground md:block dark:bg-neutral-800">
             <Image
               fill
               src="/placeholder.svg"

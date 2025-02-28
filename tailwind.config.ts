@@ -10,8 +10,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#171717",
-        brand: "rgb(101, 209, 253)",
+        lightBackground: "#f5f5f5",
+        darkBackground: "#070B0F",
+        brandDark: "#65d1fd",
+        brandLight: "#008CBA",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

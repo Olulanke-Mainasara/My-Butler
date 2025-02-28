@@ -4,16 +4,15 @@ import React from "react";
 import { Edit, Search } from "lucide-react";
 import { Button } from "@/components/Shad-UI/button";
 import { Link } from "next-view-transitions";
-import { useContext } from "react";
 import { authContext } from "@/components/Providers/AllProviders";
 import { supabase } from "@/lib/supabase";
 
-export default function RootLayout({
+export default function ButlerLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  const user = useContext(authContext);
+}) {
+  const user = React.useContext(authContext);
   const [userCount, setUserCount] = React.useState(0);
   const [conversations, setConversations] = React.useState<
     { chat_id: string; chat_title: string }[] | null
@@ -55,7 +54,7 @@ export default function RootLayout({
   return (
     <main className="flex h-screen">
       {user && (
-        <div className="hidden md:block min-w-52 w-1/5 border-r pt-3 bg-white/10 px-3 z-30">
+        <div className="hidden xl:block min-w-52 w-1/5 pt-3 bg-white/10 px-3 z-30 border-r">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <p className="text-xl">Conversations</p>

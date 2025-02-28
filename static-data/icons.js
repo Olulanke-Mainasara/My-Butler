@@ -1,6 +1,5 @@
-import { Stars } from "lucide-react";
+import { BellIcon, Calendar, Home, Settings, Stars } from "lucide-react";
 import {
-  GiBigGear,
   GiNewspaper,
   GiPaintBucket,
   GiPhotoCamera,
@@ -9,12 +8,105 @@ import {
   GiTicket,
 } from "react-icons/gi";
 
+export const groupedNavigation = [
+  {
+    id: "1",
+    title: "Create & Explore",
+    links: [
+      {
+        id: "1-1",
+        url: "/?splashed=true",
+        icon: <Home />,
+        title: "Home",
+      },
+      {
+        id: "1-2",
+        url: "/butler",
+        icon: <Stars />,
+        title: "Butler Assistant",
+      },
+      {
+        id: "1-3",
+        url: "/outfits",
+        icon: <GiShirt />,
+        title: "Outfit Gallery",
+      },
+      {
+        id: "1-4",
+        url: "/combine",
+        icon: <GiPaintBucket />,
+        title: "Outfit Combiner",
+      },
+      {
+        id: "1-5",
+        url: "/camera",
+        icon: <GiPhotoCamera />,
+        title: "Take a Photo",
+      },
+    ],
+  },
+  {
+    id: "2",
+    title: "Shop & Events",
+    links: [
+      {
+        id: "2-1",
+        url: "/shop",
+        icon: <GiShoppingCart />,
+        title: "Shop Now",
+      },
+      {
+        id: "2-2",
+        url: "/events",
+        icon: <GiTicket />,
+        title: "Upcoming Events",
+      },
+    ],
+  },
+  {
+    id: "3",
+    title: "Stay Informed",
+    links: [
+      {
+        id: "3-1",
+        url: "/news",
+        icon: <GiNewspaper />,
+        title: "Latest News",
+      },
+    ],
+  },
+  {
+    id: "4",
+    title: "User Dashboard",
+    links: [
+      {
+        id: "4-1",
+        title: "Notifications",
+        url: "/notifications",
+        icon: <BellIcon />,
+      },
+      {
+        id: "4-2",
+        title: "Calendar",
+        url: "/calendar",
+        icon: <Calendar />,
+      },
+      {
+        id: "4-3",
+        title: "Settings",
+        url: "/settings",
+        icon: <Settings />,
+      },
+    ],
+  },
+];
+
 export const navigation = [
   {
     id: "1",
     name: "",
     href: "/butler",
-    icon: <Stars size={30} />,
+    icon: <Stars />,
   },
   {
     id: "2",
@@ -38,7 +130,7 @@ export const navigation = [
     id: "5",
     name: "",
     href: "/settings",
-    icon: <GiBigGear />,
+    icon: <Settings />,
   },
   {
     id: "6",

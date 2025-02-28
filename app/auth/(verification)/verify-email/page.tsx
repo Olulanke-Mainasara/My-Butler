@@ -22,8 +22,10 @@ const VerifyEmail = () => {
           <div className="flex flex-col items-center">
             <p>
               Your email{" "}
-              <span className="font-bold text-brand">{user?.email}</span> has
-              been verified.
+              <span className="font-bold text-brandLight dark:text-brandDark">
+                {user?.email}
+              </span>{" "}
+              has been verified.
             </p>
             <p className="max-w-xl">
               You can return to your previous tab and close this one or go back

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { VariantProps, cva } from "class-variance-authority";
-import { PanelLeft } from "lucide-react";
+import { AlignLeft } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,7 @@ import {
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH_MOBILE = "16rem";
 const SIDEBAR_WIDTH_ICON = "5rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
@@ -196,7 +196,7 @@ const Sidebar = React.forwardRef<
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
-          className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          className="w-[--sidebar-width] bg-lightBackground dark:bg-darkBackground p-0 text-black dark:text-white [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -263,24 +263,19 @@ const SidebarTrigger = React.forwardRef<
   const { toggleSidebar } = useSidebar();
 
   return (
-    <Button
+    <button
       ref={ref}
       data-sidebar="trigger"
-      variant="ghost"
-      size="icon"
-      className={cn(
-        "h-10 w-10 border border-neutral-800 dark:border-white",
-        className
-      )}
+      className={cn("", className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
     >
-      <PanelLeft />
+      <AlignLeft />
       <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+    </button>
   );
 });
 SidebarTrigger.displayName = "SidebarTrigger";
@@ -388,7 +383,7 @@ const SidebarSeparator = React.forwardRef<
     <Separator
       ref={ref}
       data-sidebar="separator"
-      className={cn("mx-2 w-auto bg-sidebar-border", className)}
+      className={cn("m-2 w-auto bg-sidebar-border", className)}
       {...props}
     />
   );
@@ -442,7 +437,7 @@ const SidebarGroupLabel = React.forwardRef<
       ref={ref}
       data-sidebar="group-label"
       className={cn(
-        "duration-200 flex justify-between shrink-0 items-center rounded-md px-2 text-2xl tracking-widest font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "duration-200 flex justify-between shrink-0 items-center rounded-md px-2 font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
         className
       )}
@@ -515,7 +510,7 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem";
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -524,7 +519,7 @@ const sidebarMenuButtonVariants = cva(
           "bg-white shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))] dark:bg-neutral-950",
       },
       size: {
-        default: "h-8 text-lg",
+        default: "h-8 text-base",
         sm: "h-7 text-sm",
         lg: "h-12 text-xl group-data-[collapsible=icon]:!p-0",
       },

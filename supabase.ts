@@ -58,6 +58,48 @@ export type Database = {
         }
         Relationships: []
       }
+      cart: {
+        Row: {
+          added_at: string | null
+          id: number
+          item_id: number | null
+          quantity: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          id?: number
+          item_id?: number | null
+          quantity?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Update: {
+          added_at?: string | null
+          id?: number
+          item_id?: number | null
+          quantity?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -90,7 +132,6 @@ export type Database = {
           chat_id: string
           chat_title: string
           created_at: string
-          email: string | null
           messages: Json[]
           user_id: string
         }
@@ -98,17 +139,68 @@ export type Database = {
           chat_id?: string
           chat_title?: string
           created_at?: string
-          email?: string | null
           messages: Json[]
-          user_id: string
+          user_id?: string
         }
         Update: {
           chat_id?: string
           chat_title?: string
           created_at?: string
-          email?: string | null
           messages?: Json[]
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: number
+          image_url: string | null
+          is_virtual: boolean | null
+          location: string | null
+          slug: string
+          start_date: string
+          tickets_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: number
+          image_url?: string | null
+          is_virtual?: boolean | null
+          location?: string | null
+          slug: string
+          start_date: string
+          tickets_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: number
+          image_url?: string | null
+          is_virtual?: boolean | null
+          location?: string | null
+          slug?: string
+          start_date?: string
+          tickets_url?: string | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -222,6 +314,48 @@ export type Database = {
           },
         ]
       }
+      news: {
+        Row: {
+          author: string | null
+          content: string
+          created_at: string | null
+          description: string | null
+          id: number
+          image_url: string | null
+          published_at: string | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author?: string | null
+          content: string
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          image_url?: string | null
+          published_at?: string | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author?: string | null
+          content?: string
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          image_url?: string | null
+          published_at?: string | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       outfits: {
         Row: {
           created_at: string | null
@@ -273,6 +407,7 @@ export type Database = {
           item_id: number
           rating: number | null
           review_text: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
@@ -280,6 +415,7 @@ export type Database = {
           item_id: number
           rating?: number | null
           review_text?: string | null
+          user_id?: string
         }
         Update: {
           created_at?: string | null
@@ -287,6 +423,7 @@ export type Database = {
           item_id?: number
           rating?: number | null
           review_text?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -296,20 +433,36 @@ export type Database = {
             referencedRelation: "items"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       roles: {
         Row: {
+          created_at: string | null
           description: string | null
+          id: number
           name: string
+          updated_at: string | null
         }
         Insert: {
+          created_at?: string | null
           description?: string | null
+          id?: number
           name: string
+          updated_at?: string | null
         }
         Update: {
+          created_at?: string | null
           description?: string | null
+          id?: number
           name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -326,6 +479,8 @@ export type Database = {
           phone_number: string | null
           preferred_language: string | null
           profile_picture: string | null
+          role_id: number | null
+          supabase_user_id: string | null
           updated_at: string | null
           user_type: string | null
         }
@@ -341,6 +496,8 @@ export type Database = {
           phone_number?: string | null
           preferred_language?: string | null
           profile_picture?: string | null
+          role_id?: number | null
+          supabase_user_id?: string | null
           updated_at?: string | null
           user_type?: string | null
         }
@@ -356,16 +513,18 @@ export type Database = {
           phone_number?: string | null
           preferred_language?: string | null
           profile_picture?: string | null
+          role_id?: number | null
+          supabase_user_id?: string | null
           updated_at?: string | null
           user_type?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "users_user_type_fkey"
-            columns: ["user_type"]
+            foreignKeyName: "fk_role"
+            columns: ["role_id"]
             isOneToOne: false
             referencedRelation: "roles"
-            referencedColumns: ["name"]
+            referencedColumns: ["id"]
           },
         ]
       }

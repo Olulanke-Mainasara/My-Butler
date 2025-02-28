@@ -36,7 +36,7 @@ export default function Home() {
             default: { delay: 1.5, duration: 1 },
             display: { delay: 2 },
           }}
-          className="absolute inset-0 bg-white dark:bg-background z-50"
+          className="absolute inset-0 bg-lightBackground dark:bg-darkBackground z-50"
         ></motion.div>
       )}
 

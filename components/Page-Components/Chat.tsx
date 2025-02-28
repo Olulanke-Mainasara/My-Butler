@@ -60,7 +60,7 @@ const formatResponseText = (text: string): string => {
     .trim();
 };
 
-const Chat = ({ prompt }: { prompt?: string }) => {
+export default function Chat({ prompt }: { prompt?: string }) {
   const [input, setInput] = React.useState<string>("");
   const [messages, setMessages] = React.useState<Message[]>(
     prompt ? [{ role: "user", content: prompt }] : []
@@ -86,6 +86,7 @@ const Chat = ({ prompt }: { prompt?: string }) => {
     // If a visitor hasn't logged in yet
     if (!user && prompt) {
       const fetchAnonymousMessages = async () => {
+        setResponseError(null);
         setResponseLoading(true);
         try {
           const anonymousData = await getAssistantResponse([
@@ -112,8 +113,6 @@ const Chat = ({ prompt }: { prompt?: string }) => {
     if (userCount > 0) {
       return;
     }
-
-    setUserCount((prevCount) => prevCount + 1);
 
     const fetchChatMessages = async () => {
       setLoading(true);
@@ -170,6 +169,8 @@ const Chat = ({ prompt }: { prompt?: string }) => {
       scrollToBottom();
     };
 
+    setUserCount((prevCount) => prevCount + 1);
+
     fetchChatMessages();
   }, [pathname, prompt, router, user, userCount]);
 
@@ -178,6 +179,7 @@ const Chat = ({ prompt }: { prompt?: string }) => {
 
     scrollToBottom();
 
+    setResponseError(null);
     setResponseLoading(true);
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -192,8 +194,6 @@ const Chat = ({ prompt }: { prompt?: string }) => {
         ...messages,
         { role: "user", content: input },
       ]);
-
-      console.log(messages);
 
       if (assistantResponse) {
         const { error: updateError } = await supabase
@@ -223,7 +223,7 @@ const Chat = ({ prompt }: { prompt?: string }) => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full h-full">
       <section className="w-full flex flex-col h-screen pt-16">
         <div className="overflow-hidden w-full grow px-2 xl:px-8 pb-8">
           <div
@@ -269,7 +269,7 @@ const Chat = ({ prompt }: { prompt?: string }) => {
                         <div
                           className={` ${
                             message.role === "user"
-                              ? "p-4 bg-background text-white dark:bg-white/10 rounded-xl w-fit max-w-xl"
+                              ? "p-4 bg-darkBackground text-white dark:bg-white/10 rounded-xl w-fit max-w-xl"
                               : ""
                           } `}
                         >
@@ -334,6 +334,4 @@ const Chat = ({ prompt }: { prompt?: string }) => {
       </section>
     </div>
   );
-};
-
-export default Chat;
+}

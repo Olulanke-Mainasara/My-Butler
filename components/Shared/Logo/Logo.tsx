@@ -9,7 +9,7 @@ const Logo = ({ scale }: { scale: "small" | "medium" | "big" }) => {
       }`}
     >
       <h1 className="text-[200px] text-white dark:text-black">B</h1>
-      <div className="text-[150px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-brand bg-black dark:bg-white flex items-center justify-center h-8">
+      <div className="text-[150px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-brandLight dark:text-brandDark bg-black dark:bg-white flex items-center justify-center h-8">
         <GiBowTie />
       </div>
     </div>
