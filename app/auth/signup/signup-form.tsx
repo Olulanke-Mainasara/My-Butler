@@ -28,7 +28,7 @@ export function SignupForm({
     event.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -40,11 +40,34 @@ export function SignupForm({
         },
       },
     });
+
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/auth/verify-email");
+      const supabaseUserId = data.user?.id;
+
+      if (!supabaseUserId) {
+        setError("Failed to retrieve user ID");
+        setLoading(false);
+        return;
+      }
+      const { error: insertError } = await supabase.from("users").insert([
+        {
+          id: supabaseUserId,
+          first_name: fname,
+          last_name: lname,
+          email: email,
+          supabase_user_id: supabaseUserId,
+        },
+      ]);
+
+      if (insertError) {
+        setError(insertError.message);
+        setLoading(false);
+      } else {
+        router.push("/auth/verify-email");
+      }
     }
   };
 

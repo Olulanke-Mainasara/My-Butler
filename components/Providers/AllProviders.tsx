@@ -42,7 +42,7 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
             <main className="w-full relative">
               <div
                 className={`flex justify-between items-center fixed z-40 top-0 right-0 ${
-                  pathname === "/butler" && user
+                  pathname.startsWith("/butler") && user
                     ? "w-full xl:w-[83.1%]"
                     : "w-full"
                 } p-3 bg-lightBackground dark:bg-darkBackground`}

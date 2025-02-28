@@ -54,7 +54,7 @@ const formatResponseText = (text: string): string => {
       /###\s*(.*?)\s*\n/g,
       '<hr class="my-10"/><h3 class="text-lg font-semibold text-white">$1</h3>'
     ) // Subsections
-    .replace(/-\s(.*?)\n/g, '<li class="text-sm mb-2 pl-5">$1</li>') // Bullet points
+    .replace(/-\s(.*?)\n/g, '<li class="text-base mb-2 pl-5">$1</li>') // Bullet points
     .replace(/\*\*(.*?)\*\*/g, '<strong class="mb-10">$1</strong>') // Bold text
     .replace(/\n\n/g, "<br/><br/>") // Paragraph spacing
     .trim();
@@ -236,7 +236,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
                   <AvatarImage src="" />
                   <AvatarFallback className="bg-gray-400 dark:bg-gray-400"></AvatarFallback>
                 </Avatar>
-                <div className="p-4 bg-gray-400 animate-pulse w-2/5 h-20 rounded-xl max-w-xl"></div>
+                <div className="p-4 bg-gray-400 animate-pulse w-full md:w-2/5 h-20 rounded-xl max-w-xl"></div>
               </div>
             ) : (
               messages.map((message, index) => (
@@ -251,7 +251,11 @@ export default function Chat({ prompt }: { prompt?: string }) {
                         message.role === "user" && "flex-row-reverse"
                       } gap-4`}
                     >
-                      <Avatar>
+                      <Avatar
+                        className={`size-6 md:size-11 ${
+                          message.role === "user" && "hidden md:flex"
+                        }`}
+                      >
                         <AvatarImage
                           src={
                             message.role !== "user" && theme === "dark"
@@ -269,7 +273,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
                         <div
                           className={` ${
                             message.role === "user"
-                              ? "p-4 bg-darkBackground text-white dark:bg-white/10 rounded-xl w-fit max-w-xl"
+                              ? "px-4 py-3 bg-darkBackground text-white dark:bg-white/10 rounded-xl w-fit max-w-xl"
                               : ""
                           } `}
                         >
@@ -293,10 +297,12 @@ export default function Chat({ prompt }: { prompt?: string }) {
             {responseLoading && (
               <div className={`flex gap-4`}>
                 <Avatar className="animate-pulse">
-                  <AvatarImage src="" />
+                  <AvatarImage
+                    src={theme === "dark" ? "/LogoDark.png" : "/logoLight.png"}
+                  />
                   <AvatarFallback className="bg-gray-400 dark:bg-gray-400"></AvatarFallback>
                 </Avatar>
-                <div className="p-4 bg-gray-400 animate-pulse w-2/5 h-20 rounded-xl max-w-xl"></div>
+                <div className="p-4 bg-gray-400 animate-pulse w-full md:w-2/5 h-20 rounded-xl max-w-xl"></div>
               </div>
             )}
           </div>

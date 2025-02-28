@@ -480,7 +480,7 @@ export type Database = {
           preferred_language: string | null
           profile_picture: string | null
           role_id: number | null
-          supabase_user_id: string | null
+          supabase_user_id: string
           updated_at: string | null
           user_type: string | null
         }
@@ -491,13 +491,13 @@ export type Database = {
           email: string
           first_name: string
           gender?: string | null
-          id: string
+          id?: string
           last_name: string
           phone_number?: string | null
           preferred_language?: string | null
           profile_picture?: string | null
           role_id?: number | null
-          supabase_user_id?: string | null
+          supabase_user_id?: string
           updated_at?: string | null
           user_type?: string | null
         }
@@ -514,7 +514,7 @@ export type Database = {
           preferred_language?: string | null
           profile_picture?: string | null
           role_id?: number | null
-          supabase_user_id?: string | null
+          supabase_user_id?: string
           updated_at?: string | null
           user_type?: string | null
         }

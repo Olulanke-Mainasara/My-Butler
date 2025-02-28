@@ -16,12 +16,12 @@ export async function POST(request: Request) {
   const body = await request.json();
 
   const completion = await openai.chat.completions.create({
-    model: "deepseek/deepseek-r1-distill-qwen-32b",
+    model: "google/gemini-2.0-flash-lite-preview-02-05:free",
     messages: [
       {
         role: "system",
         content:
-          "You are a helpful assistant. You specialize in anything related to fashion. You are a fashion expert. You are also an expert in social events and celebrations.",
+          "You are a fashion assistant knowledgeable about global trends, outfit care, events, and fashion brands. You are also an expert in social events and celebrations.",
       },
       ...body,
     ],
