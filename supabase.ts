@@ -356,6 +356,44 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: number
+          is_read: boolean | null
+          message: string
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          is_read?: boolean | null
+          message: string
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          is_read?: boolean | null
+          message?: string
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       outfits: {
         Row: {
           created_at: string | null
@@ -491,13 +529,13 @@ export type Database = {
           email: string
           first_name: string
           gender?: string | null
-          id?: string
+          id: string
           last_name: string
           phone_number?: string | null
           preferred_language?: string | null
           profile_picture?: string | null
           role_id?: number | null
-          supabase_user_id?: string
+          supabase_user_id: string
           updated_at?: string | null
           user_type?: string | null
         }

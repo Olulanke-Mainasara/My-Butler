@@ -54,7 +54,7 @@ const Combine = () => {
   }, [api]);
 
   return (
-    <main className="h-screen bg-slate-700">
+    <main className="h-screen dark:bg-slate-700">
       <div className="w-full h-full">
         <Carousel opts={{ align: "start" }} setApi={setApi} className="h-full">
           <CarouselContent className="h-full -ml-0">
@@ -69,7 +69,7 @@ const Combine = () => {
                       }`,
                     })}
                   </div>
-                  <div className="absolute inset-0 z-10 backdrop-brightness-[15%] h-full w-full space-y-4 flex flex-col justify-center items-center px-4 xl:px-0 text-white">
+                  <div className="absolute inset-0 z-10 backdrop-brightness-[20%] dark:backdrop-brightness-[15%] h-full w-full space-y-4 flex flex-col justify-center items-center px-4 xl:px-0 text-white">
                     {link.icon}
                     <p className="text-2xl md:text-4xl font-bold">
                       {link.title}
@@ -78,7 +78,7 @@ const Combine = () => {
                     <Button
                       variant={"secondary"}
                       asChild
-                      className="bg-darkBackground dark:bg-white text-white dark:text-black hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
+                      className="text-base bg-lightBackground text-black hover:opacity-70 dark:hover:bg-lightBackground dark:hover:text-black dark:hover:opacity-100"
                     >
                       <Link href={link.url}>Use this</Link>
                     </Button>

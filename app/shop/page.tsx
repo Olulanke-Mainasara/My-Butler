@@ -81,7 +81,7 @@ const Shop = () => {
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Latest drops</p>
 
-            <Link href={"/news/latest"} className="text-xl">
+            <Link href={"/shop/latest"} className="text-xl">
               {" "}
               See More
             </Link>
@@ -115,7 +115,7 @@ const Shop = () => {
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Recommended</p>
 
-            <Link href={"/news/latest"} className="text-xl">
+            <Link href={"/shop/recommended"} className="text-xl">
               {" "}
               See More
             </Link>

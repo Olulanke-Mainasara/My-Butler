@@ -259,7 +259,7 @@ Sidebar.displayName = "Sidebar";
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
+>(({ className, onClick, children, ...props }, ref) => {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -273,7 +273,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <AlignLeft />
+      {children ? children : <AlignLeft />}
       <span className="sr-only">Toggle Sidebar</span>
     </button>
   );
@@ -514,7 +514,8 @@ const sidebarMenuButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        default:
+          "hover:bg-darkBackground dark:hover:bg-neutral-700 hover:text-white",
         outline:
           "bg-white shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))] dark:bg-neutral-950",
       },

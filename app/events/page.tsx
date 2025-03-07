@@ -32,7 +32,7 @@ const Events = () => {
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Upcoming</p>
 
-            <Link href={"/news/latest"} className="text-xl">
+            <Link href={"/events/latest"} className="text-xl">
               {" "}
               See More
             </Link>
@@ -69,7 +69,7 @@ const Events = () => {
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Recommended</p>
 
-            <Link href={"/news/latest"} className="text-xl">
+            <Link href={"/events/recommended"} className="text-xl">
               {" "}
               See More
             </Link>

@@ -2,12 +2,13 @@
 
 import React from "react";
 
-import { Search, ShoppingCart, SlidersHorizontal } from "lucide-react";
-import { Link } from "next-view-transitions";
+import { Search } from "lucide-react";
 import NormalCarousel from "@/components/Shared/UI/Carousel/NormalCarousel";
 import CarouselWithSubCarousel from "@/components/Shared/UI/Carousel/CarouselWithSubCarousel";
 import CarouselWithSlideTracker from "@/components/Shared/UI/Carousel/CarouselWithSlideTracker";
 import OutfitCard from "@/components/Shared/UI/Cards/OutfitCard";
+import CartDrawerTrigger from "@/components/Shared/UI/Buttons/CartDrawerTrigger";
+import FilterDrawerTrigger from "@/components/Shared/UI/Buttons/FilterDrawerTrigger";
 
 const Outfits = () => {
   return (
@@ -26,17 +27,13 @@ const Outfits = () => {
             />
           </div>
           <div className="flex items-center gap-4">
-            <Link href={"/cart"}>
-              <ShoppingCart />
-            </Link>
-            <button>
-              <SlidersHorizontal />
-            </button>
+            <CartDrawerTrigger />
+            <FilterDrawerTrigger />
           </div>
         </div>
       </div>
 
-      <section className="grid grid-cols-2 gap-2 xl:gap-8 items-center xl:mx-auto xl:w-4/5 pt-14 md:pt-[113px] xl:pt-[120px] px-4 xl:px-0">
+      <section className="grid grid-cols-2 gap-2 xl:gap-8 items-center xl:mx-auto xl:w-4/5 pt-16 md:pt-[113px] xl:pt-[120px] px-4 xl:px-0">
         <div className="border h-44 md:h-60 rounded-3xl"></div>
         <p className="text-4xl md:text-6xl xl:text-8xl p-2">
           Different{" "}

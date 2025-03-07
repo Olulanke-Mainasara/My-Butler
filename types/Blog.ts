@@ -1,10 +1,3 @@
-import { Image } from "./Image";
+import { Database } from "@/supabase";
 
-export type Blog = {
-  _id: string | number;
-  title: string;
-  slug: string;
-  image: Image;
-  description: string;
-  content?: string[];
-};
+export type Blog = Database["public"]["Tables"]["news"]["Row"];

@@ -1,4 +1,4 @@
-import { SidebarNav } from "@/components/Shared/UI/Cards/SidebarNav";
+import { SidebarNav } from "@/components/Shared/UI/Sidebars/SidebarNav";
 import React from "react";
 
 const sidebarNavItems = [
@@ -23,7 +23,7 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="px-4 xl:px-3 pt-16 pb-4 xl:pb-5 h-screen overflow-y-scroll flex flex-col gap-6">
       <div className="space-y-0.5">
-        <h2 className="text-3xl font-bold">Settings</h2>
+        <h2 className="text-4xl">Settings</h2>
         <p className="opacity-70">
           Manage your account settings and set e-mail preferences.
         </p>

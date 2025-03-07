@@ -1,13 +1,3 @@
-import { Image } from "./Image";
+import { Database } from "@/supabase";
 
-type Outfit = {
-  id: string;
-  name: string;
-  image: Image;
-};
-
-export type Brand = {
-  id: string;
-  name: string;
-  lineup: Outfit[];
-};
+export type Brand = Database["public"]["Tables"]["brands"]["Row"];

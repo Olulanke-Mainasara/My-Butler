@@ -1,4 +1,11 @@
-import { BellIcon, Calendar, Home, Settings, Stars } from "lucide-react";
+import {
+  BellIcon,
+  Calendar,
+  Home,
+  Settings,
+  ShoppingCart,
+  Stars,
+} from "lucide-react";
 import {
   GiNewspaper,
   GiPaintBucket,
@@ -81,18 +88,24 @@ export const groupedNavigation = [
     links: [
       {
         id: "4-1",
+        title: "Cart",
+        url: "/cart",
+        icon: <ShoppingCart />,
+      },
+      {
+        id: "4-2",
         title: "Notifications",
         url: "/notifications",
         icon: <BellIcon />,
       },
       {
-        id: "4-2",
+        id: "4-3",
         title: "Calendar",
         url: "/calendar",
         icon: <Calendar />,
       },
       {
-        id: "4-3",
+        id: "4-4",
         title: "Settings",
         url: "/settings",
         icon: <Settings />,

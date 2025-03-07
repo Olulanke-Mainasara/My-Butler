@@ -3,18 +3,20 @@
 import React from "react";
 import { Button } from "@/components/Shad-UI/button";
 import { Link } from "next-view-transitions";
-import EmailLogo from "@/public/emailLogo.png";
-import Image from "next/image";
-import { authContext } from "@/components/Providers/AllProviders";
+import { MailCheck } from "lucide-react";
+import { useAuth } from "@/components/Providers/AllProviders";
 
 const Verification = () => {
-  const user = React.useContext(authContext);
+  const user = useAuth();
 
   return (
     <div className="h-screen flex items-center justify-center">
-      <div className="space-y-5 border p-4 rounded-lg text-white text-center">
-        <div className="flex flex-col items-center">
-          <Image src={EmailLogo} className="w-32 bg-black" alt="Email Logo" />
+      <div className="space-y-4 border border-darkBackground dark:border-lightBackground p-4 rounded-lg dark:text-white text-center">
+        <div className="flex flex-col items-center gap-3">
+          <MailCheck
+            size={70}
+            className="text-brandLight dark:text-brandDark"
+          />
           <h1 className="text-4xl">Email verified</h1>
         </div>
 
@@ -26,14 +28,14 @@ const Verification = () => {
             </span>{" "}
             has been verified.
           </p>
-          <p className="max-w-xl">
+          <p className="max-w-md">
             You can return to your previous tab and close this one or go back to
             the home page
           </p>
         </div>
 
         <Button size={"lg"} asChild>
-          <Link href={"/profile"}>Home</Link>
+          <Link href={"/"}>Home</Link>
         </Button>
       </div>
     </div>

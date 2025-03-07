@@ -69,7 +69,7 @@ const News = () => {
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Recommended</p>
 
-            <Link href={"/news/latest"} className="text-xl">
+            <Link href={"/news/recommended"} className="text-xl">
               {" "}
               See More
             </Link>

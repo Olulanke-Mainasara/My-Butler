@@ -67,7 +67,7 @@ export function AppearanceForm() {
                   <select
                     className={cn(
                       buttonVariants({ variant: "outline" }),
-                      "w-[200px] appearance-none font-normal"
+                      "w-[200px] appearance-none font-normal text-base"
                     )}
                     {...field}
                   >
@@ -78,9 +78,7 @@ export function AppearanceForm() {
                 </FormControl>
                 <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50" />
               </div>
-              <FormDescription>
-                Set the font you want to use in the dashboard.
-              </FormDescription>
+              <FormDescription>Set your preferred font.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -91,9 +89,7 @@ export function AppearanceForm() {
           render={({ field }) => (
             <FormItem className="space-y-1">
               <FormLabel>Theme</FormLabel>
-              <FormDescription>
-                Select the theme for the dashboard.
-              </FormDescription>
+              <FormDescription>Select the theme you prefer.</FormDescription>
               <FormMessage />
               <RadioGroup
                 onValueChange={field.onChange}
@@ -105,7 +101,13 @@ export function AppearanceForm() {
                     <FormControl>
                       <RadioGroupItem value="light" className="sr-only" />
                     </FormControl>
-                    <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
+                    <div
+                      className={`items-center rounded-md border-2 ${
+                        field.value === "light"
+                          ? "border-darkBackground dark:border-white"
+                          : "border-neutral-400 dark:border-neutral-600 hover:border-darkBackground dark:hover:border-white cursor-pointer"
+                      } p-1`}
+                    >
                       <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
                         <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
                           <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
@@ -131,7 +133,13 @@ export function AppearanceForm() {
                     <FormControl>
                       <RadioGroupItem value="dark" className="sr-only" />
                     </FormControl>
-                    <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
+                    <div
+                      className={`items-center rounded-md border-2 ${
+                        field.value === "dark"
+                          ? "border-darkBackground dark:border-white"
+                          : "border-neutral-400 dark:border-neutral-600 hover:border-darkBackground dark:hover:border-white cursor-pointer"
+                      } bg-popover p-1`}
+                    >
                       <div className="space-y-2 rounded-sm bg-slate-950 p-2">
                         <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
                           <div className="h-2 w-[80px] rounded-lg bg-slate-400" />
@@ -157,7 +165,9 @@ export function AppearanceForm() {
           )}
         />
 
-        <Button type="submit">Update preferences</Button>
+        <Button type="submit" className="text-base w-full md:w-fit">
+          Update preferences
+        </Button>
       </form>
     </Form>
   );

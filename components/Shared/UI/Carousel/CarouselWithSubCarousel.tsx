@@ -9,7 +9,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const CarouselWithSubCarousel = ({ items }: { items: object[] }) => {
-  const ismobile = useIsMobile();
+  const isMobile = useIsMobile();
 
   return (
     <div className="flex flex-col xl:flex-row w-full gap-6 md:gap-8 xl:gap-16 xl:pr-7 h-[340px]">
@@ -19,7 +19,7 @@ const CarouselWithSubCarousel = ({ items }: { items: object[] }) => {
             opts={{
               align: "start",
             }}
-            orientation={ismobile ? "horizontal" : "vertical"}
+            orientation={isMobile ? "horizontal" : "vertical"}
             className="w-full"
           >
             <CarouselContent className="-mt-5 h-20 xl:h-[200px] pr-16 xl:pr-0">

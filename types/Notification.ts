@@ -1,7 +1,3 @@
-export type Notification = {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-};
+import { Database } from "@/supabase";
+
+export type Notification = Database["public"]["Tables"]["notifications"]["Row"];

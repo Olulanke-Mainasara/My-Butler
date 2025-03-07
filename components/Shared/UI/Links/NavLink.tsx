@@ -19,7 +19,7 @@ const NavLink = ({
   index: number;
   shouldSplash: boolean;
 }) => {
-  const ismobile = useIsMobile();
+  const isMobile = useIsMobile();
 
   const positionClasses: { [key: string]: string } = {
     "1": "col-start-2 flex justify-center row-span-2",
@@ -58,7 +58,7 @@ const NavLink = ({
           anchorPositionClasses[button.id] || ""
         }`}
       >
-        {React.cloneElement(button.icon, { size: ismobile ? 25 : 29 })}
+        {React.cloneElement(button.icon, { size: isMobile ? 25 : 29 })}
       </Link>
     </motion.div>
   );

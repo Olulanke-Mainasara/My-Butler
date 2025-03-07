@@ -33,6 +33,9 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      height: {
+        screen: "100dvh",
+      },
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-require-imports

@@ -27,7 +27,8 @@ import {
   SelectValue,
 } from "@/components/Shad-UI/select";
 import { Textarea } from "@/components/Shad-UI/textarea";
-import { authContext } from "@/components/Providers/AllProviders";
+import { Plus } from "lucide-react";
+import { useAuth } from "@/components/Providers/AllProviders";
 
 const profileFormSchema = z.object({
   username: z
@@ -65,7 +66,7 @@ const defaultValues: Partial<ProfileFormValues> = {
 };
 
 export function ProfileForm() {
-  const user = React.useContext(authContext);
+  const user = useAuth();
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
@@ -184,13 +185,15 @@ export function ProfileForm() {
             type="button"
             variant="outline"
             size="sm"
-            className="mt-2"
+            className="mt-2 w-full md:w-fit"
             onClick={() => append({ value: "" })}
           >
-            Add URL
+            Add URL <Plus />
           </Button>
         </div>
-        <Button type="submit">Update profile</Button>
+        <Button type="submit" className="text-base w-full md:w-fit">
+          Update profile
+        </Button>
       </form>
     </Form>
   );

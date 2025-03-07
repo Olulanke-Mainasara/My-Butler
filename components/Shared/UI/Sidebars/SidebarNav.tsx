@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/Shad-UI/button";
+import { Link } from "next-view-transitions";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
@@ -38,11 +38,11 @@ export function SidebarNav({
           className={cn(
             buttonVariants({ variant: "ghost" }),
             pathname === initialPath && item.id === 1
-              ? "bg-darkBackground text-white"
+              ? "bg-neutral-800 text-white"
               : pathname === item.href
-              ? "bg-neutral-800"
-              : "hover:bg-darkBackground",
-            "justify-start"
+              ? "bg-neutral-800 text-white"
+              : "",
+            "justify-start text-base hover:bg-neutral-800 hover:text-white"
           )}
         >
           {item.title}

@@ -24,18 +24,17 @@ import { ThemeToggler } from "../Buttons/ThemeToggler";
 import { useSidebar } from "@/components/Shad-UI/sidebar";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase";
-import { useContext } from "react";
-import { authContext } from "@/components/Providers/AllProviders";
 import Image from "next/image";
-import logoDark from "@/public/logoDark.png";
-import logoLight from "@/public/logoLight.png";
-import { groupedNavigation } from "@/static-data/icons";
+import logoDark from "@/public/Logo/logoDark.png";
+import logoLight from "@/public/Logo/logoLight.png";
+import { groupedNavigation } from "@/static-data/navigation";
 import { ChevronUp, LogIn } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/components/Providers/AllProviders";
 
 export function AppSidebar() {
-  const user = useContext(authContext);
+  const user = useAuth();
   const router = useTransitionRouter();
   const { theme } = useTheme();
   const { toggleSidebar } = useSidebar();
@@ -45,7 +44,7 @@ export function AppSidebar() {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.log("Error signing out:", error.message);
+      console.error("Error signing out:", error.message);
     } else {
       toggleSidebar();
       router.push("/");
@@ -70,7 +69,7 @@ export function AppSidebar() {
       <SidebarSeparator className="bg-darkBackground dark:bg-lightBackground w-full ml-0" />
       <SidebarContent className="sm:justify-center gap-0 px-0">
         {groupedNavigation.map((group) => (
-          <SidebarGroup key={group.id} className="pt-0 px-0">
+          <SidebarGroup key={group.id} className="pt-0 px-2">
             <SidebarGroupLabel className="tracking-normal text-base text-neutral-500">
               {group.title}
             </SidebarGroupLabel>
@@ -143,7 +142,7 @@ export function AppSidebar() {
                   toggleSidebar();
                   router.push("/auth/login");
                 }}
-                className="h-10 rounded-full bg-darkBackground text-white dark:bg-white dark:text-black justify-center hover:bg-neutral-700 hover:text-white transition-colors dark:hover:bg-neutral-700 dark:hover:text-white"
+                className="h-10 rounded-full bg-darkBackground text-white dark:bg-white dark:text-black justify-center hover:bg-neutral-800 hover:text-white transition-colors dark:hover:bg-neutral-700 dark:hover:text-white"
               >
                 <Link href="/auth/login">
                   <LogIn />

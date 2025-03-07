@@ -139,7 +139,7 @@ export function SignupForm({
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center gap-1 disabled:opacity-50"
+                className="w-full text-base flex items-center gap-1 disabled:opacity-50"
               >
                 {loading && <Icons.spinner className="w-6 h-6 animate-spin" />}
                 Signup
@@ -147,7 +147,7 @@ export function SignupForm({
               <div className="text-center text-red-600">
                 <p>{error && `${error}, please try again`}</p>
               </div>
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-neutral-200 dark:after:border-neutral-800">
+              {/* <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-neutral-200 dark:after:border-neutral-800">
                 <span className="relative z-10 bg-white px-2 text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
                   Or continue with
                 </span>
@@ -156,7 +156,7 @@ export function SignupForm({
                 <Button
                   variant="outline"
                   disabled={loading}
-                  className="w-full disabled:opacity-50"
+                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
                 >
                   <Icons.apple className="w-6 h-6" />
                   <span className="sr-only">Login with Apple</span>
@@ -164,7 +164,7 @@ export function SignupForm({
                 <Button
                   variant="outline"
                   disabled={loading}
-                  className="w-full disabled:opacity-50"
+                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
                 >
                   <Icons.google className="w-6 h-6" />
                   <span className="sr-only">Login with Google</span>
@@ -172,13 +172,13 @@ export function SignupForm({
                 <Button
                   variant="outline"
                   disabled={loading}
-                  className="w-full disabled:opacity-50"
+                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
                 >
                   <Icons.meta className="w-6 h-6" />
                   <span className="sr-only">Login with Meta</span>
                 </Button>
-              </div>
-              <div className="text-center text-sm">
+              </div> */}
+              <div className="text-center text-sm flex gap-1 justify-center">
                 Already have an account?{""}
                 <Link
                   href="/auth/login"

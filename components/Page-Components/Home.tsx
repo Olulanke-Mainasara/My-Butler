@@ -2,7 +2,7 @@
 
 import Logo from "@/components/Shared/Logo/Logo";
 import NavLink from "@/components/Shared/UI/Links/NavLink";
-import { navigation } from "@/static-data/icons";
+import { navigation } from "@/static-data/navigation";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";

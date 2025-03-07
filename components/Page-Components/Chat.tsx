@@ -10,9 +10,10 @@ import { usePathname } from "next/navigation";
 import { ArrowRight, Square, Stars } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Json } from "@/supabase";
-import { authContext } from "@/components/Providers/AllProviders";
 import { useTheme } from "next-themes";
 import { useTransitionRouter } from "next-view-transitions";
+import { toast } from "sonner";
+import { useAuth } from "../Providers/AllProviders";
 
 type Message = {
   role: string;
@@ -20,28 +21,24 @@ type Message = {
 };
 
 const getAssistantResponse = async (
-  messages: { role: string; content: string }[]
-): Promise<{ role: string; content: string }[] | null> => {
-  try {
-    const response = await fetch(`/api/butler`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(messages),
-      cache: "no-cache",
-    });
+  messages: Message[]
+): Promise<Message[] | null> => {
+  const response = await fetch(`/api/butler`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(messages),
+    cache: "no-cache",
+  });
 
-    if (!response.ok) {
-      return null;
-    }
-
-    const responseData = await response.json();
-    return responseData;
-  } catch (error) {
-    console.error("Error fetching response", error);
+  if (!response.ok) {
+    console.error("Error fetching response");
     return null;
   }
+
+  const responseData = await response.json();
+  return responseData;
 };
 
 const formatResponseText = (text: string): string => {
@@ -69,12 +66,13 @@ export default function Chat({ prompt }: { prompt?: string }) {
   const [responseLoading, setResponseLoading] = React.useState(false);
   const [responseError, setResponseError] = React.useState<string | null>(null);
   const [userCount, setUserCount] = React.useState(0);
-  const user = React.useContext(authContext);
+  const user = useAuth();
   const router = useTransitionRouter();
   const pathname = usePathname();
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
 
+  // Scroll to the bottom of the chat
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -83,39 +81,43 @@ export default function Chat({ prompt }: { prompt?: string }) {
   };
 
   React.useEffect(() => {
-    // If a visitor hasn't logged in yet
+    // Fetch the AI response on page load for a that visitor isn't logged in yet
     if (!user && prompt) {
       const fetchAnonymousMessages = async () => {
         setResponseError(null);
         setResponseLoading(true);
-        try {
-          const anonymousData = await getAssistantResponse([
-            { role: "user", content: prompt },
-          ]);
-          if (!anonymousData) {
-            setResponseError("Error fetching response");
-          } else {
-            setMessages((prevMessages) => [...prevMessages, ...anonymousData]);
-          }
-        } catch {
+
+        const anonymousResponseData = await getAssistantResponse([
+          { role: "user", content: prompt },
+        ]);
+
+        if (!anonymousResponseData) {
           setResponseError("Error fetching response");
-        } finally {
-          setResponseLoading(false);
-          scrollToBottom();
+        } else {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            ...anonymousResponseData,
+          ]);
         }
+
+        setResponseLoading(false);
+        scrollToBottom();
       };
 
       fetchAnonymousMessages();
-
       return;
     }
 
+    // Keep the onStateFunction from re-running the code below, over and over
     if (userCount > 0) {
       return;
     }
 
+    // Fetch the AI response on page load, for a visitor that is logged in
     const fetchChatMessages = async () => {
       setLoading(true);
+
+      // Firstly, fetch the existing messages in the conversion, from the database
       const [chatId] = pathname.split("/").slice(-1);
       const { data, error: fetchError } = await supabase
         .from("chats")
@@ -123,7 +125,8 @@ export default function Chat({ prompt }: { prompt?: string }) {
         .eq("chat_id", chatId)
         .single();
 
-      if (fetchError) {
+      if (fetchError || data.messages.length === 0) {
+        toast("Unable to fetch the conversation");
         router.push("/butler");
         return;
       }
@@ -131,19 +134,16 @@ export default function Chat({ prompt }: { prompt?: string }) {
       const chatMessages = data?.messages.filter(
         (msg: Json): msg is Message => msg !== null
       );
+      setMessages(chatMessages);
+      setLoading(false);
 
-      if (chatMessages.length === 0) {
-        setLoading(false);
-        return;
-      }
-
+      // Fetch an AI response, if the last person to drop a message was the user
       if (chatMessages[chatMessages.length - 1]?.role !== "assistant") {
-        setMessages(chatMessages);
-        setLoading(false);
         setResponseLoading(true);
         const assistantResponse = await getAssistantResponse(chatMessages);
 
         if (assistantResponse) {
+          // If a response was gotten, update the database
           const { error: updateError } = await supabase
             .from("chats")
             .update({
@@ -152,7 +152,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
             .eq("chat_id", chatId);
 
           if (updateError) {
-            console.log("Error updating messages", updateError);
+            console.error("Error updating messages: ", updateError);
           }
 
           setMessages(chatMessages.concat(assistantResponse));
@@ -161,9 +161,6 @@ export default function Chat({ prompt }: { prompt?: string }) {
         }
 
         setResponseLoading(false);
-      } else {
-        setMessages(chatMessages);
-        setLoading(false);
       }
 
       scrollToBottom();
@@ -174,11 +171,11 @@ export default function Chat({ prompt }: { prompt?: string }) {
     fetchChatMessages();
   }, [pathname, prompt, router, user, userCount]);
 
+  // Fetch an AI response, after the user sends a new prompt
   const handleSubmit = async () => {
     if (!input.trim()) return;
 
     scrollToBottom();
-
     setResponseError(null);
     setResponseLoading(true);
     setMessages((prevMessages) => [
@@ -189,45 +186,42 @@ export default function Chat({ prompt }: { prompt?: string }) {
 
     const [chatId] = pathname.split("/").slice(-1);
 
-    try {
-      const assistantResponse = await getAssistantResponse([
-        ...messages,
-        { role: "user", content: input },
-      ]);
+    // Fetch response to the user's prompt
+    const assistantResponse = await getAssistantResponse([
+      ...messages,
+      { role: "user", content: input },
+    ]);
 
-      if (assistantResponse) {
-        const { error: updateError } = await supabase
-          .from("chats")
-          .update({
-            messages: [
-              ...messages,
-              { role: "user", content: input },
-              ...assistantResponse,
-            ],
-          })
-          .eq("chat_id", chatId);
+    if (assistantResponse) {
+      const { error: updateError } = await supabase
+        .from("chats")
+        .update({
+          messages: [
+            ...messages,
+            { role: "user", content: input },
+            ...assistantResponse,
+          ],
+        })
+        .eq("chat_id", chatId);
 
-        if (updateError) {
-          console.log("Error updating messages", updateError);
-        }
-        setMessages((prevMessages) => [...prevMessages, ...assistantResponse]);
-      } else {
-        setResponseError("Error fetching response");
+      if (updateError) {
+        console.error("Error updating messages", updateError);
       }
-    } catch {
+      setMessages((prevMessages) => [...prevMessages, ...assistantResponse]);
+    } else {
       setResponseError("Error fetching response");
-    } finally {
-      setResponseLoading(false);
-      scrollToBottom();
     }
+
+    setResponseLoading(false);
+    scrollToBottom();
   };
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <section className="w-full flex flex-col h-screen pt-16">
-        <div className="overflow-hidden w-full grow px-2 xl:px-8 pb-8">
+        <div className="overflow-hidden w-full grow px-4 xl:px-8">
           <div
-            className="space-y-10 overflow-y-scroll h-full scrollbar-none max-w-screen-md m-auto"
+            className="space-y-8 overflow-y-scroll h-full scrollbar-none max-w-screen-md m-auto scroll-py-96 pb-12"
             ref={chatContainerRef}
           >
             {loading ? (
@@ -242,38 +236,38 @@ export default function Chat({ prompt }: { prompt?: string }) {
               messages.map((message, index) => (
                 <React.Fragment key={index}>
                   <div
-                    className={`flex flex-col ${
-                      message?.role === "user" && "items-end"
-                    } gap-2`}
+                    className={`flex ${
+                      message?.role === "user" && "justify-end"
+                    }`}
                   >
-                    <div
-                      className={`flex ${
-                        message.role === "user" && "flex-row-reverse"
-                      } gap-4`}
-                    >
+                    <div className="flex gap-4">
                       <Avatar
-                        className={`size-6 md:size-11 ${
-                          message.role === "user" && "hidden md:flex"
+                        className={`size-6 ${
+                          message.role === "user"
+                            ? "hidden"
+                            : message.role === "assistant"
+                            ? "xl:hidden"
+                            : ""
                         }`}
                       >
                         <AvatarImage
                           src={
-                            message.role !== "user" && theme === "dark"
-                              ? "/LogoDark.png"
-                              : message.role !== "user" && theme === "light"
-                              ? "/logoLight.png"
-                              : "https://github.com/shadcn.png"
+                            theme === "dark"
+                              ? "/Logo/logoDark.png"
+                              : theme === "light"
+                              ? "/Logo/logoLight.png"
+                              : ""
                           }
                         />
                         <AvatarFallback>
-                          {message.role == "assistant" ? "B" : "CN"}
+                          {message.role === "assistant" && "B"}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
+                      <div className="max-w-xs md:max-w-lg">
                         <div
                           className={` ${
                             message.role === "user"
-                              ? "px-4 py-3 bg-darkBackground text-white dark:bg-white/10 rounded-xl w-fit max-w-xl"
+                              ? "px-4 py-3 bg-darkBackground text-white dark:bg-neutral-800 rounded-3xl"
                               : ""
                           } `}
                         >
@@ -289,16 +283,24 @@ export default function Chat({ prompt }: { prompt?: string }) {
                         </div>
                       </div>
                     </div>
-                    <p>{responseError}</p>
                   </div>
                 </React.Fragment>
               ))
+            )}
+            {responseError && (
+              <p className="text-right text-red-500 -translate-y-5">
+                {responseError}
+              </p>
             )}
             {responseLoading && (
               <div className={`flex gap-4`}>
                 <Avatar className="animate-pulse">
                   <AvatarImage
-                    src={theme === "dark" ? "/LogoDark.png" : "/logoLight.png"}
+                    src={
+                      theme === "dark"
+                        ? "/Logo/logoDark.png"
+                        : "/Logo/logoLight.png"
+                    }
                   />
                   <AvatarFallback className="bg-gray-400 dark:bg-gray-400"></AvatarFallback>
                 </Avatar>
@@ -308,10 +310,10 @@ export default function Chat({ prompt }: { prompt?: string }) {
           </div>
         </div>
 
-        <div className="p-4 xl:p-8 border-t flex items-center justify-center w-full">
-          <div className="border w-full xl:w-3/5 rounded-full flex items-center justify-center overflow-hidden px-4 gap-4 pr-2">
+        <div className="p-4 pt-0 flex items-center justify-center w-full">
+          <div className="border border-black dark:border-white w-full xl:max-w-[800px] rounded-full flex items-center justify-center overflow-hidden px-4 gap-4 pr-2">
             <Stars
-              className={`opacity-70 ${
+              className={`text-brandLight dark:text-brandDark ${
                 loading || (responseLoading && "animate-pulse")
               }`}
             />
@@ -322,7 +324,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               disabled={loading || responseLoading}
-              className="py-4 w-full outline-none bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
+              className="py-4 w-full outline-none bg-transparent disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-neutral-500 dark:placeholder-neutral-400"
             />
             <button
               className="w-10 h-10 p-2 text-black bg-white hover:text-white hover:bg-black border border-black dark:border-white flex items-center justify-center transition-colors rounded-full disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-black"
