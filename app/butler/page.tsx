@@ -8,15 +8,15 @@ import Image from "next/image";
 import logoLight from "@/public/Logo/logoLight.png";
 import logoDark from "@/public/Logo/logoDark.png";
 import { useTheme } from "next-themes";
-import Chat from "@/components/Page-Components/Chat";
-import { useAuth } from "@/components/Providers/AllProviders";
+import Chat from "./chat-component";
+import { useUserProfile } from "@/components/Providers/AllProviders";
 
 const Butler = () => {
   const [prompt, setPrompt] = React.useState<string>("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [anonymous, setAnonymous] = React.useState(false);
-  const user = useAuth();
+  const userProfile = useUserProfile();
   const router = useTransitionRouter();
   const { theme } = useTheme();
 
@@ -28,7 +28,7 @@ const Butler = () => {
     setError(null);
     setLoading(true);
 
-    if (!user) {
+    if (!userProfile) {
       setLoading(false);
       setAnonymous(true);
       return;
@@ -40,7 +40,7 @@ const Butler = () => {
       const { data, error } = await supabase
         .from("chats")
         .insert({
-          user_id: user.id,
+          user_id: userProfile.id,
           messages: [
             {
               role: role,

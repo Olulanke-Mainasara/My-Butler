@@ -3,8 +3,8 @@
 import React from "react";
 import { Search } from "lucide-react";
 import { Link } from "next-view-transitions";
-import CarouselWithSlideTracker from "@/components/Shared/UI/Carousel/CarouselWithSlideTracker";
-import NewsCard from "@/components/Shared/UI/Cards/NewsCard";
+import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
+import NewsCard from "@/components/Custom-UI/Cards/NewsCard";
 
 const News = () => {
   return (

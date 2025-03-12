@@ -8,7 +8,12 @@ import { Input } from "@/components/Shad-UI/input";
 import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
-import { Icons } from "@/components/Shared/UI/icons";
+import { Icons } from "@/components/Custom-UI/icons";
+import { supabase } from "@/lib/supabase";
+import { toast } from "@/hooks/use-toast";
+import getURL from "@/lib/getURL";
+import { useAuth } from "@/components/Providers/AllProviders";
+import { ChangePasswordForm } from "./change-password-form";
 
 export function ResetPasswordForm({
   className,
@@ -17,14 +22,29 @@ export function ResetPasswordForm({
   const [email, setEmail] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
+  const userSession = useAuth();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
     setLoading(true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${getURL()}/auth/forgot-password`,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      toast({
+        title: "Password reset email sent",
+      });
+    }
+
+    setLoading(false);
   };
 
-  return (
+  return !userSession ? (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
@@ -62,37 +82,6 @@ export function ResetPasswordForm({
               <div className="text-center text-red-600">
                 <p>{error && `${error}, please try again`}</p>
               </div>
-              {/* <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-neutral-200 dark:after:border-neutral-800">
-                <span className="relative z-10 bg-white px-2 text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
-                  Or continue with
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <Button
-                  variant="outline"
-                  disabled={loading}
-                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
-                >
-                  <Icons.apple className="w-6 h-6" />
-                  <span className="sr-only">Login with Apple</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={loading}
-                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
-                >
-                  <Icons.google className="w-6 h-6" />
-                  <span className="sr-only">Login with Google</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={loading}
-                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
-                >
-                  <Icons.meta className="w-6 h-6" />
-                  <span className="sr-only">Login with Meta</span>
-                </Button>
-              </div> */}
               <div className="text-center text-sm flex gap-1 justify-center">
                 Remember your password?{""}
                 <Link
@@ -120,5 +109,7 @@ export function ResetPasswordForm({
         and <a href="#">Privacy Policy</a>.
       </div>
     </div>
+  ) : (
+    <ChangePasswordForm />
   );
 }

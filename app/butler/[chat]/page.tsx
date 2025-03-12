@@ -1,6 +1,6 @@
 "use client";
 
-import Chat from "@/components/Page-Components/Chat";
+import Chat from "../chat-component";
 
 const Conversation = () => {
   return <Chat />;

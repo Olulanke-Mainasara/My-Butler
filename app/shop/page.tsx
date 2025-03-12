@@ -8,10 +8,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
-import { Search, Shirt, ShoppingCart, SlidersHorizontal } from "lucide-react";
+import { Search, Shirt } from "lucide-react";
 import { Link } from "next-view-transitions";
-import CarouselWithSlideTracker from "@/components/Shared/UI/Carousel/CarouselWithSlideTracker";
-import ShopCard from "@/components/Shared/UI/Cards/ShopCard";
+import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
+import ShopCard from "@/components/Custom-UI/Cards/ShopCard";
+import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
+import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
 
 const Shop = () => {
   return (
@@ -30,12 +32,8 @@ const Shop = () => {
             />
           </div>
           <div className="flex items-center gap-4">
-            <Link href={"/cart"}>
-              <ShoppingCart />
-            </Link>
-            <button>
-              <SlidersHorizontal />
-            </button>
+            <CartDrawerTrigger />
+            <FilterDrawerTrigger />
           </div>
         </div>
       </div>

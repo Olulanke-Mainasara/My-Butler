@@ -61,7 +61,7 @@ export function AppearanceForm() {
           name="font"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Font</FormLabel>
+              <FormLabel>Language</FormLabel>
               <div className="relative w-max">
                 <FormControl>
                   <select
@@ -71,14 +71,14 @@ export function AppearanceForm() {
                     )}
                     {...field}
                   >
-                    <option value="inter">Inter</option>
-                    <option value="manrope">Manrope</option>
-                    <option value="system">System</option>
+                    <option value="inter">English</option>
+                    <option value="manrope">French</option>
+                    <option value="system">Spanish</option>
                   </select>
                 </FormControl>
                 <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50" />
               </div>
-              <FormDescription>Set your preferred font.</FormDescription>
+              <FormDescription>Set your preferred language.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

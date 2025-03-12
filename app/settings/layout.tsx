@@ -1,4 +1,4 @@
-import { SidebarNav } from "@/components/Shared/UI/Sidebars/SidebarNav";
+import { SidebarNav } from "@/components/Custom-UI/Sidebars/SidebarNav";
 import React from "react";
 
 const sidebarNavItems = [
@@ -37,7 +37,8 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
             className="overflow-scroll"
           />
         </aside>
-        <div className="h-full overflow-y-scroll lg:max-w-2xl">{children}</div>
+        <div className="h-full overflow-y-scroll w-full">{children}</div>
+        <aside className="lg:w-10/12 border hidden xl:block rounded-lg"></aside>
       </div>
     </div>
   );

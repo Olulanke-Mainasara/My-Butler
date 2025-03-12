@@ -31,11 +31,13 @@ import { groupedNavigation } from "@/static-data/navigation";
 import { ChevronUp, LogIn } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/components/Providers/AllProviders";
+import { useUserProfile } from "@/components/Providers/AllProviders";
+import { usePathname } from "next/navigation";
 
 export function AppSidebar() {
-  const user = useAuth();
+  const userProfile = useUserProfile();
   const router = useTransitionRouter();
+  const pathname = usePathname();
   const { theme } = useTheme();
   const { toggleSidebar } = useSidebar();
   const isMobile = useIsMobile();
@@ -47,7 +49,9 @@ export function AppSidebar() {
       console.error("Error signing out:", error.message);
     } else {
       toggleSidebar();
-      router.push("/");
+      if (pathname !== "/") {
+        router.push("/");
+      }
     }
   };
 
@@ -106,18 +110,24 @@ export function AppSidebar() {
       <SidebarFooter className="pb-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            {user ? (
+            {userProfile ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton className="h-10">
+                  <SidebarMenuButton className="h-12">
                     <Image
-                      src={theme === "dark" ? logoDark : logoLight}
-                      className="w-10 h-10"
+                      src={
+                        userProfile.profile_picture
+                          ? userProfile.profile_picture
+                          : theme === "dark"
+                          ? logoDark
+                          : logoLight
+                      }
+                      className="w-8 h-8 rounded-full"
                       alt="logo"
+                      width={40}
+                      height={40}
                     />{" "}
-                    {user?.user_metadata.first_name +
-                      " " +
-                      user?.user_metadata.last_name}
+                    {userProfile.display_name}
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
@@ -125,8 +135,13 @@ export function AppSidebar() {
                   side="top"
                   className="w-[--radix-popper-anchor-width]"
                 >
-                  <DropdownMenuItem onClick={() => router.push("/settings")}>
-                    <span>Account</span>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      toggleSidebar();
+                      router.push("/profile");
+                    }}
+                  >
+                    <span>Profile</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignout}>
                     <span>Sign out</span>

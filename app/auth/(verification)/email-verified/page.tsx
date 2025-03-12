@@ -7,10 +7,10 @@ import { MailCheck } from "lucide-react";
 import { useAuth } from "@/components/Providers/AllProviders";
 
 const Verification = () => {
-  const user = useAuth();
+  const userSession = useAuth();
 
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div className="h-screen flex items-center justify-center px-4">
       <div className="space-y-4 border border-darkBackground dark:border-lightBackground p-4 rounded-lg dark:text-white text-center">
         <div className="flex flex-col items-center gap-3">
           <MailCheck
@@ -24,7 +24,7 @@ const Verification = () => {
           <p>
             Your email{" "}
             <span className="font-bold text-brandLight dark:text-brandDark">
-              {user?.email}
+              {userSession?.email}
             </span>{" "}
             has been verified.
           </p>

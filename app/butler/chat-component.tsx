@@ -13,10 +13,10 @@ import { Json } from "@/supabase";
 import { useTheme } from "next-themes";
 import { useTransitionRouter } from "next-view-transitions";
 import { toast } from "sonner";
-import { useAuth } from "../Providers/AllProviders";
+import { useUserProfile } from "@/components/Providers/AllProviders";
 
 type Message = {
-  role: string;
+  role: "user" | "assistant";
   content: string;
 };
 
@@ -66,7 +66,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
   const [responseLoading, setResponseLoading] = React.useState(false);
   const [responseError, setResponseError] = React.useState<string | null>(null);
   const [userCount, setUserCount] = React.useState(0);
-  const user = useAuth();
+  const userProfile = useUserProfile();
   const router = useTransitionRouter();
   const pathname = usePathname();
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
@@ -82,7 +82,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
 
   React.useEffect(() => {
     // Fetch the AI response on page load for a that visitor isn't logged in yet
-    if (!user && prompt) {
+    if (!userProfile && prompt) {
       const fetchAnonymousMessages = async () => {
         setResponseError(null);
         setResponseLoading(true);
@@ -169,7 +169,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
     setUserCount((prevCount) => prevCount + 1);
 
     fetchChatMessages();
-  }, [pathname, prompt, router, user, userCount]);
+  }, [pathname, prompt, router, userProfile, userCount]);
 
   // Fetch an AI response, after the user sends a new prompt
   const handleSubmit = async () => {
@@ -225,11 +225,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
             ref={chatContainerRef}
           >
             {loading ? (
-              <div className={`flex flex-row-reverse gap-4`}>
-                <Avatar className="animate-pulse">
-                  <AvatarImage src="" />
-                  <AvatarFallback className="bg-gray-400 dark:bg-gray-400"></AvatarFallback>
-                </Avatar>
+              <div className={`flex justify-end `}>
                 <div className="p-4 bg-gray-400 animate-pulse w-full md:w-2/5 h-20 rounded-xl max-w-xl"></div>
               </div>
             ) : (
@@ -242,12 +238,8 @@ export default function Chat({ prompt }: { prompt?: string }) {
                   >
                     <div className="flex gap-4">
                       <Avatar
-                        className={`size-6 ${
-                          message.role === "user"
-                            ? "hidden"
-                            : message.role === "assistant"
-                            ? "xl:hidden"
-                            : ""
+                        className={`size-6 md:size-8 ${
+                          message.role === "user" ? "hidden" : ""
                         }`}
                       >
                         <AvatarImage
@@ -259,15 +251,19 @@ export default function Chat({ prompt }: { prompt?: string }) {
                               : ""
                           }
                         />
-                        <AvatarFallback>
-                          {message.role === "assistant" && "B"}
+                        <AvatarFallback className="bg-transparent text-black dark:text-white">
+                          B
                         </AvatarFallback>
                       </Avatar>
-                      <div className="max-w-xs md:max-w-lg">
+                      <div
+                        className={`${
+                          message.role === "user" ? "max-w-xs md:max-w-lg" : ""
+                        }`}
+                      >
                         <div
                           className={` ${
                             message.role === "user"
-                              ? "px-4 py-3 bg-darkBackground text-white dark:bg-neutral-800 rounded-3xl"
+                              ? "px-4 py-3 bg-darkBackground text-white dark:bg-neutral-800 rounded-3xl rounded-tr-sm"
                               : ""
                           } `}
                         >
@@ -293,8 +289,8 @@ export default function Chat({ prompt }: { prompt?: string }) {
               </p>
             )}
             {responseLoading && (
-              <div className={`flex gap-4`}>
-                <Avatar className="animate-pulse">
+              <div className={`flex gap-4 items-center`}>
+                <Avatar>
                   <AvatarImage
                     src={
                       theme === "dark"
@@ -302,15 +298,19 @@ export default function Chat({ prompt }: { prompt?: string }) {
                         : "/Logo/logoLight.png"
                     }
                   />
-                  <AvatarFallback className="bg-gray-400 dark:bg-gray-400"></AvatarFallback>
+                  <AvatarFallback className="bg-gray-400 dark:bg-gray-400 text-black">
+                    B
+                  </AvatarFallback>
                 </Avatar>
-                <div className="p-4 bg-gray-400 animate-pulse w-full md:w-2/5 h-20 rounded-xl max-w-xl"></div>
+                <p className="text-black dark:text-white animate-pulse">
+                  Just a moment...
+                </p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="p-4 pt-0 flex items-center justify-center w-full">
+        <div className="p-4 pt-0 flex flex-col gap-4 items-center justify-center w-full">
           <div className="border border-black dark:border-white w-full xl:max-w-[800px] rounded-full flex items-center justify-center overflow-hidden px-4 gap-4 pr-2">
             <Stars
               className={`text-brandLight dark:text-brandDark ${
@@ -338,6 +338,9 @@ export default function Chat({ prompt }: { prompt?: string }) {
               )}
             </button>
           </div>
+          <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
+            Butler could be wrong, please validate its responses.
+          </p>
         </div>
       </section>
     </div>

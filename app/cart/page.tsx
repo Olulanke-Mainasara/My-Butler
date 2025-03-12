@@ -1,8 +1,8 @@
 "use client";
 
-import { CartPlaceholder } from "@/components/Shared/UI/Placeholders/CartPlaceholder";
+import { CartPlaceholder } from "@/components/Custom-UI/Placeholders/CartPlaceholder";
 import { useCart } from "@/components/Providers/AllProviders";
-import CartItemCard from "@/components/Shared/UI/Cards/CartItemCard";
+import CartItemCard from "@/components/Custom-UI/Cards/CartItemCard";
 
 const Cart = () => {
   const cart = useCart();
@@ -14,7 +14,7 @@ const Cart = () => {
       <hr className="mx-4 xl:mx-3 mt-8" />
 
       <section className="px-4 xl:px-3 h-full">
-        {!cart ? (
+        {!cart || cart.length === 0 ? (
           <CartPlaceholder />
         ) : (
           cart.map((item, index) => <CartItemCard key={index} />)

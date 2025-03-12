@@ -7,17 +7,17 @@ import { Card, CardContent } from "@/components/Shad-UI/card";
 import { Input } from "@/components/Shad-UI/input";
 import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
-import { Link, useTransitionRouter } from "next-view-transitions";
+import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase";
-import { Icons, ThirdPartySignIn } from "@/components/Custom-UI/icons";
-import getURL from "@/lib/getURL";
+import { toast } from "@/hooks/use-toast";
+import { useTransitionRouter } from "next-view-transitions";
 
-export function LoginForm({
+export function ChangePasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const router = useTransitionRouter();
@@ -26,29 +26,27 @@ export function LoginForm({
     event.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      password: password,
     });
+
     if (error) {
       setError(error.message);
-      setLoading(false);
     } else {
+      toast({
+        title: "Password reset successfully",
+      });
       router.push("/");
     }
-  };
 
-  const handleGoogleLogin = async () => {
-    setError("");
-    setLoading(true);
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: getURL() },
-    });
-    if (error) {
-      setError(error.message);
-    }
+    setLoading(false);
   };
 
   return (
@@ -58,39 +56,30 @@ export function LoginForm({
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-balance text-neutral-500 dark:text-neutral-400">
-                  Login to your My Butler account
+                <h1 className="text-2xl font-bold">Alright, good as new</h1>
+                <p className="text-neutral-500 dark:text-neutral-400">
+                  Enter your new password and confirm it
                 </p>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="password">New password</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="m@example.com"
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
                   className="disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
+                <Label htmlFor="confirm-password">Confirm new password</Label>
                 <Input
-                  id="password"
+                  id="confirm-password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   disabled={loading}
                   className="disabled:cursor-not-allowed disabled:opacity-50"
@@ -102,28 +91,10 @@ export function LoginForm({
                 className="w-full text-base flex items-center gap-1 disabled:opacity-50"
               >
                 {loading && <Icons.spinner className="w-6 h-6 animate-spin" />}
-                Login
+                Reset
               </Button>
               <div className="text-center text-red-600">
-                <p>{error && `${error}, please try again`}</p>
-              </div>
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-neutral-200 dark:after:border-neutral-800">
-                <span className="relative z-10 bg-white px-2 text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
-                  Or continue with
-                </span>
-              </div>
-              <ThirdPartySignIn
-                loading={loading}
-                handleGoogleLogin={handleGoogleLogin}
-              />
-              <div className="text-center text-sm flex gap-1 justify-center">
-                Don&apos;t have an account?{""}
-                <Link
-                  href="/auth/signup"
-                  className="underline underline-offset-4"
-                >
-                  Sign up
-                </Link>
+                <p>{error && error}</p>
               </div>
             </div>
           </form>

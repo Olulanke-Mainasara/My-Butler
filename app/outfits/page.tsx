@@ -3,12 +3,12 @@
 import React from "react";
 
 import { Search } from "lucide-react";
-import NormalCarousel from "@/components/Shared/UI/Carousel/NormalCarousel";
-import CarouselWithSubCarousel from "@/components/Shared/UI/Carousel/CarouselWithSubCarousel";
-import CarouselWithSlideTracker from "@/components/Shared/UI/Carousel/CarouselWithSlideTracker";
-import OutfitCard from "@/components/Shared/UI/Cards/OutfitCard";
-import CartDrawerTrigger from "@/components/Shared/UI/Buttons/CartDrawerTrigger";
-import FilterDrawerTrigger from "@/components/Shared/UI/Buttons/FilterDrawerTrigger";
+import NormalCarousel from "@/components/Custom-UI/Carousel/NormalCarousel";
+import CarouselWithSubCarousel from "@/components/Custom-UI/Carousel/CarouselWithSubCarousel";
+import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
+import OutfitCard from "@/components/Custom-UI/Cards/OutfitCard";
+import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
+import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
 
 const Outfits = () => {
   return (

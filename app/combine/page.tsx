@@ -12,7 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
-import SlideTracker from "@/components/Shared/UI/Carousel/SlideTracker";
+import SlideTracker from "@/components/Custom-UI/Carousel/SlideTracker";
 
 const Combine = () => {
   const links = [

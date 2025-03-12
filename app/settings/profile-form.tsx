@@ -1,12 +1,10 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/Shad-UI/button";
 import {
@@ -18,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/Shad-UI/form";
-import { Input } from "@/components/Shad-UI/input";
 import {
   Select,
   SelectContent,
@@ -26,9 +23,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/Shad-UI/select";
+
+import { Input } from "@/components/Shad-UI/input";
 import { Textarea } from "@/components/Shad-UI/textarea";
-import { Plus } from "lucide-react";
-import { useAuth } from "@/components/Providers/AllProviders";
+import { useUserProfile } from "@/components/Providers/AllProviders";
+import { industries } from "@/static-data/filter";
+import { supabase } from "@/lib/supabase";
 
 const profileFormSchema = z.object({
   username: z
@@ -38,60 +38,76 @@ const profileFormSchema = z.object({
     })
     .max(30, {
       message: "Username must not be longer than 30 characters.",
-    }),
-  email: z
-    .string({
-      required_error: "Please select an email to display.",
     })
-    .email(),
-  bio: z.string().max(160).min(4),
-  urls: z
-    .array(
-      z.object({
-        value: z.string().url({ message: "Please enter a valid URL." }),
-      })
-    )
     .optional(),
+  email: z.string().email().optional(),
+  bio: z
+    .string()
+    .max(160)
+    .min(4, { message: "Bio must be at least 4 characters." })
+    .optional(),
+  url: z.string().url({ message: "Please enter a valid URL." }).optional(),
+  location: z.string().min(2, {
+    message: "Location must be at least 2 characters.",
+  }),
+  category: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-  bio: "I own a computer.",
-  urls: [
-    { value: "https://shadcn.com" },
-    { value: "http://twitter.com/shadcn" },
-  ],
-};
-
 export function ProfileForm() {
-  const user = useAuth();
+  const [loading, setLoading] = React.useState(false);
+  const userProfile = useUserProfile();
+
+  const defaultValues: Partial<ProfileFormValues> = {
+    username: userProfile?.display_name,
+    email: userProfile?.email,
+    bio: userProfile?.bio || "N/A",
+    url: userProfile?.url || "N/A",
+    location: userProfile?.location || "N/A",
+    category: userProfile?.category || "N/A",
+  };
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
     mode: "onChange",
   });
 
-  const { fields, append } = useFieldArray({
-    name: "urls",
-    control: form.control,
-  });
+  async function onSubmit(data: ProfileFormValues) {
+    setLoading(true);
 
-  function onSubmit(data: ProfileFormValues) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+    const { error } = await supabase.rpc("update_user_details", {
+      _bio: data.bio ?? "",
+      _category: data.category ?? "",
+      _display_name: data.username ?? "",
+      _email: data.email ?? "",
+      _location: data.location ?? "",
+      _supabase_user_id: userProfile?.supabase_user_id ?? "",
+      _url: data.url ?? "",
     });
+
+    if (error) {
+      toast({
+        title: "Error updating profile",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Profile updated successfully",
+        description: "Your profile has been successfully updated.",
+      });
+    }
+
+    setLoading(false);
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 max-w-2xl"
+      >
         <FormField
           control={form.control}
           name="username"
@@ -100,13 +116,14 @@ export function ProfileForm() {
               <FormLabel>Username</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={user?.user_metadata.first_name}
+                  placeholder={userProfile?.display_name}
                   {...field}
+                  disabled={loading}
                 />
               </FormControl>
               <FormDescription>
                 This is your public display name. It can be your real name or a
-                pseudonym. You can only change this once every 30 days.
+                pseudonym.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -118,22 +135,14 @@ export function ProfileForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {user?.email && (
-                    <SelectItem value={user.email}>{user.email}</SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                You can manage verified email addresses in your{" "}
-                <Link href="/examples/forms">email settings</Link>.
-              </FormDescription>
+              <FormControl>
+                <Input
+                  placeholder={userProfile?.email}
+                  {...field}
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormDescription>This is your contact email.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -146,51 +155,113 @@ export function ProfileForm() {
               <FormLabel>Bio</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us a little bit about yourself"
+                  placeholder={
+                    !userProfile?.bio || userProfile.bio === "N/A"
+                      ? "Tell us a little about yourself"
+                      : userProfile.bio
+                  }
                   className="resize-none"
                   {...field}
+                  value={field.value === "N/A" ? "" : field.value}
+                  disabled={loading}
                 />
               </FormControl>
               <FormDescription>
-                You can <span>@mention</span> other users and organizations to
-                link to them.
+                What do you want people to know about you? You have 160
+                characters.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div>
-          {fields.map((field, index) => (
-            <FormField
-              control={form.control}
-              key={field.id}
-              name={`urls.${index}.value`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={cn(index !== 0 && "sr-only")}>
-                    URLs
-                  </FormLabel>
-                  <FormDescription className={cn(index !== 0 && "sr-only")}>
-                    Add links to your website, blog, or social media profiles.
-                  </FormDescription>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-2 w-full md:w-fit"
-            onClick={() => append({ value: "" })}
-          >
-            Add URL <Plus />
-          </Button>
-        </div>
+        <FormField
+          control={form.control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={
+                    !userProfile?.url || userProfile.url === "N/A"
+                      ? "Your website URL"
+                      : userProfile.url
+                  }
+                  {...field}
+                  value={field.value === "N/A" ? "" : field.value}
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormDescription>
+                Add a link to your website, blog, or social media profile.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={
+                    !userProfile?.location || userProfile.location === "N/A"
+                      ? "Where are you located?"
+                      : userProfile.location
+                  }
+                  {...field}
+                  value={field.value === "N/A" ? "" : field.value}
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormDescription>
+                Could be your personal location or brand location.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value === "N/A" ? "" : field.value}
+                disabled={loading}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={
+                        !userProfile?.category || userProfile.category === "N/A"
+                          ? "Select a category"
+                          : userProfile.category
+                      }
+                    />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {industries.map((category, index) => (
+                    <SelectItem key={index} value={category.value}>
+                      {category.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Select what category you/your brand belong to
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit" className="text-base w-full md:w-fit">
           Update profile
         </Button>

@@ -11,7 +11,7 @@ export function CartPlaceholder() {
       <Image
         src={theme === "dark" ? emptyCartDark : emptyCartLight}
         alt="Empty cart"
-        className="size-64 md:size-96"
+        className="size-64 md:size-80"
       />
       <h2 className="text-4xl md:text-5xl font-semibold text-black dark:text-white">
         No cart items

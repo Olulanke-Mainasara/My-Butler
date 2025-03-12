@@ -1,7 +1,7 @@
 "use client";
 
-import { NotificationsPlaceholder } from "@/components/Shared/UI/Placeholders/NotificationsPlaceholder";
-import NotificationCard from "@/components/Shared/UI/Cards/NotificationCard";
+import { NotificationsPlaceholder } from "@/components/Custom-UI/Placeholders/NotificationsPlaceholder";
+import NotificationCard from "@/components/Custom-UI/Cards/NotificationCard";
 import { useNotifications } from "@/components/Providers/AllProviders";
 const Notifications = () => {
   const notifications = useNotifications();
@@ -13,7 +13,7 @@ const Notifications = () => {
       <hr className="mx-4 xl:mx-3 mt-8" />
 
       <section className="px-4 xl:px-3 h-full">
-        {!notifications ? (
+        {!notifications || notifications.length === 0 ? (
           <NotificationsPlaceholder />
         ) : (
           notifications.map((notification, index) => (

@@ -1,9 +1,13 @@
+"use client";
+
 import { ProfileForm } from "@/app/settings/profile-form";
+import { useUserProfile } from "@/components/Providers/AllProviders";
 import React from "react";
 
-const page = () => {
+const Settings = () => {
+  const userProfile = useUserProfile();
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col gap-6">
       <div>
         <h3 className="text-2xl font-medium">Profile</h3>
         <p className="opacity-70">
@@ -11,9 +15,15 @@ const page = () => {
         </p>
       </div>
       <hr />
-      <ProfileForm />
+      {userProfile ? (
+        <ProfileForm />
+      ) : (
+        <div className="h-full flex items-center justify-center text-2xl grow">
+          Fetching user info...
+        </div>
+      )}
     </div>
   );
 };
 
-export default page;
+export default Settings;

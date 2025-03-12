@@ -9,7 +9,7 @@ import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase";
-import { Icons } from "@/components/Shared/UI/icons";
+import { Icons, ThirdPartySignIn } from "@/components/Custom-UI/icons";
 import getURL from "@/lib/getURL";
 
 export function SignupForm({
@@ -28,15 +28,15 @@ export function SignupForm({
     event.preventDefault();
     setError("");
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${getURL()}/auth/email-verified`,
         data: {
-          first_name: fname,
-          last_name: lname,
-          displayName: fname,
+          full_name: fname + " " + lname,
+          display_name: fname + " " + lname,
+          picture: "",
         },
       },
     });
@@ -45,29 +45,20 @@ export function SignupForm({
       setError(error.message);
       setLoading(false);
     } else {
-      const supabaseUserId = data.user?.id;
+      router.push("/auth/verify-email");
+    }
+  };
 
-      if (!supabaseUserId) {
-        setError("Failed to retrieve user ID");
-        setLoading(false);
-        return;
-      }
-      const { error: insertError } = await supabase.from("users").insert([
-        {
-          id: supabaseUserId,
-          first_name: fname,
-          last_name: lname,
-          email: email,
-          supabase_user_id: supabaseUserId,
-        },
-      ]);
+  const handleGoogleLogin = async () => {
+    setError("");
+    setLoading(true);
 
-      if (insertError) {
-        setError(insertError.message);
-        setLoading(false);
-      } else {
-        router.push("/auth/verify-email");
-      }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: getURL() },
+    });
+    if (error) {
+      setError(error.message);
     }
   };
 
@@ -147,37 +138,10 @@ export function SignupForm({
               <div className="text-center text-red-600">
                 <p>{error && `${error}, please try again`}</p>
               </div>
-              {/* <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-neutral-200 dark:after:border-neutral-800">
-                <span className="relative z-10 bg-white px-2 text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
-                  Or continue with
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <Button
-                  variant="outline"
-                  disabled={loading}
-                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
-                >
-                  <Icons.apple className="w-6 h-6" />
-                  <span className="sr-only">Login with Apple</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={loading}
-                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
-                >
-                  <Icons.google className="w-6 h-6" />
-                  <span className="sr-only">Login with Google</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={loading}
-                  className="w-full disabled:opacity-50 hover:bg-darkBackground hover:text-white dark:hover:bg-lightBackground dark:hover:text-black"
-                >
-                  <Icons.meta className="w-6 h-6" />
-                  <span className="sr-only">Login with Meta</span>
-                </Button>
-              </div> */}
+              <ThirdPartySignIn
+                loading={loading}
+                handleGoogleLogin={handleGoogleLogin}
+              />
               <div className="text-center text-sm flex gap-1 justify-center">
                 Already have an account?{""}
                 <Link
