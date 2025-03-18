@@ -126,7 +126,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
         .single();
 
       if (fetchError || data.messages.length === 0) {
-        toast("Unable to fetch the conversation");
+        toast.error("Unable to fetch the conversation");
         router.push("/butler");
         return;
       }
@@ -269,12 +269,13 @@ export default function Chat({ prompt }: { prompt?: string }) {
                         >
                           {message.role === "assistant" ? (
                             <div
+                              className="text-lg"
                               dangerouslySetInnerHTML={{
                                 __html: formatResponseText(message.content),
                               }}
                             />
                           ) : (
-                            <p>{message.content}</p>
+                            <p className="text-lg">{message.content}</p>
                           )}
                         </div>
                       </div>
@@ -302,7 +303,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
                     B
                   </AvatarFallback>
                 </Avatar>
-                <p className="text-black dark:text-white animate-pulse">
+                <p className="text-black dark:text-white animate-pulse text-lg">
                   Just a moment...
                 </p>
               </div>

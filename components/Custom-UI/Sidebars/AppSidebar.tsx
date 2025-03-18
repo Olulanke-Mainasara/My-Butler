@@ -28,7 +28,7 @@ import Image from "next/image";
 import logoDark from "@/public/Logo/logoDark.png";
 import logoLight from "@/public/Logo/logoLight.png";
 import { groupedNavigation } from "@/static-data/navigation";
-import { ChevronUp, LogIn } from "lucide-react";
+import { ChevronUp, LogIn, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserProfile } from "@/components/Providers/AllProviders";
@@ -49,9 +49,7 @@ export function AppSidebar() {
       console.error("Error signing out:", error.message);
     } else {
       toggleSidebar();
-      if (pathname !== "/") {
-        router.push("/");
-      }
+      window.location.reload();
     }
   };
 
@@ -83,6 +81,7 @@ export function AppSidebar() {
                   <SidebarMenuItem key={link.title}>
                     <SidebarMenuButton
                       asChild
+                      isActive={pathname === link.url}
                       size={isMobile ? "default" : "sm"}
                       onClick={() => {
                         toggleSidebar();
@@ -114,19 +113,19 @@ export function AppSidebar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton className="h-12">
-                    <Image
-                      src={
-                        userProfile.profile_picture
-                          ? userProfile.profile_picture
-                          : theme === "dark"
-                          ? logoDark
-                          : logoLight
-                      }
-                      className="w-8 h-8 rounded-full"
-                      alt="logo"
-                      width={40}
-                      height={40}
-                    />{" "}
+                    {userProfile.profile_picture ? (
+                      <Image
+                        src={userProfile.profile_picture}
+                        className="w-8 h-8 rounded-full"
+                        alt="logo"
+                        width={40}
+                        height={40}
+                      />
+                    ) : (
+                      <span className="p-1 rounded-full bg-darkBackground text-white dark:bg-lightBackground dark:text-black">
+                        <User />
+                      </span>
+                    )}{" "}
                     {userProfile.display_name}
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
@@ -157,10 +156,10 @@ export function AppSidebar() {
                   toggleSidebar();
                   router.push("/auth/login");
                 }}
-                className="h-10 rounded-full bg-darkBackground text-white dark:bg-white dark:text-black justify-center hover:bg-neutral-800 hover:text-white transition-colors dark:hover:bg-neutral-700 dark:hover:text-white"
+                className="h-10 rounded-full bg-darkBackground text-white dark:bg-white dark:text-black justify-center hover:bg-neutral-800 hover:text-white transition-colors dark:hover:bg-neutral-700 dark:hover:text-white gap-1"
               >
                 <Link href="/auth/login">
-                  <LogIn />
+                  <LogIn size={20} />
                   <span>Login</span>
                 </Link>
               </SidebarMenuButton>

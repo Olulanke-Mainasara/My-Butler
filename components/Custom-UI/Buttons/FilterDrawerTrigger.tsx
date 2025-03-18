@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import {
   Dialog,
@@ -31,7 +31,7 @@ export default function FilterDrawerTrigger() {
           <DrawerTrigger asChild>
             <SlidersHorizontal />
           </DrawerTrigger>
-          <DrawerContent className="h-full max-h-[90dvh]">
+          <DrawerContent className="h-fit">
             <DrawerHeader className="text-left pb-4">
               <DrawerTitle>Filter</DrawerTitle>
               <DrawerDescription>
@@ -64,7 +64,7 @@ export default function FilterDrawerTrigger() {
           <DialogTrigger asChild className="cursor-pointer">
             <SlidersHorizontal />
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[625px] h-full max-h-[55dvh] xl:max-h-[80dvh] gap-0">
+          <DialogContent className="sm:max-w-[625px] h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
             <DialogHeader className="pb-4">
               <DialogTitle>Filter</DialogTitle>
               <DialogDescription>
@@ -79,7 +79,7 @@ export default function FilterDrawerTrigger() {
                     {criteria[1].map((option, index) => (
                       <button
                         key={index}
-                        className="px-4 py-2 text-sm text-gray-800 bg-gray-100 hover:bg-gray-200 dark:hover:opacity-70 rounded-full"
+                        className="px-4 py-2 text-sm text-gray-800 bg-gray-100 hover:bg-gray-300 dark:hover:opacity-70 rounded-full"
                       >
                         {option.name}
                       </button>

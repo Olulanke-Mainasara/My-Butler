@@ -25,8 +25,8 @@ const Profile = () => {
               height={40}
             />
           ) : (
-            <div>
-              <User />
+            <div className="w-32 h-32 lg:w-32 lg:h-32 rounded-full absolute left-1/2 md:left-4 bottom-0 translate-y-1/2 -translate-x-1/2 md:-translate-x-0 bg-neutral-500 border flex items-center justify-center">
+              <User className="size-20 text-white" />
             </div>
           )}
           <Link

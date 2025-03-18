@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import {
   Dialog,
@@ -33,7 +33,7 @@ export default function CartDrawerTrigger() {
           <DrawerTrigger asChild>
             <ShoppingCart />
           </DrawerTrigger>
-          <DrawerContent className="h-full max-h-[90dvh]">
+          <DrawerContent className="h-fit max-h-[90dvh]">
             <DrawerHeader className="text-left pb-0">
               <DrawerTitle>Your cart</DrawerTitle>
               <DrawerDescription>
@@ -56,7 +56,7 @@ export default function CartDrawerTrigger() {
           <DialogTrigger asChild className="cursor-pointer">
             <ShoppingCart />
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[725px] h-full max-h-[55dvh] xl:max-h-[80dvh] gap-0">
+          <DialogContent className="sm:max-w-[725px] h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
             <DialogHeader className="pb-0">
               <DialogTitle>Your cart</DialogTitle>
               <DialogDescription>

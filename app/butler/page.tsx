@@ -71,6 +71,7 @@ const Butler = () => {
       <div className="flex items-center justify-center gap-2">
         <Image
           src={theme === "dark" ? logoDark : logoLight}
+          suppressHydrationWarning
           className="w-10 h-10"
           alt="logo"
         />

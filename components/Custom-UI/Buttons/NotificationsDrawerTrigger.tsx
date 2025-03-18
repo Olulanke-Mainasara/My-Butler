@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 import {
   Dialog,
@@ -20,19 +20,21 @@ import { BellDot } from "lucide-react";
 import NotificationCard from "../Cards/NotificationCard";
 import { useNotifications } from "@/components/Providers/AllProviders";
 import { NotificationsPlaceholder } from "../Placeholders/NotificationsPlaceholder";
+import { usePathname } from "next/navigation";
 export default function NotificationsDrawerTrigger() {
   const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
+  const pathname = usePathname();
   const notifications = useNotifications();
 
   return (
     <>
-      <div className="md:hidden">
+      <div className={`md:hidden ${pathname === "/camera" ? "hidden" : ""}`}>
         <Drawer open={openMobile} onOpenChange={setOpenMobile}>
           <DrawerTrigger asChild>
             <BellDot />
           </DrawerTrigger>
-          <DrawerContent className="h-full max-h-[90dvh]">
+          <DrawerContent className="h-fit max-h-[90dvh]">
             <DrawerHeader className="text-left pb-0">
               <DrawerTitle>Notifications</DrawerTitle>
               <DrawerDescription>
@@ -53,12 +55,16 @@ export default function NotificationsDrawerTrigger() {
         </Drawer>
       </div>
 
-      <div className="hidden md:block">
+      <div
+        className={`hidden ${
+          pathname === "/camera" ? "md:hidden" : "md:block"
+        }`}
+      >
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild className="cursor-pointer">
             <BellDot />
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[725px] h-full max-h-[55dvh] xl:max-h-[80dvh] gap-0">
+          <DialogContent className="sm:max-w-[725px] h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
             <DialogHeader className="pb-0">
               <DialogTitle>Notifications</DialogTitle>
               <DialogDescription>

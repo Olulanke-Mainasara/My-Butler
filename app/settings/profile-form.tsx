@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/Shad-UI/button";
 import {
   Form,
@@ -29,6 +29,8 @@ import { Textarea } from "@/components/Shad-UI/textarea";
 import { useUserProfile } from "@/components/Providers/AllProviders";
 import { industries } from "@/static-data/filter";
 import { supabase } from "@/lib/supabase";
+import { useTransitionRouter } from "next-view-transitions";
+import { compareTwoObjects } from "@/lib/compareTwoObjects";
 
 const profileFormSchema = z.object({
   username: z
@@ -57,13 +59,14 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
   const [loading, setLoading] = React.useState(false);
+  const router = useTransitionRouter();
   const userProfile = useUserProfile();
 
   const defaultValues: Partial<ProfileFormValues> = {
     username: userProfile?.display_name,
     email: userProfile?.email,
-    bio: userProfile?.bio || "N/A",
-    url: userProfile?.url || "N/A",
+    bio: userProfile?.bio || "Not/Available",
+    url: userProfile?.url || "https://localhost:3000",
     location: userProfile?.location || "N/A",
     category: userProfile?.category || "N/A",
   };
@@ -75,28 +78,42 @@ export function ProfileForm() {
   });
 
   async function onSubmit(data: ProfileFormValues) {
+    const noChanges = compareTwoObjects(defaultValues, data);
+
+    if (noChanges) {
+      toast.info("No changes detected");
+      return;
+    }
+
+    if (!userProfile) {
+      toast.info("You need to log in first", {
+        action: {
+          label: "Login",
+          onClick: () => router.push("/auth/login"),
+        },
+      });
+      return;
+    }
+
     setLoading(true);
 
     const { error } = await supabase.rpc("update_user_details", {
-      _bio: data.bio ?? "",
-      _category: data.category ?? "",
-      _display_name: data.username ?? "",
-      _email: data.email ?? "",
-      _location: data.location ?? "",
+      _bio: data.bio === "Not/Available" ? "" : data.bio ?? "",
+      _category: data.category === "N/A" ? "" : data.category ?? "",
+      _display_name: data.username === "N/A" ? "" : data.username ?? "",
+      _email: data.email === "N/A" ? "" : data.email ?? "",
+      _location: data.location === "N/A" ? "" : data.location ?? "",
       _supabase_user_id: userProfile?.supabase_user_id ?? "",
-      _url: data.url ?? "",
+      _url: data.url === "https://localhost:3000" ? "" : data.url ?? "",
     });
 
     if (error) {
-      toast({
-        title: "Error updating profile",
+      toast.error("Error updating profile", {
         description: error.message,
       });
     } else {
-      toast({
-        title: "Profile updated successfully",
-        description: "Your profile has been successfully updated.",
-      });
+      toast.success("Profile updated successfully");
+      router.push("/profile");
     }
 
     setLoading(false);
@@ -156,13 +173,13 @@ export function ProfileForm() {
               <FormControl>
                 <Textarea
                   placeholder={
-                    !userProfile?.bio || userProfile.bio === "N/A"
+                    !userProfile?.bio || userProfile.bio === "Not/Available"
                       ? "Tell us a little about yourself"
                       : userProfile.bio
                   }
                   className="resize-none"
                   {...field}
-                  value={field.value === "N/A" ? "" : field.value}
+                  value={field.value === "Not/Available" ? "" : field.value}
                   disabled={loading}
                 />
               </FormControl>
@@ -183,12 +200,15 @@ export function ProfileForm() {
               <FormControl>
                 <Input
                   placeholder={
-                    !userProfile?.url || userProfile.url === "N/A"
+                    !userProfile?.url ||
+                    userProfile.url === "https://localhost:3000"
                       ? "Your website URL"
                       : userProfile.url
                   }
                   {...field}
-                  value={field.value === "N/A" ? "" : field.value}
+                  value={
+                    field.value === "https://localhost:3000" ? "" : field.value
+                  }
                   disabled={loading}
                 />
               </FormControl>

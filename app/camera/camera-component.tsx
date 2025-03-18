@@ -1,21 +1,35 @@
 "use client";
+
 import React from "react";
-import { CameraIcon } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { CameraIcon, SwitchCamera } from "lucide-react";
+import GalleryDrawerTrigger from "@/components/Custom-UI/Buttons/GalleryDrawerTrigger";
 
-const CameraComponent = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [capturedImage, setCapturedImage] = useState("");
+const CameraComponent = ({
+  handleCapture,
+  setDeleting,
+}: {
+  handleCapture: (image: string) => void;
+  setDeleting: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const [cameraMode, setCameraMode] = React.useState("environment");
 
-  useEffect(() => {
+  const toggleCamera = () => {
+    if (cameraMode === "environment") {
+      setCameraMode("user");
+    } else {
+      setCameraMode("environment");
+    }
+  };
+
+  React.useEffect(() => {
     const video = videoRef.current;
 
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: { facingMode: cameraMode },
         });
         if (video) {
           video.srcObject = stream;
@@ -33,7 +47,7 @@ const CameraComponent = () => {
         tracks.forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, [cameraMode]);
 
   const capturePhoto = () => {
     const canvas = canvasRef.current;
@@ -41,13 +55,19 @@ const CameraComponent = () => {
 
     if (canvas && video) {
       const context = canvas.getContext("2d");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
       context?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       // Get the image as a data URL
       const imageDataURL = canvas.toDataURL("image/png");
-      setCapturedImage(imageDataURL);
+      handleCapture(imageDataURL);
+
+      // Stop the video stream
+      if (video.srcObject instanceof MediaStream) {
+        const tracks = video.srcObject.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
     }
   };
 
@@ -60,26 +80,21 @@ const CameraComponent = () => {
           playsInline
           className="w-full h-screen object-cover"
         ></video>
-        <button
-          onClick={capturePhoto}
-          className="absolute left-1/2 -translate-x-1/2 bottom-8 p-4 rounded-full bg-white hover:bg-black text-black hover:text-white transition-colors z-20"
-        >
-          <CameraIcon size={40} className="text-6xl" />
-        </button>
+        <div className="absolute bottom-0 w-full p-4 z-20 flex items-center justify-center gap-20 text-white">
+          <GalleryDrawerTrigger setDeleting={setDeleting} />
+          <button
+            onClick={capturePhoto}
+            className="p-4 rounded-full bg-white hover:bg-black text-black hover:text-white transition-colors border"
+          >
+            <CameraIcon size={38} className="text-6xl" />
+          </button>
+          <button onClick={() => toggleCamera()}>
+            <SwitchCamera size={30} />
+          </button>
+        </div>
+
         <canvas ref={canvasRef} className="hidden"></canvas>
       </div>
-
-      {capturedImage !== "" && (
-        <div className="absolute bottom-0 w-full px-6 pb-6">
-          <Image
-            src={capturedImage}
-            alt="Captured image"
-            width={300}
-            height={300}
-            className="w-full h-auto, max-w-xs rounded-lg"
-          ></Image>
-        </div>
-      )}
     </div>
   );
 };

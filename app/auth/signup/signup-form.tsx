@@ -11,6 +11,7 @@ import { Link, useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase";
 import { Icons, ThirdPartySignIn } from "@/components/Custom-UI/icons";
 import getURL from "@/lib/getURL";
+import { Provider } from "@supabase/supabase-js";
 
 export function SignupForm({
   className,
@@ -49,12 +50,12 @@ export function SignupForm({
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleOAuthLogin = async (provider: Provider) => {
     setError("");
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: provider,
       options: { redirectTo: getURL() },
     });
     if (error) {
@@ -140,7 +141,8 @@ export function SignupForm({
               </div>
               <ThirdPartySignIn
                 loading={loading}
-                handleGoogleLogin={handleGoogleLogin}
+                handleThirdPartyLogin={handleOAuthLogin}
+                google
               />
               <div className="text-center text-sm flex gap-1 justify-center">
                 Already have an account?{""}
@@ -164,8 +166,7 @@ export function SignupForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-neutral-500 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-neutral-900 dark:text-neutral-400 dark:hover:[&_a]:text-neutral-50">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>
-        {""}
+        By clicking signup, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
       </div>
     </div>

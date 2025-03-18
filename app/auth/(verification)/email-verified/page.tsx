@@ -35,7 +35,7 @@ const Verification = () => {
         </div>
 
         <Button size={"lg"} asChild>
-          <Link href={"/"}>Home</Link>
+          <Link href={"/?splashed=true"}>Home</Link>
         </Button>
       </div>
     </div>

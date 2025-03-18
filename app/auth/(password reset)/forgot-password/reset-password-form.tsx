@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import getURL from "@/lib/getURL";
 import { useAuth } from "@/components/Providers/AllProviders";
 import { ChangePasswordForm } from "./change-password-form";
@@ -36,9 +36,7 @@ export function ResetPasswordForm({
     if (error) {
       setError(error.message);
     } else {
-      toast({
-        title: "Password reset email sent",
-      });
+      toast.success("Password reset email sent");
     }
 
     setLoading(false);
@@ -77,7 +75,7 @@ export function ResetPasswordForm({
                 className="w-full text-base flex items-center gap-1 disabled:opacity-50"
               >
                 {loading && <Icons.spinner className="w-6 h-6 animate-spin" />}
-                Reset
+                Send email
               </Button>
               <div className="text-center text-red-600">
                 <p>{error && `${error}, please try again`}</p>
@@ -104,9 +102,8 @@ export function ResetPasswordForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-neutral-500 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-neutral-900 dark:text-neutral-400 dark:hover:[&_a]:text-neutral-50">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>
-        {""}
-        and <a href="#">Privacy Policy</a>.
+        By clicking send email, you agree to our{" "}
+        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
       </div>
     </div>
   ) : (

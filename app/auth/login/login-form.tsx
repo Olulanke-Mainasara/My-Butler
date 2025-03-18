@@ -11,6 +11,7 @@ import { Link, useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase";
 import { Icons, ThirdPartySignIn } from "@/components/Custom-UI/icons";
 import getURL from "@/lib/getURL";
+import { Provider } from "@supabase/supabase-js";
 
 export function LoginForm({
   className,
@@ -34,16 +35,16 @@ export function LoginForm({
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/");
+      router.push("/?splashed=true");
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleOAuthLogin = async (provider: Provider) => {
     setError("");
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: provider,
       options: { redirectTo: getURL() },
     });
     if (error) {
@@ -107,14 +108,10 @@ export function LoginForm({
               <div className="text-center text-red-600">
                 <p>{error && `${error}, please try again`}</p>
               </div>
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-neutral-200 dark:after:border-neutral-800">
-                <span className="relative z-10 bg-white px-2 text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
-                  Or continue with
-                </span>
-              </div>
               <ThirdPartySignIn
                 loading={loading}
-                handleGoogleLogin={handleGoogleLogin}
+                handleThirdPartyLogin={(provider) => handleOAuthLogin(provider)}
+                google
               />
               <div className="text-center text-sm flex gap-1 justify-center">
                 Don&apos;t have an account?{""}
@@ -138,9 +135,8 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-neutral-500 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-neutral-900 dark:text-neutral-400 dark:hover:[&_a]:text-neutral-50">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>
-        {""}
-        and <a href="#">Privacy Policy</a>.
+        By clicking login, you agree to our <a href="#">Terms of Service</a> and{" "}
+        <a href="#">Privacy Policy</a>.
       </div>
     </div>
   );

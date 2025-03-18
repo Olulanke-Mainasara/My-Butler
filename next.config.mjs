@@ -14,6 +14,12 @@ const nextConfig = {
         port: "",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "lizntcmxpepbnqbmmfvk.supabase.co",
+        port: "",
+        search: "",
+      },
     ],
   },
 };

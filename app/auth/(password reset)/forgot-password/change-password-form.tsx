@@ -9,7 +9,7 @@ import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
 import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useTransitionRouter } from "next-view-transitions";
 
 export function ChangePasswordForm({
@@ -40,10 +40,8 @@ export function ChangePasswordForm({
     if (error) {
       setError(error.message);
     } else {
-      toast({
-        title: "Password reset successfully",
-      });
-      router.push("/");
+      toast.success("Password reset successfully");
+      router.push("/?splashed=true");
     }
 
     setLoading(false);
@@ -109,9 +107,8 @@ export function ChangePasswordForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-neutral-500 [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-neutral-900 dark:text-neutral-400 dark:hover:[&_a]:text-neutral-50">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>
-        {""}
-        and <a href="#">Privacy Policy</a>.
+        By clicking reset, you agree to our <a href="#">Terms of Service</a> and{" "}
+        <a href="#">Privacy Policy</a>.
       </div>
     </div>
   );
