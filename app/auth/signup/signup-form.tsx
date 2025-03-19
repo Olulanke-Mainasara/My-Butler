@@ -85,6 +85,8 @@ export function SignupForm({
                     onChange={(e) => setFname(e.target.value)}
                     placeholder="Clark"
                     required
+                    minLength={2}
+                    maxLength={50}
                     disabled={loading}
                     className="disabled:cursor-not-allowed disabled:opacity-50"
                   />
@@ -98,6 +100,8 @@ export function SignupForm({
                     onChange={(e) => setLname(e.target.value)}
                     placeholder="Kent"
                     required
+                    minLength={2}
+                    maxLength={50}
                     disabled={loading}
                     className="disabled:cursor-not-allowed disabled:opacity-50"
                   />

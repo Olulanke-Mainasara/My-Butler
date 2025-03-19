@@ -138,7 +138,7 @@ const Camera = () => {
           alt="Captured image"
           width={300}
           height={300}
-          className="w-full h-full"
+          className="w-full h-full object-cover"
         />
 
         <div className="absolute w-full bottom-4 flex items-center justify-center gap-20 text-white">
@@ -156,6 +156,7 @@ const Camera = () => {
           </button>
         </div>
       </div>
+
       <button
         className="absolute top-3 z-40 right-3 text-white"
         onClick={() => {

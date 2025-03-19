@@ -99,14 +99,14 @@ const PictureDialogTrigger = ({
           className="w-full h-full max-h-32 object-cover"
         />
       </DialogTrigger>
-      <DialogContent className="w-[95%] max-h-[40dvh] sm:max-w-[85vw] h-full md:max-h-[55dvh] xl:max-h-[90dvh] p-0">
+      <DialogContent className="w-[95%] max-h-[90dvh] sm:max-w-[85vw] h-full md:max-h-[55dvh] xl:max-h-[90dvh] p-0">
         <div className="flex items-center justify-center h-full overflow-hidden">
           <Image
             src={image.image_url}
             alt="Picture"
             width={800}
             height={800}
-            className="w-full h-full"
+            className="w-full h-full object-cover"
           />
 
           <div className="absolute w-full bottom-4 flex items-center justify-center gap-20 text-white">

@@ -13,7 +13,7 @@ const CameraComponent = ({
 }) => {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const [cameraMode, setCameraMode] = React.useState("environment");
+  const [cameraMode, setCameraMode] = React.useState("user");
 
   const toggleCamera = () => {
     if (cameraMode === "environment") {
@@ -29,7 +29,11 @@ const CameraComponent = ({
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: cameraMode },
+          video: {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            facingMode: cameraMode,
+          },
         });
         if (video) {
           video.srcObject = stream;
@@ -55,8 +59,18 @@ const CameraComponent = ({
 
     if (canvas && video) {
       const context = canvas.getContext("2d");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+
+      // Set canvas size to video size
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      if (cameraMode === "user") {
+        // Flip the image horizontally (mirror effect)
+        context?.translate(canvas.width, 0);
+        context?.scale(-1, 1);
+      }
+
+      // Draw the video frame onto the canvas
       context?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       // Get the image as a data URL
@@ -78,7 +92,9 @@ const CameraComponent = ({
           ref={videoRef}
           autoPlay
           playsInline
-          className="w-full h-screen object-cover"
+          className={`w-full h-screen object-cover ${
+            cameraMode !== "environment" ? "scale-x-[-1]" : ""
+          }`}
         ></video>
         <div className="absolute bottom-0 w-full p-4 z-20 flex items-center justify-center gap-20 text-white">
           <GalleryDrawerTrigger setDeleting={setDeleting} />
@@ -88,7 +104,7 @@ const CameraComponent = ({
           >
             <CameraIcon size={38} className="text-6xl" />
           </button>
-          <button onClick={() => toggleCamera()}>
+          <button className="2xl:hidden" onClick={() => toggleCamera()}>
             <SwitchCamera size={30} />
           </button>
         </div>
