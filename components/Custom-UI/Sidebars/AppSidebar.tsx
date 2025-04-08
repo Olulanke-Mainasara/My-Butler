@@ -28,7 +28,7 @@ import Image from "next/image";
 import logoDark from "@/public/Logo/logoDark.png";
 import logoLight from "@/public/Logo/logoLight.png";
 import { groupedNavigation } from "@/static-data/navigation";
-import { ChevronUp, LogIn, User } from "lucide-react";
+import { ChevronUp, LogIn, LogOut, User, UserCircle2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserProfile } from "@/components/Providers/AllProviders";
@@ -140,10 +140,14 @@ export function AppSidebar() {
                       router.push("/profile");
                     }}
                   >
-                    <span>Profile</span>
+                    <span className="flex gap-1 items-center">
+                      <UserCircle2 /> Profile
+                    </span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignout}>
-                    <span>Sign out</span>
+                    <span className="flex gap-1 items-center">
+                      <LogOut /> Sign out
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

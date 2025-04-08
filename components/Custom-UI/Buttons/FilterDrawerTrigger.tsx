@@ -17,12 +17,15 @@ import {
   DrawerTrigger,
 } from "@/components/Shad-UI/drawer";
 import { SlidersHorizontal } from "lucide-react";
-import { filter } from "@/static-data/filter";
 
-export default function FilterDrawerTrigger() {
+export default function FilterDrawerTrigger({
+  optionCollection,
+}: {
+  optionCollection: object;
+}) {
   const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
-  const options = Object.entries(filter);
+  const options = Object.entries(optionCollection);
 
   return (
     <>
@@ -31,7 +34,7 @@ export default function FilterDrawerTrigger() {
           <DrawerTrigger asChild>
             <SlidersHorizontal />
           </DrawerTrigger>
-          <DrawerContent className="h-fit">
+          <DrawerContent className="h-[65dvh]">
             <DrawerHeader className="text-left pb-4">
               <DrawerTitle>Filter</DrawerTitle>
               <DrawerDescription>
@@ -43,14 +46,19 @@ export default function FilterDrawerTrigger() {
                 <div key={index} className="border-t py-8">
                   <h3 className="text-xl font-semibold">{criteria[0]}</h3>
                   <div className="flex flex-wrap gap-4 mt-4">
-                    {criteria[1].map((option, index) => (
-                      <button
-                        key={index}
-                        className="px-4 py-2 text-sm font-medium text-gray-800 bg-gray-100 rounded-full"
-                      >
-                        {option.name}
-                      </button>
-                    ))}
+                    {criteria[1].map(
+                      (
+                        option: { name: string; value: string },
+                        index: number
+                      ) => (
+                        <button
+                          key={index}
+                          className="px-4 py-2 text-sm font-medium text-gray-800 bg-gray-100 rounded-full"
+                        >
+                          {option.name}
+                        </button>
+                      )
+                    )}
                   </div>
                 </div>
               ))}
@@ -76,14 +84,19 @@ export default function FilterDrawerTrigger() {
                 <div key={index} className="border-t first: py-8">
                   <h3 className="text-lg font-semibold">{criteria[0]}</h3>
                   <div className="flex flex-wrap gap-4 mt-4">
-                    {criteria[1].map((option, index) => (
-                      <button
-                        key={index}
-                        className="px-4 py-2 text-sm text-gray-800 bg-gray-100 hover:bg-gray-300 dark:hover:opacity-70 rounded-full"
-                      >
-                        {option.name}
-                      </button>
-                    ))}
+                    {criteria[1].map(
+                      (
+                        option: { name: string; value: string },
+                        index: number
+                      ) => (
+                        <button
+                          key={index}
+                          className="px-4 py-2 text-sm text-gray-800 bg-gray-100 hover:bg-gray-300 dark:hover:opacity-70 rounded-full"
+                        >
+                          {option.name}
+                        </button>
+                      )
+                    )}
                   </div>
                 </div>
               ))}

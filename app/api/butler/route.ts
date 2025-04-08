@@ -16,16 +16,28 @@ export async function POST(request: Request) {
   const body = await request.json();
 
   const completion = await openai.chat.completions.create({
-    model: "google/gemini-2.0-flash-lite-preview-02-05:free",
+    model: "google/gemini-2.5-pro-exp-03-25:free",
     messages: [
       {
         role: "system",
         content:
-          "You are a fashion assistant knowledgeable about global trends, outfit care, events, and fashion brands. You are also an expert in social events and celebrations.",
+          "You are an assistant knowledgeable about global trends, outfit care, food, events, and fashion brands. You are also an expert in social events and celebrations.",
       },
       ...body,
     ],
   });
+
+  // Check if the completion is empty
+  if (!completion || !completion.choices || completion.choices.length === 0) {
+    console.log("No response from the model");
+    return new Response(
+      JSON.stringify({ error: "No response from the model" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   const message = completion.choices[0].message;
 

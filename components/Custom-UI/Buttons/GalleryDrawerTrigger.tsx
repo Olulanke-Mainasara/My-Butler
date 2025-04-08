@@ -23,6 +23,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { GalleryPlaceholder } from "../Placeholders/GalleryPlaceholder";
 import { Image } from "@/types/Image";
+import { LoginPlaceholder } from "../Placeholders/LoginPlaceholder";
 
 export default function GalleryDrawerTrigger({
   setDeleting,
@@ -76,10 +77,6 @@ export default function GalleryDrawerTrigger({
     fetchImages();
   }, [userProfile]);
 
-  if (!userProfile) {
-    return;
-  }
-
   return (
     <>
       <div className="md:hidden">
@@ -87,12 +84,14 @@ export default function GalleryDrawerTrigger({
           <DrawerTrigger asChild>
             <ImageIcon size={30} />
           </DrawerTrigger>
-          <DrawerContent className="h-fit max-h-[90dvh] pb-2">
+          <DrawerContent className="h-[65dvh] max-h-[90dvh] pb-2">
             <DrawerHeader className="text-left px-2 pb-4">
               <DrawerTitle>Gallery</DrawerTitle>
               <DrawerDescription>View all your saved photos.</DrawerDescription>
             </DrawerHeader>
-            {images.length === 0 ? (
+            {!userProfile ? (
+              <LoginPlaceholder info="your saved photos" />
+            ) : images.length === 0 ? (
               <section>
                 <GalleryPlaceholder />
               </section>
@@ -121,12 +120,14 @@ export default function GalleryDrawerTrigger({
               <DialogTitle>Gallery</DialogTitle>
               <DialogDescription>View all your saved photos.</DialogDescription>
             </DialogHeader>
-            {images.length === 0 ? (
+            {!userProfile ? (
+              <LoginPlaceholder info="your saved photos" />
+            ) : images.length === 0 ? (
               <section>
                 <GalleryPlaceholder />
               </section>
             ) : (
-              <section className="h-full overflow-y-scroll grid grid-cols-4 gap-[2px]">
+              <section className="h-full overflow-y-scroll grid grid-cols-3 gap-[2px] px-2">
                 {images.map((imageData, index) => (
                   <PictureDialogTrigger
                     image={imageData}

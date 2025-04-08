@@ -33,7 +33,6 @@ const getAssistantResponse = async (
   });
 
   if (!response.ok) {
-    console.error("Error fetching response");
     return null;
   }
 
@@ -238,9 +237,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
                   >
                     <div className="flex gap-4">
                       <Avatar
-                        className={`size-6 md:size-8 ${
-                          message.role === "user" ? "hidden" : ""
-                        }`}
+                        className={`${message.role === "user" ? "hidden" : ""}`}
                       >
                         <AvatarImage
                           src={

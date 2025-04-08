@@ -50,7 +50,9 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                   <main className="w-full relative">
                     <div
                       className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full p-3 ${
-                        pathname !== "/camera" && pathname !== "/combine"
+                        pathname !== "/camera" &&
+                        pathname !== "/combine" &&
+                        pathname !== "/combine/personal"
                           ? "bg-lightBackground dark:bg-darkBackground"
                           : "text-white"
                       } `}
@@ -59,7 +61,10 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                       <Link
                         href={"/?splashed=true"}
                         className={`text-2xl ${
-                          pathname === "/camera" ? "hidden" : ""
+                          pathname === "/camera" ||
+                          pathname === "/combine/personal"
+                            ? "hidden"
+                            : ""
                         }`}
                       >
                         My{" "}

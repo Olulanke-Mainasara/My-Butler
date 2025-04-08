@@ -10,7 +10,10 @@ import Image from "next/image";
 import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import LightChangeImg from "@/public/AuthImgs/change-light.svg";
+import DarkChangeImg from "@/public/AuthImgs/change-dark.svg";
 import { useTransitionRouter } from "next-view-transitions";
+import { useTheme } from "next-themes";
 
 export function ChangePasswordForm({
   className,
@@ -20,6 +23,7 @@ export function ChangePasswordForm({
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
+  const { theme } = useTheme();
   const router = useTransitionRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -99,9 +103,10 @@ export function ChangePasswordForm({
           <div className="relative hidden bg-lightBackground md:block dark:bg-neutral-800">
             <Image
               fill
-              src="/placeholder.svg"
+              src={theme === "dark" ? DarkChangeImg : LightChangeImg}
+              suppressHydrationWarning
               alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
         </CardContent>

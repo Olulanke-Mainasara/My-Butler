@@ -14,6 +14,7 @@ import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWi
 import ShopCard from "@/components/Custom-UI/Cards/ShopCard";
 import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
 import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
+import { Itemfilter } from "@/static-data/filters";
 
 const Shop = () => {
   return (
@@ -33,7 +34,7 @@ const Shop = () => {
           </div>
           <div className="flex items-center gap-4">
             <CartDrawerTrigger />
-            <FilterDrawerTrigger />
+            <FilterDrawerTrigger optionCollection={Itemfilter} />
           </div>
         </div>
       </div>

@@ -17,13 +17,15 @@ import {
   DrawerTrigger,
 } from "@/components/Shad-UI/drawer";
 import { ShoppingCart } from "lucide-react";
-import { useCart } from "@/components/Providers/AllProviders";
+import { useCart, useUserProfile } from "@/components/Providers/AllProviders";
 import { CartPlaceholder } from "../Placeholders/CartPlaceholder";
 import CartItemCard from "../Cards/CartItemCard";
+import { LoginPlaceholder } from "../Placeholders/LoginPlaceholder";
 
 export default function CartDrawerTrigger() {
   const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
+  const userProfile = useUserProfile();
   const cart = useCart();
 
   return (
@@ -33,20 +35,24 @@ export default function CartDrawerTrigger() {
           <DrawerTrigger asChild>
             <ShoppingCart />
           </DrawerTrigger>
-          <DrawerContent className="h-fit max-h-[90dvh]">
+          <DrawerContent className="h-[65dvh] max-h-[90dvh]">
             <DrawerHeader className="text-left pb-0">
               <DrawerTitle>Your cart</DrawerTitle>
               <DrawerDescription>
                 Preview the items in your cart.
               </DrawerDescription>
             </DrawerHeader>
-            <section className="px-4 pb-4 h-full overflow-y-scroll">
-              {!cart || cart.length === 0 ? (
-                <CartPlaceholder />
-              ) : (
-                cart.map((_, index) => <CartItemCard key={index} />)
-              )}
-            </section>
+            {!userProfile ? (
+              <LoginPlaceholder info="the items in your cart" />
+            ) : (
+              <section className="px-4 pb-4 h-full overflow-y-scroll">
+                {!cart || cart.length === 0 ? (
+                  <CartPlaceholder />
+                ) : (
+                  cart.map((_, index) => <CartItemCard key={index} />)
+                )}
+              </section>
+            )}
           </DrawerContent>
         </Drawer>
       </div>
@@ -63,13 +69,17 @@ export default function CartDrawerTrigger() {
                 Preview the items in your cart.
               </DialogDescription>
             </DialogHeader>
-            <section className="px-4 pb-4 h-full overflow-y-scroll">
-              {!cart || cart.length === 0 ? (
-                <CartPlaceholder />
-              ) : (
-                cart.map((_, index) => <CartItemCard key={index} />)
-              )}
-            </section>
+            {!userProfile ? (
+              <LoginPlaceholder info="the items in your cart" />
+            ) : (
+              <section className="px-4 pb-4 h-full overflow-y-scroll">
+                {!cart || cart.length === 0 ? (
+                  <CartPlaceholder />
+                ) : (
+                  cart.map((_, index) => <CartItemCard key={index} />)
+                )}
+              </section>
+            )}
           </DialogContent>
         </Dialog>
       </div>

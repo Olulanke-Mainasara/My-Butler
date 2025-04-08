@@ -7,7 +7,7 @@ type Button = {
   id: string;
   name: string;
   href: string;
-  icon: JSX.Element;
+  icon: React.JSX.Element;
 };
 
 const NavLink = ({

@@ -12,6 +12,9 @@ import { supabase } from "@/lib/supabase";
 import { Icons, ThirdPartySignIn } from "@/components/Custom-UI/icons";
 import getURL from "@/lib/getURL";
 import { Provider } from "@supabase/supabase-js";
+import LightLoginImg from "@/public/AuthImgs/login-light.svg";
+import DarkLoginImg from "@/public/AuthImgs/login-dark.svg";
+import { useTheme } from "next-themes";
 
 export function LoginForm({
   className,
@@ -22,6 +25,7 @@ export function LoginForm({
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const router = useTransitionRouter();
+  const { theme } = useTheme();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -57,7 +61,7 @@ export function LoginForm({
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6 max-w-96 mx-auto">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-balance text-neutral-500 dark:text-neutral-400">
@@ -127,9 +131,10 @@ export function LoginForm({
           <div className="relative hidden bg-lightBackground md:block dark:bg-neutral-800">
             <Image
               fill
-              src="/placeholder.svg"
+              src={theme === "dark" ? DarkLoginImg : LightLoginImg}
               alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              suppressHydrationWarning
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
         </CardContent>

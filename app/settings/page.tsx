@@ -2,6 +2,7 @@
 
 import { ProfileForm } from "@/app/settings/profile-form";
 import { useUserProfile } from "@/components/Providers/AllProviders";
+import { Button } from "@/components/Shad-UI/button";
 import React from "react";
 
 const Settings = () => {
@@ -18,8 +19,9 @@ const Settings = () => {
       {userProfile ? (
         <ProfileForm />
       ) : (
-        <div className="h-full flex items-center justify-center text-2xl grow">
-          Fetching user info...
+        <div className="h-full flex flex-col gap-1 items-center justify-center text-2xl grow">
+          <p>Your info is not available, please retry.</p>
+          <Button onClick={() => window.location.reload()}>Reload</Button>
         </div>
       )}
     </div>

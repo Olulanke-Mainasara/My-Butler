@@ -130,7 +130,9 @@ export function ChatSidebar() {
             </div>
           ) : conversations && !error ? (
             <SidebarGroup className="p-0">
-              <SidebarGroupLabel>Conversations</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-black dark:text-white">
+                Conversations
+              </SidebarGroupLabel>
               <SidebarGroupContent className="p-2">
                 <SidebarMenu>
                   {conversations.map((convo) => (
@@ -149,8 +151,9 @@ export function ChatSidebar() {
                       </SidebarMenuButton>
                       <SidebarMenuAction
                         onClick={() => handleChatDelete(convo.chat_id)}
+                        className="text-red-500"
                       >
-                        <Trash2 /> <span className="sr-only">Add Project</span>
+                        <Trash2 /> <span className="sr-only">Delete chat</span>
                       </SidebarMenuAction>
                     </SidebarMenuItem>
                   ))}

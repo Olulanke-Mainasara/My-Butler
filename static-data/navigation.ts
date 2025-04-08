@@ -2,8 +2,8 @@ import React from "react";
 import {
   BellIcon,
   Calendar,
+  ForkKnifeCrossed,
   Home,
-  Settings,
   ShoppingCart,
   Stars,
 } from "lucide-react";
@@ -31,7 +31,7 @@ export const groupedNavigation = [
         id: "1-2",
         url: "/butler",
         icon: React.createElement(Stars),
-        title: "Butler Assistant",
+        title: "Butler A.I",
       },
       {
         id: "1-3",
@@ -43,7 +43,7 @@ export const groupedNavigation = [
         id: "1-4",
         url: "/combine",
         icon: React.createElement(GiPaintBucket),
-        title: "Outfit Combiner",
+        title: "Outfit Creator",
       },
       {
         id: "1-5",
@@ -65,21 +65,27 @@ export const groupedNavigation = [
       },
       {
         id: "2-2",
-        url: "/events",
-        icon: React.createElement(GiTicket),
-        title: "Upcoming Events",
+        url: "/food",
+        icon: React.createElement(ForkKnifeCrossed),
+        title: "Tasty Cuisine",
       },
     ],
   },
   {
     id: "3",
-    title: "Stay Informed",
+    title: "Stay Active",
     links: [
       {
         id: "3-1",
         url: "/news",
         icon: React.createElement(GiNewspaper),
         title: "Latest News",
+      },
+      {
+        id: "3-2",
+        url: "/events",
+        icon: React.createElement(GiTicket),
+        title: "Upcoming Events",
       },
     ],
   },
@@ -89,7 +95,7 @@ export const groupedNavigation = [
     links: [
       {
         id: "4-1",
-        title: "Cart",
+        title: "Your Cart",
         url: "/cart",
         icon: React.createElement(ShoppingCart),
       },
@@ -105,12 +111,6 @@ export const groupedNavigation = [
         url: "/calendar",
         icon: React.createElement(Calendar),
       },
-      {
-        id: "4-4",
-        title: "Settings",
-        url: "/settings",
-        icon: React.createElement(Settings),
-      },
     ],
   },
 ];
@@ -118,49 +118,49 @@ export const groupedNavigation = [
 export const navigation = [
   {
     id: "1",
-    name: "",
+    name: "Butler A.I",
     href: "/butler",
     icon: React.createElement(Stars),
   },
   {
     id: "2",
-    name: "",
+    name: "Outfits",
     href: "/outfits",
     icon: React.createElement(GiShirt),
   },
   {
     id: "3",
-    name: "",
+    name: "Outfit Creator",
     href: "/combine",
     icon: React.createElement(GiPaintBucket),
   },
   {
     id: "4",
-    name: "",
+    name: "Camera",
     href: "/camera",
     icon: React.createElement(GiPhotoCamera),
   },
   {
     id: "5",
-    name: "",
-    href: "/settings",
-    icon: React.createElement(Settings),
+    name: "Food",
+    href: "/food",
+    icon: React.createElement(ForkKnifeCrossed),
   },
   {
     id: "6",
-    name: "",
+    name: "News",
     href: "/news",
     icon: React.createElement(GiNewspaper),
   },
   {
     id: "7",
-    name: "",
+    name: "Shop",
     href: "/shop",
     icon: React.createElement(GiShoppingCart),
   },
   {
     id: "8",
-    name: "",
+    name: "Events",
     href: "/events",
     icon: React.createElement(GiTicket),
   },

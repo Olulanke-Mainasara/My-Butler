@@ -14,6 +14,9 @@ import { toast } from "sonner";
 import getURL from "@/lib/getURL";
 import { useAuth } from "@/components/Providers/AllProviders";
 import { ChangePasswordForm } from "./change-password-form";
+import LightResetImg from "@/public/AuthImgs/reset-light.svg";
+import DarkResetImg from "@/public/AuthImgs/reset-dark.svg";
+import { useTheme } from "next-themes";
 
 export function ResetPasswordForm({
   className,
@@ -22,6 +25,7 @@ export function ResetPasswordForm({
   const [email, setEmail] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
+  const { theme } = useTheme();
   const userSession = useAuth();
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -94,9 +98,10 @@ export function ResetPasswordForm({
           <div className="relative hidden bg-lightBackground md:block dark:bg-neutral-800">
             <Image
               fill
-              src="/placeholder.svg"
+              src={theme === "dark" ? DarkResetImg : LightResetImg}
+              suppressHydrationWarning
               alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
         </CardContent>

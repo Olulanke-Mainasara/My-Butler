@@ -57,7 +57,7 @@ const News = () => {
           <p className="text-center text-3xl md:text-4xl">
             What&apos;s the tea?
           </p>
-          <div className="grid md:grid-cols-3 gap-4 md:gap-5 xl:gap-8 mx-auto xl:w-full">
+          <div className="grid md:grid-cols-3 gap-4 md:gap-5 mx-auto xl:w-full">
             <div className="border rounded-3xl col-span-2 xl:col-span-1 xl:row-span-2 h-44 xl:h-auto"></div>
             <div className="border h-44 md:h-52 xl:h-60 rounded-3xl"></div>
             <div className="border h-44 md:h-52 xl:h-60 rounded-3xl col-start-2"></div>
