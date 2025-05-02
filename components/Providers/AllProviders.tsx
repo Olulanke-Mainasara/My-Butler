@@ -4,7 +4,7 @@ import React from "react";
 import { ThemeProvider } from "./ThemeProvider";
 import { SidebarProvider, SidebarTrigger } from "@/components/Shad-UI/sidebar";
 import { AppSidebar } from "../Custom-UI/Sidebars/AppSidebar";
-import { Link, ViewTransitions } from "next-view-transitions";
+import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import { usePathname } from "next/navigation";
 import { Toaster } from "../Shad-UI/toaster";
@@ -36,57 +36,55 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
   return (
     <authContext.Provider value={userSession}>
       <userProfileContext.Provider value={userProfile}>
-        <ViewTransitions>
-          <SidebarProvider defaultOpen={false}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <notificationsContext.Provider value={notifications}>
-                <cartContext.Provider value={cart}>
-                  <AppSidebar />
-                  <main className="w-full relative">
-                    <div
-                      className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full p-3 ${
-                        pathname !== "/camera" &&
-                        pathname !== "/combine" &&
-                        pathname !== "/combine/personal"
-                          ? "bg-lightBackground dark:bg-darkBackground"
-                          : "text-white"
-                      } `}
+        <SidebarProvider defaultOpen={false}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <notificationsContext.Provider value={notifications}>
+              <cartContext.Provider value={cart}>
+                <AppSidebar />
+                <main className="w-full relative">
+                  <div
+                    className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full p-3 ${
+                      pathname !== "/camera" &&
+                      pathname !== "/combine" &&
+                      pathname !== "/combine/personal"
+                        ? "bg-lightBackground dark:bg-darkBackground"
+                        : "text-white"
+                    } `}
+                  >
+                    <SidebarTrigger />
+                    <Link
+                      href={"/?splashed=true"}
+                      className={`text-2xl ${
+                        pathname === "/camera" ||
+                        pathname === "/combine/personal"
+                          ? "hidden"
+                          : ""
+                      }`}
                     >
-                      <SidebarTrigger />
-                      <Link
-                        href={"/?splashed=true"}
-                        className={`text-2xl ${
-                          pathname === "/camera" ||
-                          pathname === "/combine/personal"
-                            ? "hidden"
-                            : ""
-                        }`}
-                      >
-                        My{" "}
-                        <span className="text-brandLight dark:text-brandDark ">
-                          Butler
-                        </span>
-                      </Link>
-                      {pathname !== "/notifications" ? (
-                        <NotificationsDrawerTrigger />
-                      ) : (
-                        <CartDrawerTrigger />
-                      )}
-                    </div>
-                    {children}
-                  </main>
-                  <Toaster />
-                  <Sonner />
-                </cartContext.Provider>
-              </notificationsContext.Provider>
-            </ThemeProvider>
-          </SidebarProvider>
-        </ViewTransitions>
+                      My{" "}
+                      <span className="text-brandLight dark:text-brandDark ">
+                        Butler
+                      </span>
+                    </Link>
+                    {pathname !== "/notifications" ? (
+                      <NotificationsDrawerTrigger />
+                    ) : (
+                      <CartDrawerTrigger />
+                    )}
+                  </div>
+                  {children}
+                </main>
+                <Toaster />
+                <Sonner />
+              </cartContext.Provider>
+            </notificationsContext.Provider>
+          </ThemeProvider>
+        </SidebarProvider>
       </userProfileContext.Provider>
     </authContext.Provider>
   );

@@ -4,12 +4,12 @@ import CameraComponent from "@/app/camera/camera-component";
 import { Icons } from "@/components/Custom-UI/icons";
 import { useUserProfile } from "@/components/Providers/AllProviders";
 import { toast } from "sonner";
-import { base64ToFile } from "@/lib/base64ToFile";
-import { supabase } from "@/lib/supabase";
+import { base64ToFile } from "@/lib/utils";
+import { supabase } from "@/lib/supabase/client";
 import { Download, Share, X } from "lucide-react";
 import Image from "next/image";
 import React from "react";
-import { useTransitionRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/Shad-UI/dialog";
 
 const Camera = () => {
@@ -19,7 +19,7 @@ const Camera = () => {
   const [deleting, setDeleting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const [capturedImage, setCapturedImage] = React.useState("");
-  const router = useTransitionRouter();
+  const router = useRouter();
 
   const handleCapture = (imageData: string) => {
     setCapturedImage(imageData);

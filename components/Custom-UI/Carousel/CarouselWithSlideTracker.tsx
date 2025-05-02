@@ -16,7 +16,7 @@ const CarouselWithSlideTracker = ({
 }: {
   items: object[];
   className?: string;
-  children: ReactElement;
+  children: ReactElement<{ item: object }>;
 }) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);

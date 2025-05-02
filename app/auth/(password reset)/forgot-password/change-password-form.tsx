@@ -8,11 +8,11 @@ import { Input } from "@/components/Shad-UI/input";
 import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
 import { Icons } from "@/components/Custom-UI/icons";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import LightChangeImg from "@/public/AuthImgs/change-light.svg";
 import DarkChangeImg from "@/public/AuthImgs/change-dark.svg";
-import { useTransitionRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 
 export function ChangePasswordForm({
@@ -24,7 +24,7 @@ export function ChangePasswordForm({
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const { theme } = useTheme();
-  const router = useTransitionRouter();
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

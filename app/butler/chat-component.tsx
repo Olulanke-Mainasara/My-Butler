@@ -8,10 +8,10 @@ import {
 } from "@/components/Shad-UI/avatar";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Square, Stars } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { Json } from "@/supabase";
 import { useTheme } from "next-themes";
-import { useTransitionRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useUserProfile } from "@/components/Providers/AllProviders";
 
@@ -66,7 +66,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
   const [responseError, setResponseError] = React.useState<string | null>(null);
   const [userCount, setUserCount] = React.useState(0);
   const userProfile = useUserProfile();
-  const router = useTransitionRouter();
+  const router = useRouter();
   const pathname = usePathname();
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
   const { theme } = useTheme();

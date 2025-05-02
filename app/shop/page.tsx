@@ -9,7 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
 import { Search, Shirt } from "lucide-react";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import ShopCard from "@/components/Custom-UI/Cards/ShopCard";
 import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";

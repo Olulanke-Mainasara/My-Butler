@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@/components/Shad-UI/button";
 import { Brain, User } from "lucide-react";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import {
   Carousel,
   CarouselApi,

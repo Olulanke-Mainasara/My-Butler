@@ -28,9 +28,9 @@ import { Input } from "@/components/Shad-UI/input";
 import { Textarea } from "@/components/Shad-UI/textarea";
 import { useUserProfile } from "@/components/Providers/AllProviders";
 import { industries } from "@/static-data/filters";
-import { supabase } from "@/lib/supabase";
-import { useTransitionRouter } from "next-view-transitions";
-import { compareTwoObjects } from "@/lib/compareTwoObjects";
+import { supabase } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { compareTwoObjects } from "@/lib/utils";
 
 const profileFormSchema = z.object({
   username: z
@@ -59,7 +59,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
   const [loading, setLoading] = React.useState(false);
-  const router = useTransitionRouter();
+  const router = useRouter();
   const userProfile = useUserProfile();
 
   const defaultValues: Partial<ProfileFormValues> = {

@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/Shad-UI/card";
 import { Input } from "@/components/Shad-UI/input";
 import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
-import { Link } from "next-view-transitions";
+import Link from "next/link"
 import { Icons } from "@/components/Custom-UI/icons";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import getURL from "@/lib/getURL";
+import { getURL } from "@/lib/utils";
 import { useAuth } from "@/components/Providers/AllProviders";
 import { ChangePasswordForm } from "./change-password-form";
 import LightResetImg from "@/public/AuthImgs/reset-light.svg";

@@ -7,10 +7,12 @@ import { Card, CardContent } from "@/components/Shad-UI/card";
 import { Input } from "@/components/Shad-UI/input";
 import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
-import { Link, useTransitionRouter } from "next-view-transitions";
-import { supabase } from "@/lib/supabase";
-import { Icons, ThirdPartySignIn } from "@/components/Custom-UI/icons";
-import getURL from "@/lib/getURL";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase/client";
+import { Icons } from "@/components/Custom-UI/icons";
+import { ThirdPartySignIn } from "@/components/Custom-UI/Buttons/ThirdPartySignIn";
+import { getURL } from "@/lib/utils";
 import { Provider } from "@supabase/supabase-js";
 import LightLoginImg from "@/public/AuthImgs/login-light.svg";
 import DarkLoginImg from "@/public/AuthImgs/login-dark.svg";
@@ -24,7 +26,7 @@ export function LoginForm({
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
-  const router = useTransitionRouter();
+  const router = useRouter();
   const { theme } = useTheme();
 
   const handleSubmit = async (event: React.FormEvent) => {

@@ -16,9 +16,10 @@ import {
   useSidebar,
 } from "@/components/Shad-UI/sidebar";
 
-import { Link, useTransitionRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Edit, Trash2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { useUserProfile } from "@/components/Providers/AllProviders";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { usePathname } from "next/navigation";
@@ -26,7 +27,7 @@ import { usePathname } from "next/navigation";
 export function ChatSidebar() {
   const userProfile = useUserProfile();
   const { toggleSidebar } = useSidebar();
-  const router = useTransitionRouter();
+  const router = useRouter();
   const pathname = usePathname();
   const [conversations, setConversations] = React.useState<
     { chat_id: string; chat_title: string }[] | null

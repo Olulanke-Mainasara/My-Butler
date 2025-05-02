@@ -2,8 +2,8 @@
 
 import React from "react";
 import { ArrowRight, Stars } from "lucide-react";
-import { useTransitionRouter } from "next-view-transitions";
-import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
 import Image from "next/image";
 import logoLight from "@/public/Logo/logoLight.png";
 import logoDark from "@/public/Logo/logoDark.png";
@@ -17,7 +17,7 @@ const Butler = () => {
   const [error, setError] = React.useState<string | null>(null);
   const [anonymous, setAnonymous] = React.useState(false);
   const userProfile = useUserProfile();
-  const router = useTransitionRouter();
+  const router = useRouter();
   const { theme } = useTheme();
 
   const handleSubmit = async () => {

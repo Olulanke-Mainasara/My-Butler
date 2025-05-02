@@ -1,4 +1,4 @@
-import getURL from "@/lib/getURL";
+import { getURL } from "@/lib/utils";
 import OpenAI from "openai";
 
 export const runtime = "edge";

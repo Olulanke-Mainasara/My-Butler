@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/Shad-UI/button";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {

@@ -3,7 +3,7 @@ import { Notification } from "@/types/Notification";
 import { CartItem } from "@/types/CartItem";
 import { UserProfile } from "@/types/UserProfile";
 import { RealtimePostgresChangesPayload, User } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 
 export function useUserInfo() {
   const [userSession, setUserSession] = React.useState<User | null>(null);

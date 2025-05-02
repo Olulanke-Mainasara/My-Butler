@@ -19,7 +19,7 @@ import {
 import { ImageIcon } from "lucide-react";
 import PictureDialogTrigger from "./PictureDialogTrigger";
 import { useUserProfile } from "@/components/Providers/AllProviders";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { GalleryPlaceholder } from "../Placeholders/GalleryPlaceholder";
 import { Image } from "@/types/Image";

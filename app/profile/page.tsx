@@ -2,7 +2,7 @@
 
 import { useUserProfile } from "@/components/Providers/AllProviders";
 import { Calendar, Factory, Link2, Map, PenBox, User } from "lucide-react";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import Select from "./select";
