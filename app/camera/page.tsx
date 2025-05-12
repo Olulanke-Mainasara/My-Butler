@@ -2,7 +2,7 @@
 
 import CameraComponent from "@/app/camera/camera-component";
 import { Icons } from "@/components/Custom-UI/icons";
-import { useUserProfile } from "@/components/Providers/AllProviders";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { toast } from "sonner";
 import { base64ToFile } from "@/lib/utils";
 import { supabase } from "@/lib/supabase/client";
@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/Shad-UI/dialog";
 
 const Camera = () => {
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
   const [file, setFile] = React.useState<File | null>(null);
   const [savingPicture, setSavingPicture] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
@@ -55,7 +55,7 @@ const Camera = () => {
 
   const handleSave = async () => {
     // Some relevant checks
-    if (!userProfile) {
+    if (!customerProfile) {
       setSavingPicture(false);
       toast.info("You need to log in first", {
         action: {
@@ -80,7 +80,7 @@ const Camera = () => {
     setSavingPicture(true);
 
     // Define storage path
-    const filePath = `${userProfile.id}/${file.name}`;
+    const filePath = `${customerProfile.id}/${file.name}`;
 
     // Upload the image to a supabase storage bucket
     const { data, error } = await supabase.storage

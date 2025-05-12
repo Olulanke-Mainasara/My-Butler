@@ -18,7 +18,7 @@ import {
 } from "@/components/Shad-UI/drawer";
 import { ImageIcon } from "lucide-react";
 import PictureDialogTrigger from "./PictureDialogTrigger";
-import { useUserProfile } from "@/components/Providers/AllProviders";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { GalleryPlaceholder } from "../Placeholders/GalleryPlaceholder";
@@ -33,7 +33,7 @@ export default function GalleryDrawerTrigger({
   const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
   const [images, setImages] = React.useState<Image[]>([]);
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
 
   const handleDelete = async (imagePath: string) => {
     setDeleting(true);
@@ -54,7 +54,7 @@ export default function GalleryDrawerTrigger({
 
   React.useEffect(() => {
     // Check if the user is logged in
-    if (!userProfile) {
+    if (!customerProfile) {
       return;
     }
 
@@ -63,7 +63,7 @@ export default function GalleryDrawerTrigger({
       const { data, error } = await supabase
         .from("camera_pictures")
         .select("*")
-        .eq("user_id", userProfile?.id);
+        .eq("user_id", customerProfile?.id);
 
       if (error) {
         toast.error("Error fetching images");
@@ -75,7 +75,7 @@ export default function GalleryDrawerTrigger({
     };
 
     fetchImages();
-  }, [userProfile]);
+  }, [customerProfile]);
 
   return (
     <>
@@ -89,7 +89,7 @@ export default function GalleryDrawerTrigger({
               <DrawerTitle>Gallery</DrawerTitle>
               <DrawerDescription>View all your saved photos.</DrawerDescription>
             </DrawerHeader>
-            {!userProfile ? (
+            {!customerProfile ? (
               <LoginPlaceholder info="your saved photos" />
             ) : images.length === 0 ? (
               <section>
@@ -120,7 +120,7 @@ export default function GalleryDrawerTrigger({
               <DialogTitle>Gallery</DialogTitle>
               <DialogDescription>View all your saved photos.</DialogDescription>
             </DialogHeader>
-            {!userProfile ? (
+            {!customerProfile ? (
               <LoginPlaceholder info="your saved photos" />
             ) : images.length === 0 ? (
               <section>

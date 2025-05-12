@@ -35,9 +35,9 @@ export const groupedNavigation = [
       },
       {
         id: "1-3",
-        url: "/outfits",
+        url: "/collections",
         icon: React.createElement(GiShirt),
-        title: "Outfit Gallery",
+        title: "Collection Gallery",
       },
       {
         id: "1-4",
@@ -124,8 +124,8 @@ export const navigation = [
   },
   {
     id: "2",
-    name: "Outfits",
-    href: "/outfits",
+    name: "Collections",
+    href: "/collections",
     icon: React.createElement(GiShirt),
   },
   {

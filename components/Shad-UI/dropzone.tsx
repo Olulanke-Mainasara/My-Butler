@@ -1,4 +1,4 @@
-"'use client'";
+"use client";
 
 import { cn } from "@/lib/utils";
 import { type UseSupabaseUploadReturn } from "@/hooks/use-supabase-upload";
@@ -15,44 +15,22 @@ import Image from "next/image";
 export const formatBytes = (
   bytes: number,
   decimals = 2,
-  size?:
-    | "'bytes'"
-    | "'KB'"
-    | "'MB'"
-    | "'GB'"
-    | "'TB'"
-    | "'PB'"
-    | "'EB'"
-    | "'ZB'"
-    | "'YB'"
+  size?: "bytes" | "KB" | "MB" | "GB" | "TB" | "PB" | "EB" | "ZB" | "YB"
 ) => {
   const k = 1000;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = [
-    "'bytes'",
-    "'KB'",
-    "'MB'",
-    "'GB'",
-    "'TB'",
-    "'PB'",
-    "'EB'",
-    "'ZB'",
-    "'YB'",
-  ];
+  const sizes = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
   if (bytes === 0 || bytes === undefined)
-    return size !== undefined ? `0 ${size}` : "'0 bytes'";
+    return size !== undefined ? `0 ${size}` : "0 bytes";
   const i =
     size !== undefined
       ? sizes.indexOf(size)
       : Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + "'" + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + "" + sizes[i];
 };
 
-type DropzoneContextType = Omit<
-  UseSupabaseUploadReturn,
-  "'getRootProps'" | "'getInputProps'"
->;
+type DropzoneContextType = UseSupabaseUploadReturn;
 
 const DropzoneContext = createContext<DropzoneContextType | undefined>(
   undefined
@@ -83,13 +61,12 @@ const Dropzone = ({
       <div
         {...getRootProps({
           className: cn(
-            "'border-2 border-gray-300 rounded-lg p-6 text-center bg-white transition-colors duration-300 text-foreground' dark:bg-neutral-950",
+            "border-2 border-gray-300 rounded-lg p-6 text-center bg-white transition-colors duration-300 dark:bg-neutral-950",
             className,
-            isSuccess ? "'border-solid'" : "'border-dashed'",
+            isSuccess ? "border-solid" : "border-dashed",
             isActive &&
-              "'border-primary bg-neutral-900/10' dark:bg-neutral-50/10'",
-            isInvalid &&
-              "'border-destructive bg-red-500/10' dark:bg-red-900/10'"
+              "border-primary bg-neutral-900/10' dark:bg-neutral-50/10",
+            isInvalid && "border-destructive bg-red-500/10' dark:bg-red-900/10"
           ),
         })}
       >
@@ -125,7 +102,7 @@ const DropzoneContent = ({ className }: { className?: string }) => {
     return (
       <div
         className={cn(
-          "'flex flex-row items-center gap-x-2 justify-center'",
+          "flex flex-row items-center gap-x-2 justify-center",
           className
         )}
       >
@@ -135,14 +112,14 @@ const DropzoneContent = ({ className }: { className?: string }) => {
         />
         <p className="text-neutral-900 text-sm dark:text-neutral-50">
           Successfully uploaded {files.length} file
-          {files.length > 1 ? "'s'" : "''"}
+          {files.length > 1 ? "s" : ""}
         </p>
       </div>
     );
   }
 
   return (
-    <div className={cn("'flex flex-col'", className)}>
+    <div className={cn("flex flex-col", className)}>
       {files.map((file, idx) => {
         const fileError = errors.find((e) => e.name === file.name);
         const isSuccessfullyUploaded = !!successes.find((e) => e === file.name);
@@ -150,11 +127,13 @@ const DropzoneContent = ({ className }: { className?: string }) => {
         return (
           <div
             key={`${file.name}-${idx}`}
-            className="flex items-center gap-x-4 border-b py-2 first:mt-4 last:mb-4"
+            className="flex items-center gap-x-2 border-b py-2 first:mt-4 last:mb-4"
           >
-            {file.type.startsWith("'image/'") ? (
+            {file.type.startsWith("image/") ? (
               <div className="h-10 w-10 rounded border border-neutral-200 overflow-hidden shrink-0 bg-neutral-100 flex items-center justify-center dark:border-neutral-800 dark:bg-neutral-800">
                 <Image
+                  width={40}
+                  height={40}
                   src={file.preview || ""}
                   alt={file.name}
                   className="object-cover"
@@ -174,14 +153,14 @@ const DropzoneContent = ({ className }: { className?: string }) => {
                 <p className="text-xs text-red-500 dark:text-red-900">
                   {file.errors
                     .map((e) =>
-                      e.message.startsWith("'File is larger than'")
+                      e.message.startsWith("File is larger than")
                         ? `File is larger than ${formatBytes(
                             maxFileSize,
                             2
                           )} (Size: ${formatBytes(file.size, 2)})`
                         : e.message
                     )
-                    .join("', '")}
+                    .join(", ")}
                 </p>
               ) : loading && !isSuccessfullyUploaded ? (
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -219,7 +198,7 @@ const DropzoneContent = ({ className }: { className?: string }) => {
         <p className="text-sm text-left mt-2 text-red-500 dark:text-red-900">
           You may upload only up to {maxFiles} files, please remove{" "}
           {files.length - maxFiles} file
-          {files.length - maxFiles > 1 ? "'s'" : "''"}.
+          {files.length - maxFiles > 1 ? "s" : ""}.
         </p>
       )}
       {files.length > 0 && !exceedMaxFiles && (
@@ -231,11 +210,11 @@ const DropzoneContent = ({ className }: { className?: string }) => {
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                 Uploading...
               </>
             ) : (
-              <>Upload files</>
+              <>{maxFiles === 1 ? "Upload File" : "Upload Files"}</>
             )}
           </Button>
         </div>
@@ -252,22 +231,21 @@ const DropzoneEmptyState = ({ className }: { className?: string }) => {
   }
 
   return (
-    <div className={cn("'flex flex-col items-center gap-y-2'", className)}>
+    <div className={cn("flex flex-col items-center gap-y-2", className)}>
       <Upload size={20} className="text-neutral-500 dark:text-neutral-400" />
       <p className="text-sm">
-        Upload{!!maxFiles && maxFiles > 1 ? ` ${maxFiles}` : "''"} file
-        {!maxFiles || maxFiles > 1 ? "'s'" : "''"}
+        Upload{!!maxFiles && maxFiles > 1 ? ` ${maxFiles}` : ""} file
+        {!maxFiles || maxFiles > 1 ? "s" : ""}
       </p>
       <div className="flex flex-col items-center gap-y-1">
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          Drag and drop or{"'"}
+          Drag and drop or{" "}
           <a
             onClick={() => inputRef.current?.click()}
             className="underline cursor-pointer transition hover:text-neutral-950 dark:hover:text-neutral-50"
           >
-            select {maxFiles === 1 ? `file` : "'files'"}
-          </a>
-          {"'"}
+            select {maxFiles === 1 ? `file` : "files"}
+          </a>{" "}
           to upload
         </p>
         {maxFileSize !== Number.POSITIVE_INFINITY && (
@@ -284,7 +262,7 @@ const useDropzoneContext = () => {
   const context = useContext(DropzoneContext);
 
   if (!context) {
-    throw new Error("'useDropzoneContext must be used within a Dropzone'");
+    throw new Error("useDropzoneContext must be used within a Dropzone");
   }
 
   return context;

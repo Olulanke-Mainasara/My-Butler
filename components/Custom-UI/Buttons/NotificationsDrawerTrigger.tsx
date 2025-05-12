@@ -18,23 +18,22 @@ import {
 } from "@/components/Shad-UI/drawer";
 import { BellDot } from "lucide-react";
 import NotificationCard from "../Cards/NotificationCard";
-import {
-  useNotifications,
-  useUserProfile,
-} from "@/components/Providers/AllProviders";
+import { useNotifications } from "@/components/Providers/AllProviders";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { NotificationsPlaceholder } from "../Placeholders/NotificationsPlaceholder";
 import { usePathname } from "next/navigation";
 import { LoginPlaceholder } from "../Placeholders/LoginPlaceholder";
 export default function NotificationsDrawerTrigger() {
   const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
   const pathname = usePathname();
   const notifications = useNotifications();
 
   return (
     <>
       <div
+        suppressHydrationWarning
         className={`md:hidden ${
           pathname === "/camera" || pathname === "/combine/personal"
             ? "hidden"
@@ -52,7 +51,7 @@ export default function NotificationsDrawerTrigger() {
                 Preview your recent notifications.
               </DrawerDescription>
             </DrawerHeader>
-            {!userProfile ? (
+            {!customerProfile ? (
               <LoginPlaceholder info="your recent notifications" />
             ) : (
               <section className="px-4 pb-4 h-full overflow-y-scroll">
@@ -87,7 +86,7 @@ export default function NotificationsDrawerTrigger() {
                 Preview your recent notifications.
               </DialogDescription>
             </DialogHeader>
-            {!userProfile ? (
+            {!customerProfile ? (
               <LoginPlaceholder info="your recent notifications" />
             ) : (
               <section className="px-4 pb-4 h-full overflow-y-scroll">

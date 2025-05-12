@@ -2,9 +2,12 @@
 
 import { CartPlaceholder } from "@/components/Custom-UI/Placeholders/CartPlaceholder";
 import { useCart } from "@/components/Providers/AllProviders";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import CartItemCard from "@/components/Custom-UI/Cards/CartItemCard";
+import { LoginPlaceholder } from "@/components/Custom-UI/Placeholders/LoginPlaceholder";
 
 const Cart = () => {
+  const customerProfile = useCustomerProfile();
   const cart = useCart();
 
   return (
@@ -14,10 +17,16 @@ const Cart = () => {
       <hr className="mx-4 xl:mx-3 mt-8" />
 
       <section className="px-4 xl:px-3 h-full">
-        {!cart || cart.length === 0 ? (
-          <CartPlaceholder />
+        {!customerProfile ? (
+          <LoginPlaceholder info="the items in your cart" />
         ) : (
-          cart.map((item, index) => <CartItemCard key={index} />)
+          <section className="px-4 pb-4 h-full overflow-y-scroll">
+            {!cart || cart.length === 0 ? (
+              <CartPlaceholder />
+            ) : (
+              cart.map((_, index) => <CartItemCard key={index} />)
+            )}
+          </section>
         )}
       </section>
     </div>

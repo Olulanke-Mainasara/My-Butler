@@ -20,12 +20,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Edit, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
-import { useUserProfile } from "@/components/Providers/AllProviders";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { usePathname } from "next/navigation";
 
 export function ChatSidebar() {
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
   const pathname = usePathname();
@@ -70,7 +70,7 @@ export function ChatSidebar() {
 
   React.useEffect(() => {
     const fetchConversations = async () => {
-      if (!userProfile) {
+      if (!customerProfile) {
         return;
       }
 
@@ -78,7 +78,7 @@ export function ChatSidebar() {
       const { data, error } = await supabase
         .from("chats")
         .select("chat_id,chat_title")
-        .eq("user_id", userProfile.id);
+        .eq("user_id", customerProfile.id);
 
       if (error) {
         setError("Unable to fetch conversations");
@@ -90,7 +90,7 @@ export function ChatSidebar() {
     };
 
     fetchConversations();
-  }, [userProfile]);
+  }, [customerProfile]);
 
   React.useEffect(() => {
     supabase

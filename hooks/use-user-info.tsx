@@ -1,34 +1,53 @@
 import React, { useCallback } from "react";
 import { Notification } from "@/types/Notification";
 import { CartItem } from "@/types/CartItem";
-import { UserProfile } from "@/types/UserProfile";
+import { CustomerProfile } from "@/types/CustomerProfile";
 import { RealtimePostgresChangesPayload, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
+import { BrandProfile } from "@/types/BrandProfile";
 
 export function useUserInfo() {
   const [userSession, setUserSession] = React.useState<User | null>(null);
-  const [userProfile, setUserProfile] = React.useState<UserProfile | null>(
+  const [customerProfile, setCustomerProfile] =
+    React.useState<CustomerProfile | null>(null);
+  const [brandProfile, setBrandProfile] = React.useState<BrandProfile | null>(
     null
   );
-  const [userCount, setUserCount] = React.useState(0);
+  const hasFetched = React.useRef(false);
   const [notifications, setNotifications] = React.useState<
     Notification[] | null
   >(null);
   const [cart, setCart] = React.useState<CartItem[] | null>(null);
 
-  const handleUserProfileEvents = (
+  const handleCustomerProfileEvents = (
     payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
   ) => {
     console.log("Change received!", payload);
 
     if (payload.eventType === "DELETE") {
-      setUserProfile(null);
+      setCustomerProfile(null);
       return;
     } else if (
       payload.eventType === "INSERT" ||
       payload.eventType === "UPDATE"
     ) {
-      setUserProfile(payload.new as UserProfile);
+      setCustomerProfile(payload.new as CustomerProfile);
+    }
+  };
+
+  const handleBrandProfileEvents = (
+    payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
+  ) => {
+    console.log("Change received!", payload);
+
+    if (payload.eventType === "DELETE") {
+      setBrandProfile(null);
+      return;
+    } else if (
+      payload.eventType === "INSERT" ||
+      payload.eventType === "UPDATE"
+    ) {
+      setBrandProfile(payload.new as BrandProfile);
     }
   };
 
@@ -70,9 +89,13 @@ export function useUserInfo() {
     }
   };
 
-  const fetchUserProfile = React.useCallback(async (userSession: User) => {
+  const fetchCustomerProfile = React.useCallback(async (userSession: User) => {
+    if (userSession.user_metadata.role_id !== 2) {
+      return null;
+    }
+
     const { data, error } = await supabase
-      .from("users")
+      .from("customers")
       .select("*")
       .eq("id", userSession.id)
       .single();
@@ -81,17 +104,51 @@ export function useUserInfo() {
       return null;
     }
 
-    // Listen to changes in the cart table
+    // Listen to changes in the customers table
     supabase
-      .channel("users")
+      .channel("customers")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "users" },
-        (payload) => handleUserProfileEvents(payload)
+        { event: "*", schema: "public", table: "customers" },
+        (payload) => handleCustomerProfileEvents(payload)
       )
       .subscribe();
 
-    return data;
+    return {
+      ...data,
+      role_id: 2,
+    };
+  }, []);
+
+  const fetchBrandProfile = useCallback(async (userSession: User) => {
+    if (userSession.user_metadata.role_id !== 4) {
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from("brands")
+      .select("*")
+      .eq("id", userSession.id)
+      .single();
+
+    if (error) {
+      return null;
+    }
+
+    // Listen to changes in the brands table
+    supabase
+      .channel("brands")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "brands" },
+        (payload) => handleBrandProfileEvents(payload)
+      )
+      .subscribe();
+
+    return {
+      ...data,
+      role_id: 4,
+    };
   }, []);
 
   const fetchCartItems = useCallback(async (userSession: User) => {
@@ -142,29 +199,37 @@ export function useUserInfo() {
   }, []);
 
   const setUserInfo = React.useCallback(async () => {
-    if (userSession) {
-      if (userCount > 0) {
-        return;
-      }
+    if (userSession && !hasFetched.current) {
+      hasFetched.current = true;
 
-      const userProfileData = await fetchUserProfile(userSession);
-      const cartData = await fetchCartItems(userSession);
-      const notificationsData = await fetchNotifications(userSession);
+      const [
+        customerProfileData,
+        brandProfileData,
+        cartData,
+        notificationsData,
+      ] = await Promise.all([
+        fetchCustomerProfile(userSession),
+        fetchBrandProfile(userSession),
+        fetchCartItems(userSession),
+        fetchNotifications(userSession),
+      ]);
 
-      setUserProfile(userProfileData);
+      setCustomerProfile(customerProfileData);
+      setBrandProfile(brandProfileData);
       setCart(cartData);
       setNotifications(notificationsData);
-      setUserCount(userCount + 1);
-    } else {
-      setUserProfile(null);
+    } else if (!userSession) {
+      hasFetched.current = false;
+      setCustomerProfile(null);
+      setBrandProfile(null);
       setCart(null);
       setNotifications(null);
     }
   }, [
     fetchCartItems,
     fetchNotifications,
-    fetchUserProfile,
-    userCount,
+    fetchCustomerProfile,
+    fetchBrandProfile,
     userSession,
   ]);
 
@@ -194,5 +259,5 @@ export function useUserInfo() {
     setUserInfo();
   }, [setUserInfo, userSession]);
 
-  return { userSession, userProfile, cart, notifications };
+  return { userSession, customerProfile, brandProfile, cart, notifications };
 }

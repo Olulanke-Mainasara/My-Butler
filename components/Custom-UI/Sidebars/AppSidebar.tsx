@@ -32,11 +32,11 @@ import { groupedNavigation } from "@/static-data/navigation";
 import { ChevronUp, LogIn, LogOut, User, UserCircle2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useUserProfile } from "@/components/Providers/AllProviders";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { usePathname } from "next/navigation";
 
 export function AppSidebar() {
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
   const router = useRouter();
   const pathname = usePathname();
   const { theme } = useTheme();
@@ -110,13 +110,13 @@ export function AppSidebar() {
       <SidebarFooter className="pb-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            {userProfile ? (
+            {customerProfile ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton className="h-12">
-                    {userProfile.profile_picture ? (
+                    {customerProfile.profile_picture ? (
                       <Image
-                        src={userProfile.profile_picture}
+                        src={customerProfile.profile_picture}
                         className="w-8 h-8 rounded-full"
                         alt="logo"
                         width={40}
@@ -127,7 +127,7 @@ export function AppSidebar() {
                         <User />
                       </span>
                     )}{" "}
-                    {userProfile.display_name}
+                    {customerProfile.display_name}
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>

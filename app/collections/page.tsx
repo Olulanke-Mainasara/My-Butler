@@ -6,12 +6,31 @@ import { Search } from "lucide-react";
 import NormalCarousel from "@/components/Custom-UI/Carousel/NormalCarousel";
 import CarouselWithSubCarousel from "@/components/Custom-UI/Carousel/CarouselWithSubCarousel";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
-import OutfitCard from "@/components/Custom-UI/Cards/OutfitCard";
+import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
 import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
-import { Itemfilter } from "@/static-data/filters";
+import { productFilter } from "@/static-data/filters";
 
-const Outfits = () => {
+const products = [
+  {
+    id: "1",
+    name: "Cotton T-Shirt",
+    slug: "cotton-t-shirt",
+    description: "Soft and breathable cotton t-shirt",
+    category_id: 1,
+    category_name: "T-Shirts",
+    display_image: "/placeholder.svg?height=60&width=60",
+    product_images: ["/placeholder.svg?height=60&width=60"],
+    price: 29.99,
+    stock_quantity: 150,
+    rating: 4.5,
+    reviews_count: 120,
+    created_at: "2023-04-15T00:00:00Z",
+    updated_at: "2023-07-20T00:00:00Z",
+  },
+];
+
+const Collections = () => {
   return (
     <div className="mt-[76px] md:mt-6 pb-5 xl:pb-5 space-y-7 md:space-y-0">
       <div className="flex flex-col md:flex-row xl:items-center gap-4 py-3 justify-center fixed top-12 left-0 w-full bg-lightBackground dark:bg-darkBackground z-10">
@@ -23,13 +42,13 @@ const Outfits = () => {
 
             <input
               type="text"
-              placeholder="Search outfits"
+              placeholder="Search collections"
               className="pr-3 outline-none bg-transparent pl-0 w-full text-lg md:text-xl h-full"
             />
           </div>
           <div className="flex items-center gap-4">
             <CartDrawerTrigger />
-            <FilterDrawerTrigger optionCollection={Itemfilter} />
+            <FilterDrawerTrigger optionCollection={productFilter} />
           </div>
         </div>
       </div>
@@ -52,7 +71,7 @@ const Outfits = () => {
           items={Array.from({ length: 5 })}
           className="xl:hidden"
         >
-          <OutfitCard />
+          <ProductCard product={products[0]} />
         </CarouselWithSlideTracker>
 
         <section className="space-y-4 px-4 xl:px-5">
@@ -83,7 +102,7 @@ const Outfits = () => {
         </section>
 
         <section className="space-y-4 px-4 xl:px-5">
-          <p className="text-3xl md:text-4xl">Brands and line-ups</p>
+          <p className="text-3xl md:text-4xl">Brands and Collections</p>
           <CarouselWithSubCarousel items={Array.from({ length: 5 })} />
         </section>
 
@@ -92,7 +111,7 @@ const Outfits = () => {
             Our customer&apos;s favorites
           </p>
           <CarouselWithSlideTracker items={Array.from({ length: 5 })}>
-            <OutfitCard />
+            <ProductCard product={products[0]} />
           </CarouselWithSlideTracker>
         </section>
       </section>
@@ -100,4 +119,4 @@ const Outfits = () => {
   );
 };
 
-export default Outfits;
+export default Collections;

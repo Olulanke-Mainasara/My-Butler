@@ -27,13 +27,15 @@ function Home() {
   const splashed = searchParams.get("splashed");
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      router.push("/", { scroll: false });
-      setSplashCounter((prev) => prev + 1);
-    }, 2800);
+    if (splashed) {
+      const timeout = setTimeout(() => {
+        router.push("/", { scroll: false });
+        setSplashCounter((prev) => prev + 1);
+      }, 2800);
 
-    return () => clearTimeout(timeout);
-  }, [router]);
+      return () => clearTimeout(timeout);
+    }
+  }, [splashed, router]);
 
   const shouldDisplaySplash = !splashed && splashCounter === 0;
 

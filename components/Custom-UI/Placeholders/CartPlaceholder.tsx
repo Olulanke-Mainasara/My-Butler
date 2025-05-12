@@ -17,7 +17,7 @@ export function CartPlaceholder() {
         No cart items
       </h2>
       <p className="text-neutral-500 mt-2 text-center max-w-xs">
-        Outfits, items, and events will show up here when you add them to your
+        Products, Food, and events will show up here when you add them to your
         cart
       </p>
     </section>

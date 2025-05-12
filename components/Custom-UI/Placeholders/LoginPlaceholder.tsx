@@ -11,6 +11,7 @@ export function LoginPlaceholder({ info }: { info: string }) {
   return (
     <section className="flex flex-col items-center justify-center h-full">
       <Image
+        suppressHydrationWarning
         src={theme === "dark" ? emptyGalleryDark : emptyGalleryLight}
         alt="Empty cart"
         className="size-60 md:size-72"

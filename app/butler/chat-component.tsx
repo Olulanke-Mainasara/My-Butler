@@ -13,7 +13,7 @@ import { Json } from "@/supabase";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useUserProfile } from "@/components/Providers/AllProviders";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 
 type Message = {
   role: "user" | "assistant";
@@ -65,7 +65,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
   const [responseLoading, setResponseLoading] = React.useState(false);
   const [responseError, setResponseError] = React.useState<string | null>(null);
   const [userCount, setUserCount] = React.useState(0);
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
   const router = useRouter();
   const pathname = usePathname();
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
@@ -81,7 +81,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
 
   React.useEffect(() => {
     // Fetch the AI response on page load for a that visitor isn't logged in yet
-    if (!userProfile && prompt) {
+    if (!customerProfile && prompt) {
       const fetchAnonymousMessages = async () => {
         setResponseError(null);
         setResponseLoading(true);
@@ -168,7 +168,7 @@ export default function Chat({ prompt }: { prompt?: string }) {
     setUserCount((prevCount) => prevCount + 1);
 
     fetchChatMessages();
-  }, [pathname, prompt, router, userProfile, userCount]);
+  }, [pathname, prompt, router, customerProfile, userCount]);
 
   // Fetch an AI response, after the user sends a new prompt
   const handleSubmit = async () => {

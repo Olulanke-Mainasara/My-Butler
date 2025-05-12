@@ -41,7 +41,7 @@ export function LoginForm({
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/?splashed=true");
+      router.push("/");
     }
   };
 
@@ -103,6 +103,7 @@ export function LoginForm({
                   className="disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
+
               <Button
                 type="submit"
                 disabled={loading}
@@ -111,14 +112,19 @@ export function LoginForm({
                 {loading && <Icons.spinner className="w-6 h-6 animate-spin" />}
                 Login
               </Button>
-              <div className="text-center text-red-600">
-                <p>{error && `${error}, please try again`}</p>
-              </div>
+
+              {error && (
+                <div className="text-center text-red-600">
+                  <p>{`${error}, please try again`}</p>
+                </div>
+              )}
+
               <ThirdPartySignIn
                 loading={loading}
                 handleThirdPartyLogin={(provider) => handleOAuthLogin(provider)}
                 google
               />
+
               <div className="text-center text-sm flex gap-1 justify-center">
                 Don&apos;t have an account?{""}
                 <Link

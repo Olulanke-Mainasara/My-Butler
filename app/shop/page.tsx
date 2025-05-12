@@ -14,7 +14,7 @@ import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWi
 import ShopCard from "@/components/Custom-UI/Cards/ShopCard";
 import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
 import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
-import { Itemfilter } from "@/static-data/filters";
+import { productFilter } from "@/static-data/filters";
 
 const Shop = () => {
   return (
@@ -28,13 +28,13 @@ const Shop = () => {
 
             <input
               type="text"
-              placeholder="Find clothings and items"
+              placeholder="Find clothings and products"
               className="pr-3 outline-none bg-transparent pl-0 w-full text-lg md:text-xl h-full"
             />
           </div>
           <div className="flex items-center gap-4">
             <CartDrawerTrigger />
-            <FilterDrawerTrigger optionCollection={Itemfilter} />
+            <FilterDrawerTrigger optionCollection={productFilter} />
           </div>
         </div>
       </div>

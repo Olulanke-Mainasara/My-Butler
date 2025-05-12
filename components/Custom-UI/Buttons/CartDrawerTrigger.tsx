@@ -17,7 +17,8 @@ import {
   DrawerTrigger,
 } from "@/components/Shad-UI/drawer";
 import { ShoppingCart } from "lucide-react";
-import { useCart, useUserProfile } from "@/components/Providers/AllProviders";
+import { useCart } from "@/components/Providers/AllProviders";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { CartPlaceholder } from "../Placeholders/CartPlaceholder";
 import CartItemCard from "../Cards/CartItemCard";
 import { LoginPlaceholder } from "../Placeholders/LoginPlaceholder";
@@ -25,7 +26,7 @@ import { LoginPlaceholder } from "../Placeholders/LoginPlaceholder";
 export default function CartDrawerTrigger() {
   const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
   const cart = useCart();
 
   return (
@@ -42,7 +43,7 @@ export default function CartDrawerTrigger() {
                 Preview the items in your cart.
               </DrawerDescription>
             </DrawerHeader>
-            {!userProfile ? (
+            {!customerProfile ? (
               <LoginPlaceholder info="the items in your cart" />
             ) : (
               <section className="px-4 pb-4 h-full overflow-y-scroll">
@@ -69,7 +70,7 @@ export default function CartDrawerTrigger() {
                 Preview the items in your cart.
               </DialogDescription>
             </DialogHeader>
-            {!userProfile ? (
+            {!customerProfile ? (
               <LoginPlaceholder info="the items in your cart" />
             ) : (
               <section className="px-4 pb-4 h-full overflow-y-scroll">

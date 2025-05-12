@@ -1,12 +1,12 @@
 "use client";
 
-import { ProfileForm } from "@/app/settings/profile-form";
-import { useUserProfile } from "@/components/Providers/AllProviders";
+import { ProfileForm } from "./profile-form";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { Button } from "@/components/Shad-UI/button";
 import React from "react";
 
 const Settings = () => {
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
   return (
     <div className="h-full flex flex-col gap-6">
       <div>
@@ -16,7 +16,7 @@ const Settings = () => {
         </p>
       </div>
       <hr />
-      {userProfile ? (
+      {customerProfile ? (
         <ProfileForm />
       ) : (
         <div className="h-full flex flex-col gap-1 items-center justify-center text-2xl grow">

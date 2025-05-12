@@ -13,14 +13,12 @@ import NotificationsDrawerTrigger from "../Custom-UI/Buttons/NotificationsDrawer
 import CartDrawerTrigger from "../Custom-UI/Buttons/CartDrawerTrigger";
 import { Notification } from "@/types/Notification";
 import { CartItem } from "@/types/CartItem";
-import { UserProfile } from "@/types/UserProfile";
 import { useUserInfo } from "@/hooks/use-user-info";
+import UserProvider from "./UserProvider";
+import { ThemeToggler } from "../Custom-UI/Buttons/ThemeToggler";
 
 const authContext = React.createContext<User | null>(null);
 export const useAuth = () => React.useContext(authContext);
-
-const userProfileContext = React.createContext<UserProfile | null>(null);
-export const useUserProfile = () => React.useContext(userProfileContext);
 
 const notificationsContext = React.createContext<Notification[] | null>(null);
 export const useNotifications = () => React.useContext(notificationsContext);
@@ -31,11 +29,16 @@ export const useCart = () => React.useContext(cartContext);
 const AllProviders = ({ children }: React.PropsWithChildren) => {
   const pathname = usePathname();
 
-  const { userSession, userProfile, notifications, cart } = useUserInfo();
+  const { userSession, customerProfile, brandProfile, notifications, cart } =
+    useUserInfo();
 
   return (
     <authContext.Provider value={userSession}>
-      <userProfileContext.Provider value={userProfile}>
+      <UserProvider
+        userSession={userSession}
+        customerProfile={customerProfile}
+        brandProfile={brandProfile}
+      >
         <SidebarProvider defaultOpen={false}>
           <ThemeProvider
             attribute="class"
@@ -45,20 +48,31 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
           >
             <notificationsContext.Provider value={notifications}>
               <cartContext.Provider value={cart}>
-                <AppSidebar />
+                {!pathname.startsWith("/brand") ? <AppSidebar /> : <></>}
+
                 <main className="w-full relative">
                   <div
+                    suppressHydrationWarning
                     className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full p-3 ${
                       pathname !== "/camera" &&
                       pathname !== "/combine" &&
                       pathname !== "/combine/personal"
                         ? "bg-lightBackground dark:bg-darkBackground"
                         : "text-white"
-                    } `}
+                    }`}
                   >
-                    <SidebarTrigger />
+                    {!pathname.startsWith("/brand") ? (
+                      <SidebarTrigger />
+                    ) : (
+                      <></>
+                    )}
+
                     <Link
-                      href={"/?splashed=true"}
+                      href={
+                        pathname.startsWith("/brand")
+                          ? "/brand"
+                          : "/?splashed=true"
+                      }
                       className={`text-2xl ${
                         pathname === "/camera" ||
                         pathname === "/combine/personal"
@@ -71,7 +85,9 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                         Butler
                       </span>
                     </Link>
-                    {pathname !== "/notifications" ? (
+                    {pathname.startsWith("/brand") ? (
+                      <ThemeToggler />
+                    ) : pathname !== "/notifications" ? (
                       <NotificationsDrawerTrigger />
                     ) : (
                       <CartDrawerTrigger />
@@ -85,7 +101,7 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
             </notificationsContext.Provider>
           </ThemeProvider>
         </SidebarProvider>
-      </userProfileContext.Provider>
+      </UserProvider>
     </authContext.Provider>
   );
 };

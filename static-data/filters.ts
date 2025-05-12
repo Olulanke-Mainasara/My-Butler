@@ -1,4 +1,4 @@
-export const Itemfilter = {
+export const productFilter = {
   category: [
     { name: "All", value: "all" },
     { name: "T-Shirts", value: "shirts" },

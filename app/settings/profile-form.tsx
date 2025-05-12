@@ -16,21 +16,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/Shad-UI/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/Shad-UI/select";
 
 import { Input } from "@/components/Shad-UI/input";
-import { Textarea } from "@/components/Shad-UI/textarea";
-import { useUserProfile } from "@/components/Providers/AllProviders";
-import { industries } from "@/static-data/filters";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { compareTwoObjects } from "@/lib/utils";
+import { Icons } from "@/components/Custom-UI/icons";
 
 const profileFormSchema = z.object({
   username: z
@@ -43,16 +35,12 @@ const profileFormSchema = z.object({
     })
     .optional(),
   email: z.string().email().optional(),
-  bio: z
+  location: z
     .string()
-    .max(160)
-    .min(4, { message: "Bio must be at least 4 characters." })
+    .min(2, {
+      message: "Location must be at least 2 characters.",
+    })
     .optional(),
-  url: z.string().url({ message: "Please enter a valid URL." }).optional(),
-  location: z.string().min(2, {
-    message: "Location must be at least 2 characters.",
-  }),
-  category: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -60,15 +48,12 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export function ProfileForm() {
   const [loading, setLoading] = React.useState(false);
   const router = useRouter();
-  const userProfile = useUserProfile();
+  const customerProfile = useCustomerProfile();
 
   const defaultValues: Partial<ProfileFormValues> = {
-    username: userProfile?.display_name,
-    email: userProfile?.email,
-    bio: userProfile?.bio || "Not/Available",
-    url: userProfile?.url || "https://localhost:3000",
-    location: userProfile?.location || "N/A",
-    category: userProfile?.category || "N/A",
+    username: customerProfile?.display_name,
+    email: customerProfile?.email,
+    location: customerProfile?.location || "N/A",
   };
 
   const form = useForm<ProfileFormValues>({
@@ -85,7 +70,7 @@ export function ProfileForm() {
       return;
     }
 
-    if (!userProfile) {
+    if (!customerProfile) {
       toast.info("You need to log in first", {
         action: {
           label: "Login",
@@ -98,13 +83,10 @@ export function ProfileForm() {
     setLoading(true);
 
     const { error } = await supabase.rpc("update_user_details", {
-      _bio: data.bio === "Not/Available" ? "" : data.bio ?? "",
-      _category: data.category === "N/A" ? "" : data.category ?? "",
       _display_name: data.username === "N/A" ? "" : data.username ?? "",
       _email: data.email === "N/A" ? "" : data.email ?? "",
       _location: data.location === "N/A" ? "" : data.location ?? "",
-      _supabase_user_id: userProfile?.supabase_user_id ?? "",
-      _url: data.url === "https://localhost:3000" ? "" : data.url ?? "",
+      _supabase_user_id: customerProfile?.supabase_user_id ?? "",
     });
 
     if (error) {
@@ -133,7 +115,7 @@ export function ProfileForm() {
               <FormLabel>Username</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={userProfile?.display_name}
+                  placeholder={customerProfile?.display_name}
                   {...field}
                   disabled={loading}
                 />
@@ -154,67 +136,12 @@ export function ProfileForm() {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={userProfile?.email}
+                  placeholder={customerProfile?.email}
                   {...field}
                   disabled={loading}
                 />
               </FormControl>
               <FormDescription>This is your contact email.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="bio"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bio</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={
-                    !userProfile?.bio || userProfile.bio === "Not/Available"
-                      ? "Tell us a little about yourself"
-                      : userProfile.bio
-                  }
-                  className="resize-none"
-                  {...field}
-                  value={field.value === "Not/Available" ? "" : field.value}
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormDescription>
-                What do you want people to know about you? You have 160
-                characters.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>URL</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={
-                    !userProfile?.url ||
-                    userProfile.url === "https://localhost:3000"
-                      ? "Your website URL"
-                      : userProfile.url
-                  }
-                  {...field}
-                  value={
-                    field.value === "https://localhost:3000" ? "" : field.value
-                  }
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormDescription>
-                Add a link to your website, blog, or social media profile.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -228,9 +155,10 @@ export function ProfileForm() {
               <FormControl>
                 <Input
                   placeholder={
-                    !userProfile?.location || userProfile.location === "N/A"
+                    !customerProfile?.location ||
+                    customerProfile.location === "N/A"
                       ? "Where are you located?"
-                      : userProfile.location
+                      : customerProfile.location
                   }
                   {...field}
                   value={field.value === "N/A" ? "" : field.value}
@@ -244,46 +172,20 @@ export function ProfileForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value === "N/A" ? "" : field.value}
-                disabled={loading}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        !userProfile?.category || userProfile.category === "N/A"
-                          ? "Select a category"
-                          : userProfile.category
-                      }
-                    />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {industries.map((category, index) => (
-                    <SelectItem key={index} value={category.value}>
-                      {category.value}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                Select what category you/your brand belong to
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
-        <Button type="submit" className="text-base w-full md:w-fit">
-          Update profile
+        <Button
+          type="submit"
+          className="text-base w-full md:w-1/2"
+          disabled={loading}
+        >
+          {loading ? (
+            <span className="flex items-center gap-2">
+              Updating
+              <Icons.spinner />
+            </span>
+          ) : (
+            "Update Profile"
+          )}
         </Button>
       </form>
     </Form>

@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { Item } from "@/types/Item";
+import { Product } from "@/types/Product";
 
-const ShopCard = ({ item }: { item?: Item }) => {
-  console.log(item);
+const ShopCard = ({ product }: { product?: Product }) => {
+  console.log(product);
   return (
     <div className="md:px-[10px] xl:px-3 h-full">
       <div className="border flex items-center justify-center h-full rounded-3xl relative ">
-        Item
+        Product
       </div>
     </div>
   );
