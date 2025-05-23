@@ -4,10 +4,18 @@ import { SidebarNav } from "@/components/Custom-UI/Sidebars/SidebarNav";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Button } from "@/components/Shad-UI/button";
 import { supabase } from "@/lib/supabase/client";
-import { LogOut, User } from "lucide-react";
+import {
+  BookCopy,
+  ChartColumnBig,
+  LogOut,
+  Newspaper,
+  PartyPopper,
+  ShoppingBag,
+  User,
+} from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from "next-view-transitions";
+import { useTransitionRouter } from "next-view-transitions";
 import React from "react";
 
 const SidebarNavItems = [
@@ -15,32 +23,37 @@ const SidebarNavItems = [
     id: 1,
     href: "/brand",
     title: "Dashboard",
+    icon: <ChartColumnBig />,
   },
   {
     id: 2,
     href: "/brand/products",
     title: "Products",
+    icon: <ShoppingBag />,
   },
   {
     id: 3,
     href: "/brand/collections",
     title: "Collections",
+    icon: <BookCopy />,
   },
-  // {
-  //   id: 4,
-  //   href: "/brand/followers",
-  //   title: "Followers",
-  // },
-  // {
-  //   id: 5,
-  //   href: "/brand/messages",
-  //   title: "Messages",
-  // },
+  {
+    id: 4,
+    href: "/brand/articles",
+    title: "Articles",
+    icon: <Newspaper />,
+  },
+  {
+    id: 5,
+    href: "/brand/events",
+    title: "Events",
+    icon: <PartyPopper />,
+  },
 ];
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const brandProfile = useBrandProfile();
-  const router = useRouter();
+  const router = useTransitionRouter();
 
   const handleSignout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -53,7 +66,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <div className="px-3 pt-14 pb-4 xl:pb-5 h-screen overflow-y-scroll flex flex-col gap-4">
+    <div className="px-3 pt-14 pb-4 xl:pb-5 lg:h-screen lg:overflow-y-scroll flex flex-col gap-4">
       <div className="flex flex-col gap-4 lg:flex-row md:justify-between lg:items-center">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:gap-6">
           <div className="flex items-center gap-2">

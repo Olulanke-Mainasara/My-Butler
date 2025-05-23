@@ -17,12 +17,7 @@ import {
 } from "@/components/Shad-UI/form";
 import { RadioGroup, RadioGroupItem } from "@/components/Shad-UI/radio-group";
 import { useTheme } from "next-themes";
-
-const appearanceFormSchema = z.object({
-  theme: z.enum(["light", "dark"], {
-    required_error: "Please select a theme.",
-  }),
-});
+import { appearanceFormSchema } from "@/lib/schemas";
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
 

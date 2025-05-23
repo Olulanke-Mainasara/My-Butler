@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/Shad-UI/button";
 import { PlusCircle } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { Collection } from "@/types/Collection";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -36,23 +36,31 @@ export default function Collections() {
           <h1 className="text-4xl font-bold tracking-tight">Collections</h1>
           <p className="opacity-70">Manage your published Collections.</p>
         </div>
-        <Button asChild>
-          <Link href="/brand/collections/new" className="flex items-center">
-            <PlusCircle />
-            Add Collection
-          </Link>
-        </Button>
+        {collections.length > 0 && (
+          <Button asChild>
+            <Link href="/brand/collections/new" className="flex items-center">
+              <PlusCircle />
+              Add Collection
+            </Link>
+          </Button>
+        )}
       </div>
 
       {collections.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {collections.map((collection) => (
-            <CollectionCard key={collection.id} collection={collection} />
+            <CollectionCard key={collection.id} item={collection} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-10 border rounded-lg text-xl">
-          No collections found.
+        <div className="text-center py-10 border rounded-lg text-xl flex flex-col gap-4 items-center">
+          <p>No collections found.</p>
+          <Button asChild>
+            <Link href="/brand/collections/new" className="flex items-center">
+              <PlusCircle />
+              Create Collection
+            </Link>
+          </Button>
         </div>
       )}
     </div>

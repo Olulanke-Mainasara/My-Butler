@@ -1,12 +1,37 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Search } from "lucide-react";
-import Link from "next/link";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
+import { supabase } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import { Event } from "@/types/Event";
 
 const Events = () => {
+  const [events, setEvents] = React.useState<Event[]>([]);
+
+  async function fetchEvents() {
+    const { data, error } = await supabase.from("events").select("*");
+
+    if (error) {
+      toast.error("Failed to fetch events.");
+      return [];
+    }
+
+    return data || [];
+  }
+
+  const fetchPageData = useCallback(async () => {
+    const [Events] = await Promise.all([fetchEvents()]);
+
+    setEvents(Events || []);
+  }, []);
+
+  React.useEffect(() => {
+    fetchPageData();
+  }, [fetchPageData]);
+
   return (
     <div className="mt-[141px] md:mt-[136px] xl:mt-36 pb-4 xl:pb-5">
       <div className="justify-center fixed left-0 top-12 py-3 w-full bg-lightBackground dark:bg-darkBackground z-10 px-4 md:px-0">
@@ -24,31 +49,18 @@ const Events = () => {
       </div>
 
       <section className="space-y-10">
-        <CarouselWithSlideTracker items={Array.from({ length: 5 })}>
+        <CarouselWithSlideTracker items={events}>
           <EventCard />
         </CarouselWithSlideTracker>
 
         <section className="space-y-4 px-4 md:px-5">
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Upcoming</p>
-
-            <Link href={"/events/latest"} className="text-xl">
-              {" "}
-              See More
-            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-8">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className={`${
-                  index === 4 || index === 5 ? "hidden lg:flex" : "flex"
-                } gap-5 h-72`}
-              >
-                <div className="border w-full basis-1/5 h-1/3 rounded-xl"></div>
-                <div className="border w-full basis-4/5 rounded-2xl"></div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+            {events.map((event) => (
+              <EventCard key={event.id} item={event} />
             ))}
           </div>
         </section>
@@ -68,24 +80,11 @@ const Events = () => {
         <section className="space-y-4 px-4 md:px-5">
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Recommended</p>
-
-            <Link href={"/events/recommended"} className="text-xl">
-              {" "}
-              See More
-            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-8">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className={`${
-                  index === 4 || index === 5 ? "hidden lg:flex" : "flex"
-                } gap-5 h-72`}
-              >
-                <div className="border w-full basis-1/5 h-1/3 rounded-xl"></div>
-                <div className="border w-full basis-4/5 rounded-2xl"></div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+            {events.map((event) => (
+              <EventCard key={event.id} item={event} />
             ))}
           </div>
         </section>

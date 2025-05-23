@@ -16,18 +16,19 @@ import {
   useSidebar,
 } from "@/components/Shad-UI/sidebar";
 
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useTransitionRouter } from "next-view-transitions";
+import { Link } from "next-view-transitions";
 import { Edit, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 export function ChatSidebar() {
   const customerProfile = useCustomerProfile();
   const { toggleSidebar } = useSidebar();
-  const router = useRouter();
+  const router = useTransitionRouter();
   const pathname = usePathname();
   const [conversations, setConversations] = React.useState<
     { chat_id: string; chat_title: string }[] | null
@@ -52,6 +53,16 @@ export function ChatSidebar() {
           ? [...prev, payload.new as { chat_id: string; chat_title: string }]
           : [payload.new as { chat_id: string; chat_title: string }]
       );
+    } else if (payload.eventType === "UPDATE") {
+      setConversations((prev) =>
+        prev
+          ? prev.map((convo) =>
+              convo.chat_id === payload.new.chat_id
+                ? (payload.new as { chat_id: string; chat_title: string })
+                : convo
+            )
+          : null
+      );
     }
   };
 
@@ -64,7 +75,10 @@ export function ChatSidebar() {
       console.error("Error deleting chat", error);
     } else {
       toggleSidebar();
-      router.push("/butler");
+      toast.success("Chat deleted successfully");
+      if (pathname.startsWith(`/butler/${chatId}`)) {
+        router.push("/butler");
+      }
     }
   };
 
@@ -130,7 +144,7 @@ export function ChatSidebar() {
               <div className="h-8 animate-pulse bg-gray-400 rounded-md"></div>
             </div>
           ) : conversations && !error ? (
-            <SidebarGroup className="p-0">
+            <SidebarGroup className="p-0 gap-0">
               <SidebarGroupLabel className="text-black dark:text-white">
                 Conversations
               </SidebarGroupLabel>
@@ -147,7 +161,9 @@ export function ChatSidebar() {
                         }}
                       >
                         <Link href={`/butler/${convo.chat_id}`}>
-                          <span>{convo.chat_title}</span>
+                          <span className="truncate text-sm">
+                            {convo.chat_title}
+                          </span>
                         </Link>
                       </SidebarMenuButton>
                       <SidebarMenuAction

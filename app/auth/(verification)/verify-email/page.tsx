@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/Shad-UI/button";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { MailCheck, MailPlus } from "lucide-react";
 import { useAuth } from "@/components/Providers/AllProviders";
 

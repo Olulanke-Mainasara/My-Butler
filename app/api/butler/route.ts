@@ -17,6 +17,7 @@ export async function POST(request: Request) {
 
   const completion = await openai.chat.completions.create({
     model: "deepseek/deepseek-prover-v2:free",
+    reasoning_effort: "low",
     messages: [
       {
         role: "system",

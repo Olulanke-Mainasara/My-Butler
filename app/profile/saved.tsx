@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/Shad-UI/button";
 import { MoreHorizontal, Pencil, Trash, Eye, PlusCircle } from "lucide-react";
 import { Badge } from "@/components/Shad-UI/badge";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import Image from "next/image";
 
 // Mock data

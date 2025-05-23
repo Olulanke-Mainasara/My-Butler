@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ArrowRight, Stars } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase/client";
 import Image from "next/image";
 import logoLight from "@/public/Logo/logoLight.png";
@@ -17,7 +17,7 @@ const Butler = () => {
   const [error, setError] = React.useState<string | null>(null);
   const [anonymous, setAnonymous] = React.useState(false);
   const customerProfile = useCustomerProfile();
-  const router = useRouter();
+  const router = useTransitionRouter();
   const { theme } = useTheme();
 
   const handleSubmit = async () => {

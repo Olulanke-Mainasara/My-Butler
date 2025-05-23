@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -34,42 +34,23 @@ import { generateSlug } from "@/lib/utils";
 import { FeaturesInput } from "./features-input";
 import { SpecificationsInput } from "./specifications-input";
 import { Icons } from "@/components/Custom-UI/icons";
+import { productFormSchema } from "@/lib/schemas";
 
-const collectionFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Collection name must be at least 2 characters.",
-  }),
-  description: z.string(),
-  price: z.coerce.number().min(0, "Price must be at least 0"),
-  stock_quantity: z.coerce.number().min(0, "Price must be at least 0"),
-  category_id: z.coerce.number().min(0, "Price must be at least 0"),
-  features: z.array(z.string(), {
-    message: "At least one feature is required.",
-  }),
-  specifications: z
-    .record(z.string().min(1, "Value is required"))
-    .refine((obj) => Object.keys(obj).length > 0, {
-      message: "At least one specification is required.",
-    }),
-});
-
-type CollectionFormValues = z.infer<typeof collectionFormSchema>;
-type Category = {
-  id: number;
-  name: string;
-};
+type CollectionFormValues = z.infer<typeof productFormSchema>;
 
 export default function CollectionForm() {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const brandProfile = useBrandProfile();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[] | null>(null);
+  const [categories, setCategories] = useState<
+    { id: number; name: string }[] | null
+  >(null);
   const [uploadedImageNames, setUploadedImageNames] = useState<string[] | null>(
     null
   );
 
   const form = useForm<CollectionFormValues>({
-    resolver: zodResolver(collectionFormSchema),
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -166,7 +147,7 @@ export default function CollectionForm() {
           <CardHeader className="px-0 pb-4 pt-0 text-center lg:text-left">
             <CardTitle className="text-4xl">Add New Product</CardTitle>
             <CardDescription className="text-lg">
-              Fill in the details to add a new product to your inventory.
+              Fill in the details to add a new product.
             </CardDescription>
           </CardHeader>
 

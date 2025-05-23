@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -32,19 +32,12 @@ import { ImageUpload } from "@/components/Custom-UI/Cards/ImageUpload";
 import { supabase } from "@/lib/supabase/client"; // Ensure you have a Supabase client instance
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { generateSlug } from "@/lib/utils";
-
-const collectionFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Collection name must be at least 2 characters.",
-  }),
-  description: z.string().optional(),
-  display_image: z.string().optional(),
-});
+import { collectionFormSchema } from "@/lib/schemas";
 
 type CollectionFormValues = z.infer<typeof collectionFormSchema>;
 
 export default function CollectionForm() {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const brandProfile = useBrandProfile();
   const [loading, setLoading] = useState(false);
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
@@ -102,7 +95,7 @@ export default function CollectionForm() {
       toast.success("Collection created successfully!");
       router.push(
         `/brand/products/new?collectionID=${
-          generateSlug(collectionData.name) + "&" + collectionData.id
+          generateSlug(collectionData.name) + "/" + collectionData.id
         }`
       );
     } catch {

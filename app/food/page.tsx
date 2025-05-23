@@ -2,9 +2,9 @@
 
 import React from "react";
 import { Search } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
-import NewsCard from "@/components/Custom-UI/Cards/NewsCard";
+import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
 
 const Food = () => {
   return (
@@ -25,7 +25,7 @@ const Food = () => {
 
       <section className="space-y-10">
         <CarouselWithSlideTracker items={Array.from({ length: 5 })}>
-          <NewsCard trending />
+          <ArticleCard />
         </CarouselWithSlideTracker>
 
         <section className="space-y-4 px-4 md:px-5">
@@ -88,15 +88,6 @@ const Food = () => {
               </div>
             ))}
           </div>
-        </section>
-
-        <section className="space-y-5">
-          <p className="text-3xl md:text-4xl text-center">
-            Our visitor&apos;s favorites
-          </p>
-          <CarouselWithSlideTracker items={Array.from({ length: 5 })}>
-            <NewsCard trending={false} />
-          </CarouselWithSlideTracker>
         </section>
       </section>
     </div>

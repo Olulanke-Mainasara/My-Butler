@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase/client";
 import { Download, Share, X } from "lucide-react";
 import Image from "next/image";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { Dialog, DialogContent } from "@/components/Shad-UI/dialog";
 
 const Camera = () => {
@@ -19,7 +19,7 @@ const Camera = () => {
   const [deleting, setDeleting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const [capturedImage, setCapturedImage] = React.useState("");
-  const router = useRouter();
+  const router = useTransitionRouter();
 
   const handleCapture = (imageData: string) => {
     setCapturedImage(imageData);
@@ -142,9 +142,16 @@ const Camera = () => {
         />
 
         <div className="absolute w-full bottom-4 flex items-center justify-center gap-20 text-white">
-          <a href={capturedImage} download={`IMG_${Date.now()}.png`}>
+          <a
+            href={capturedImage}
+            download={`IMG_${Date.now()}.png`}
+            className="hidden xl:block"
+          >
             <Download size={25} />
           </a>
+          <button onClick={handleDirectShare} className="xl:hidden">
+            <Download size={25} />
+          </button>
           <button
             className="px-6 py-2 text-xl rounded-full bg-white hover:bg-black text-black hover:text-white transition-colors border"
             onClick={handleSave}

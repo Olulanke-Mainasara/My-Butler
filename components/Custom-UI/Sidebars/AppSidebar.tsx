@@ -22,8 +22,8 @@ import {
 } from "@/components/Shad-UI/dropdown-menu";
 import { ThemeToggler } from "../Buttons/ThemeToggler";
 import { useSidebar } from "@/components/Shad-UI/sidebar";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useTransitionRouter } from "next-view-transitions";
+import { Link } from "next-view-transitions";
 import { supabase } from "@/lib/supabase/client";
 import Image from "next/image";
 import logoDark from "@/public/Logo/logoDark.png";
@@ -37,7 +37,7 @@ import { usePathname } from "next/navigation";
 
 export function AppSidebar() {
   const customerProfile = useCustomerProfile();
-  const router = useRouter();
+  const router = useTransitionRouter();
   const pathname = usePathname();
   const { theme } = useTheme();
   const { toggleSidebar } = useSidebar();

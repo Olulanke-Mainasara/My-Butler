@@ -1,12 +1,37 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Search } from "lucide-react";
-import Link from "next/link";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
-import NewsCard from "@/components/Custom-UI/Cards/NewsCard";
+import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
+import { Article } from "@/types/Article";
+import { supabase } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 const News = () => {
+  const [articles, setArticles] = React.useState<Article[]>([]);
+
+  async function fetchArticles() {
+    const { data, error } = await supabase.from("news").select("*");
+
+    if (error) {
+      toast.error("Failed to fetch articles.");
+      return [];
+    }
+
+    return data || [];
+  }
+
+  const fetchPageData = useCallback(async () => {
+    const [Articles] = await Promise.all([fetchArticles()]);
+
+    setArticles(Articles || []);
+  }, []);
+
+  React.useEffect(() => {
+    fetchPageData();
+  }, [fetchPageData]);
+
   return (
     <div className="mt-[141px] md:mt-[136px] xl:mt-36 pb-4 xl:pb-5">
       <div className="justify-center fixed left-0 top-12 py-3 w-full bg-lightBackground dark:bg-darkBackground z-10 px-4 md:px-0">
@@ -24,31 +49,18 @@ const News = () => {
       </div>
 
       <section className="space-y-10">
-        <CarouselWithSlideTracker items={Array.from({ length: 5 })}>
-          <NewsCard trending />
+        <CarouselWithSlideTracker items={articles}>
+          <ArticleCard />
         </CarouselWithSlideTracker>
 
         <section className="space-y-4 px-4 md:px-5">
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Latest</p>
-
-            <Link href={"/news/latest"} className="text-xl">
-              {" "}
-              See More
-            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-8">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className={`${
-                  index === 4 || index === 5 ? "hidden lg:flex" : "flex"
-                } gap-5 h-36`}
-              >
-                <div className="border w-full basis-2/5 rounded-xl"></div>
-                <div className="border w-full basis-3/5"></div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+            {articles.map((article, index) => (
+              <ArticleCard key={index} item={article} />
             ))}
           </div>
         </section>
@@ -68,35 +80,13 @@ const News = () => {
         <section className="space-y-4 px-4 md:px-5">
           <div className="flex items-center justify-between">
             <p className="text-3xl md:text-4xl">Recommended</p>
-
-            <Link href={"/news/recommended"} className="text-xl">
-              {" "}
-              See More
-            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 xl:gap-8">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className={`${
-                  index > 3 ? "hidden lg:flex" : "flex"
-                } gap-5 h-36`}
-              >
-                <div className="border w-full basis-2/5 rounded-xl"></div>
-                <div className="border w-full basis-3/5"></div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+            {articles.map((article, index) => (
+              <ArticleCard key={index} item={article} />
             ))}
           </div>
-        </section>
-
-        <section className="space-y-5">
-          <p className="text-3xl md:text-4xl text-center">
-            Our reader&apos;s favorites
-          </p>
-          <CarouselWithSlideTracker items={Array.from({ length: 5 })}>
-            <NewsCard trending={false} />
-          </CarouselWithSlideTracker>
         </section>
       </section>
     </div>

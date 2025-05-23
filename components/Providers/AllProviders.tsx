@@ -4,7 +4,7 @@ import React from "react";
 import { ThemeProvider } from "./ThemeProvider";
 import { SidebarProvider, SidebarTrigger } from "@/components/Shad-UI/sidebar";
 import { AppSidebar } from "../Custom-UI/Sidebars/AppSidebar";
-import Link from "next/link";
+import { Link, ViewTransitions } from "next-view-transitions";
 import { User } from "@supabase/supabase-js";
 import { usePathname } from "next/navigation";
 import { Toaster } from "../Shad-UI/toaster";
@@ -39,68 +39,70 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
         customerProfile={customerProfile}
         brandProfile={brandProfile}
       >
-        <SidebarProvider defaultOpen={false}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <notificationsContext.Provider value={notifications}>
-              <cartContext.Provider value={cart}>
-                {!pathname.startsWith("/brand") ? <AppSidebar /> : <></>}
+        <ViewTransitions>
+          <SidebarProvider defaultOpen={false}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <notificationsContext.Provider value={notifications}>
+                <cartContext.Provider value={cart}>
+                  {!pathname.startsWith("/brand") ? <AppSidebar /> : <></>}
 
-                <main className="w-full relative">
-                  <div
-                    suppressHydrationWarning
-                    className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full p-3 ${
-                      pathname !== "/camera" &&
-                      pathname !== "/combine" &&
-                      pathname !== "/combine/personal"
-                        ? "bg-lightBackground dark:bg-darkBackground"
-                        : "text-white"
-                    }`}
-                  >
-                    {!pathname.startsWith("/brand") ? (
-                      <SidebarTrigger />
-                    ) : (
-                      <></>
-                    )}
-
-                    <Link
-                      href={
-                        pathname.startsWith("/brand")
-                          ? "/brand"
-                          : "/?splashed=true"
-                      }
-                      className={`text-2xl ${
-                        pathname === "/camera" ||
-                        pathname === "/combine/personal"
-                          ? "hidden"
-                          : ""
+                  <main className="w-full relative">
+                    <div
+                      suppressHydrationWarning
+                      className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full p-3 ${
+                        pathname !== "/camera" &&
+                        pathname !== "/combine" &&
+                        pathname !== "/combine/personal"
+                          ? "bg-lightBackground dark:bg-darkBackground"
+                          : "text-white"
                       }`}
                     >
-                      My{" "}
-                      <span className="text-brandLight dark:text-brandDark ">
-                        Butler
-                      </span>
-                    </Link>
-                    {pathname.startsWith("/brand") ? (
-                      <ThemeToggler />
-                    ) : pathname !== "/notifications" ? (
-                      <NotificationsDrawerTrigger />
-                    ) : (
-                      <CartDrawerTrigger />
-                    )}
-                  </div>
-                  {children}
-                </main>
-                <Toaster />
-                <Sonner />
-              </cartContext.Provider>
-            </notificationsContext.Provider>
-          </ThemeProvider>
-        </SidebarProvider>
+                      {!pathname.startsWith("/brand") ? (
+                        <SidebarTrigger />
+                      ) : (
+                        <></>
+                      )}
+
+                      <Link
+                        href={
+                          pathname.startsWith("/brand")
+                            ? "/brand"
+                            : "/?splashed=true"
+                        }
+                        className={`text-2xl ${
+                          pathname === "/camera" ||
+                          pathname === "/combine/personal"
+                            ? "hidden"
+                            : ""
+                        }`}
+                      >
+                        My{" "}
+                        <span className="text-brandLight dark:text-brandDark ">
+                          Butler
+                        </span>
+                      </Link>
+                      {pathname.startsWith("/brand") ? (
+                        <ThemeToggler />
+                      ) : pathname !== "/notifications" ? (
+                        <NotificationsDrawerTrigger />
+                      ) : (
+                        <CartDrawerTrigger />
+                      )}
+                    </div>
+                    {children}
+                  </main>
+                  <Toaster />
+                  <Sonner />
+                </cartContext.Provider>
+              </notificationsContext.Provider>
+            </ThemeProvider>
+          </SidebarProvider>
+        </ViewTransitions>
       </UserProvider>
     </authContext.Provider>
   );

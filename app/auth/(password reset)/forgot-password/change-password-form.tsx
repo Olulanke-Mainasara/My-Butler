@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import LightChangeImg from "@/public/AuthImgs/change-light.svg";
 import DarkChangeImg from "@/public/AuthImgs/change-dark.svg";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { useTheme } from "next-themes";
 
 export function ChangePasswordForm({
@@ -24,7 +24,7 @@ export function ChangePasswordForm({
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const { theme } = useTheme();
-  const router = useRouter();
+  const router = useTransitionRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

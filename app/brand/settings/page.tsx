@@ -11,9 +11,7 @@ const Settings = () => {
     <div className="h-full flex flex-col gap-6">
       <div>
         <h3 className="text-2xl font-medium">Profile</h3>
-        <p className="opacity-70">
-          This is how others will see you on the site.
-        </p>
+        <p className="opacity-70">This is how customers will see you.</p>
       </div>
       <hr />
       {userProfile ? (

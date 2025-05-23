@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -55,3 +54,65 @@ export function generateSlug(name: string): string {
     .replace(/--+/g, "-")
     .trim();
 }
+
+// Utility: Format AI text with HTML for display
+export const formatResponseText = (text: string): string => {
+  return text
+    .replace(
+      /--\s*(.*?)\s*--/g,
+      '<h2 class="text-2xl font-bold text-white mt-4">$1</h2>'
+    ) // Headers
+    .replace(
+      /###\s*(.*?)\s*\n/g,
+      '<hr class="my-10"/><h3 class="text-lg font-semibold text-white">$1</h3>'
+    ) // Subsections
+    .replace(/-\s(.*?)\n/g, '<li class="text-base mb-2 pl-5">$1</li>') // Bullet points
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="mb-10">$1</strong>') // Bold text
+    .replace(/\n\n/g, "<br/><br/>") // Paragraph spacing
+    .trim();
+};
+
+// Message type definition
+export type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+// Safely fetch AI response
+export const getAssistantResponse = async (
+  originalMessages: Message[],
+  getTitle: boolean
+): Promise<Message[] | null> => {
+  const messages = [...originalMessages];
+
+  if (getTitle) {
+    const lastPromptContent = messages[messages.length - 1].content;
+    const titlePrompt = `You are to respond to the following user prompt as an assistant. Your response must start with a **raw plain title** on the **first line only**. The title should be a concise summary relevant to developers. Do not style the title, do not prefix it with "Title:", do not wrap it in quotes, markdown, or symbols like **, ##, ###, etc.
+      After the title, add a line with exactly 5 dashes (-----), then write your full assistant response below it. Before returning your response, verify that your output begins with an unstyled title, followed by exactly five dashes on a new line.
+      Here is the user's prompt: "${lastPromptContent}"`;
+
+    // Replace last message safely
+    messages[messages.length - 1] = {
+      ...messages[messages.length - 1],
+      content: titlePrompt,
+    };
+  }
+
+  const response = await fetch("/api/butler", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(messages),
+    cache: "no-cache",
+  });
+
+  if (!response.ok) return null;
+
+  return await response.json();
+};
+
+export const cleanTitle = (rawTitle: string): string => {
+  return rawTitle
+    .replace(/^["'`*#>\s-]+/, "") // remove leading junk like quotes, backticks, stars, hashes, dashes
+    .replace(/["'`*#<>\s-]+$/, "") // remove trailing junk
+    .trim();
+};

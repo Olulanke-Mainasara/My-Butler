@@ -27,6 +27,7 @@ export const ImageUpload = ({
     allowedMimeTypes: ["image/*"],
     maxFiles,
     maxFileSize,
+    upsert: true,
   });
 
   const { successes } = props;

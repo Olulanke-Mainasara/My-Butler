@@ -4,7 +4,8 @@ import Logo from "@/components/Custom-UI/logo";
 import NavLink from "@/components/Custom-UI/Links/NavLink";
 import { navigation } from "@/static-data/navigation";
 import { motion } from "framer-motion";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
 
@@ -22,7 +23,7 @@ export default function HomePage() {
 
 function Home() {
   const [splashCounter, setSplashCounter] = useState(0);
-  const router = useRouter();
+  const router = useTransitionRouter();
   const searchParams = useSearchParams();
   const splashed = searchParams.get("splashed");
 

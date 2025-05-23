@@ -3,7 +3,7 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import emptyGalleryDark from "@/public/Empty-Gallery/empty-gallery-dark.svg";
 import emptyGalleryLight from "@/public/Empty-Gallery/empty-gallery-light.svg";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { Button } from "@/components/Shad-UI/button";
 
 export function LoginPlaceholder({ info }: { info: string }) {

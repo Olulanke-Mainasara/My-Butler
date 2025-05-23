@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Image as ImageType } from "@/types/Image";
 import { Share, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PictureDialogTrigger = ({
   image,
@@ -18,6 +19,7 @@ const PictureDialogTrigger = ({
   handleDelete: (imagePath: string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
+  const isMobile = useIsMobile();
 
   const deleteImage = async () => {
     await handleDelete(image.path);
@@ -25,6 +27,11 @@ const PictureDialogTrigger = ({
   };
 
   const handleDownload = async () => {
+    if (isMobile) {
+      handleShare();
+      return;
+    }
+
     try {
       if (!image.image_url) {
         toast.error("No image to download");
@@ -73,7 +80,7 @@ const PictureDialogTrigger = ({
         try {
           await navigator.share({
             title: "Check out this image!",
-            text: "Here's an image I captured.",
+            text: "Here's an image I captured on My Butler.",
             files: [file],
           });
           return;
@@ -115,7 +122,7 @@ const PictureDialogTrigger = ({
             </button>
             <button
               onClick={handleDownload}
-              className="px-6 py-2 text-xl rounded-full bg-white hover:bg-black text-black hover:text-white transition-colors border"
+              className="px-6 py-2 text-xl rounded-full bg-white hover:bg-neutral-800 text-black hover:text-white transition-colors border"
             >
               Download
             </button>

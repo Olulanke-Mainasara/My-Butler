@@ -20,34 +20,16 @@ import {
 import { Input } from "@/components/Shad-UI/input";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { supabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { compareTwoObjects } from "@/lib/utils";
 import { Icons } from "@/components/Custom-UI/icons";
-
-const profileFormSchema = z.object({
-  username: z
-    .string()
-    .min(2, {
-      message: "Username must be at least 2 characters.",
-    })
-    .max(30, {
-      message: "Username must not be longer than 30 characters.",
-    })
-    .optional(),
-  email: z.string().email().optional(),
-  location: z
-    .string()
-    .min(2, {
-      message: "Location must be at least 2 characters.",
-    })
-    .optional(),
-});
+import { profileFormSchema } from "@/lib/schemas";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
   const [loading, setLoading] = React.useState(false);
-  const router = useRouter();
+  const router = useTransitionRouter();
   const customerProfile = useCustomerProfile();
 
   const defaultValues: Partial<ProfileFormValues> = {

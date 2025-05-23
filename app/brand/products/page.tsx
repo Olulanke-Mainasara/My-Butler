@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/Shad-UI/button";
 import { PlusCircle } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 import { Product } from "@/types/Product";
 import { supabase } from "@/lib/supabase/client";
@@ -34,23 +34,31 @@ export default function Products() {
           <h1 className="text-4xl font-bold tracking-tight">Products</h1>
           <p className="opacity-70">Manage your published products.</p>
         </div>
-        <Button asChild>
-          <Link href="/brand/products/new" className="flex items-center">
-            <PlusCircle />
-            Add Product
-          </Link>
-        </Button>
+        {products.length > 0 && (
+          <Button asChild>
+            <Link href="/brand/products/new" className="flex items-center">
+              <PlusCircle />
+              Add Product
+            </Link>
+          </Button>
+        )}
       </div>
 
       {products.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} item={product} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-10 border rounded-lg text-xl">
-          No products found.
+        <div className="text-center py-10 border rounded-lg text-xl flex flex-col gap-4 items-center">
+          <p>No products found.</p>
+          <Button asChild>
+            <Link href="/brand/products/new" className="flex items-center">
+              <PlusCircle />
+              Create Product
+            </Link>
+          </Button>
         </div>
       )}
     </div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/Shad-UI/button";
 import { Card, CardContent } from "@/components/Shad-UI/card";
 import { Input } from "@/components/Shad-UI/input";
 import { Label } from "@/components/Shad-UI/label";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { supabase } from "@/lib/supabase/client";
 import { Icons } from "@/components/Custom-UI/icons";
 import { getURL } from "@/lib/utils";
@@ -14,7 +14,7 @@ import { Provider } from "@supabase/supabase-js";
 import LightSignupImg from "@/public/AuthImgs/signup-light.svg";
 import DarkSignupImg from "@/public/AuthImgs/signup-dark.svg";
 import { useTheme } from "next-themes";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import Image from "next/image";
 
 export function SignupForm({ ...props }: React.ComponentProps<"div">) {
@@ -31,7 +31,7 @@ export function SignupForm({ ...props }: React.ComponentProps<"div">) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { theme } = useTheme();
-  const router = useRouter();
+  const router = useTransitionRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

@@ -3,31 +3,48 @@
 import { SidebarNav } from "@/components/Custom-UI/Sidebars/SidebarNav";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { Button } from "@/components/Shad-UI/button";
-import { User } from "lucide-react";
+import {
+  BookCopy,
+  ImageIcon,
+  Newspaper,
+  PartyPopper,
+  ShoppingBag,
+  User,
+} from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import React from "react";
 
 const SidebarNavItems = [
   {
     id: 1,
     href: "/profile",
-    title: "Saved",
+    title: "Products",
+    icon: <ShoppingBag />,
   },
   {
     id: 2,
-    href: "/profile/cart",
-    title: "Your Cart",
+    href: "/profile/collections",
+    title: "Collections",
+    icon: <BookCopy />,
   },
   {
     id: 3,
-    href: "/profile/purchases",
-    title: "Purchases",
+    href: "/profile/articles",
+    title: "Articles",
+    icon: <Newspaper />,
   },
   {
     id: 4,
-    href: "/profile/notifications",
-    title: "Notifications",
+    href: "/profile/events",
+    title: "Events",
+    icon: <PartyPopper />,
+  },
+  {
+    id: 5,
+    href: "/profile/gallery",
+    title: "Gallery",
+    icon: <ImageIcon />,
   },
 ];
 

@@ -1,22 +1,40 @@
 "use client";
 
-import React from "react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/Shad-UI/carousel";
-import { Search, Shirt } from "lucide-react";
-import Link from "next/link";
+import React, { useCallback } from "react";
+import { Search } from "lucide-react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
-import ShopCard from "@/components/Custom-UI/Cards/ShopCard";
 import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
 import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
 import { productFilter } from "@/static-data/filters";
+import { Product } from "@/types/Product";
+import { supabase } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 
 const Shop = () => {
+  const [products, setProducts] = React.useState<Product[]>([]);
+
+  async function fetchProducts() {
+    const { data, error } = await supabase.from("products").select("*");
+
+    if (error) {
+      toast.error("Failed to fetch products.");
+      return [];
+    }
+
+    return data || [];
+  }
+
+  const fetchPageData = useCallback(async () => {
+    const [Products] = await Promise.all([fetchProducts()]);
+
+    setProducts(Products || []);
+  }, []);
+
+  React.useEffect(() => {
+    fetchPageData();
+  }, [fetchPageData]);
+
   return (
     <div className="mt-[141px] md:mt-[136px] xl:mt-36 pb-4 xl:pb-5">
       <div className="flex justify-center fixed left-0 top-12 py-3 w-full bg-lightBackground dark:bg-darkBackground z-10 px-4 md:px-0">
@@ -40,60 +58,16 @@ const Shop = () => {
       </div>
 
       <section className="space-y-10">
-        <CarouselWithSlideTracker items={Array.from({ length: 5 })}>
-          <ShopCard />
+        <CarouselWithSlideTracker items={products}>
+          <ProductCard />
         </CarouselWithSlideTracker>
 
-        <section className="space-y-4 px-4 xl:px-5">
-          <p className="text-3xl md:text-4xl">Categories</p>
-          <div>
-            <Carousel
-              opts={{
-                align: "start",
-                dragFree: true,
-              }}
-              orientation={"horizontal"}
-              className="w-full"
-            >
-              <CarouselContent className="h-14 md:pr-28 lg:pr-12 -ml-4 md:-ml-5">
-                {Array.from({ length: 13 }).map((_, index) => (
-                  <CarouselItem
-                    key={index}
-                    className="basis-1/2 md:basis-1/4 lg:basis-1/6 xl:basis-[12.5%] pl-4 md:pl-5"
-                  >
-                    <button className="flex items-center w-full gap-3">
-                      <div className="border flex items-center justify-center rounded-full w-14 h-14 text-brandLight dark:text-brandDark">
-                        <Shirt />
-                      </div>
-                      <span className="text-xl">{"Shirts"}</span>
-                    </button>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-5 xl:left-6 disabled:hidden hidden xl:flex" />
-              <CarouselNext className="right-5 xl:right-6 disabled:hidden hidden xl:flex" />
-            </Carousel>
-          </div>
-        </section>
-
         <section className="space-y-4 px-4 md:px-5">
-          <div className="flex items-center justify-between">
-            <p className="text-3xl md:text-4xl">Latest drops</p>
+          <p className="text-3xl md:text-4xl">Latest drops</p>
 
-            <Link href={"/shop/latest"} className="text-xl">
-              {" "}
-              See More
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
-            {Array.from({ length: 12 }).map((_, index) => (
-              <div
-                key={index}
-                className={`border w-full rounded-3xl h-72 ${
-                  index > 7 ? "hidden lg:flex" : "flex"
-                }`}
-              ></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
+            {products.map((product, index) => (
+              <ProductCard item={product} key={index} />
             ))}
           </div>
         </section>
@@ -111,34 +85,13 @@ const Shop = () => {
         </section>
 
         <section className="space-y-4 px-4 md:px-5">
-          <div className="flex items-center justify-between">
-            <p className="text-3xl md:text-4xl">Recommended</p>
+          <p className="text-3xl md:text-4xl">Recommended</p>
 
-            <Link href={"/shop/recommended"} className="text-xl">
-              {" "}
-              See More
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
-            {Array.from({ length: 12 }).map((_, index) => (
-              <div
-                key={index}
-                className={`border w-full rounded-3xl h-72 ${
-                  index > 7 ? "hidden lg:flex" : "flex"
-                }`}
-              ></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
+            {products.map((product, index) => (
+              <ProductCard item={product} key={index} />
             ))}
           </div>
-        </section>
-
-        <section className="space-y-5">
-          <p className="text-3xl md:text-4xl text-center">
-            Our customer&apos;s favorites
-          </p>
-          <CarouselWithSlideTracker items={Array.from({ length: 5 })}>
-            <ShopCard />
-          </CarouselWithSlideTracker>
         </section>
       </section>
     </div>

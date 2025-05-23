@@ -20,34 +20,16 @@ import {
 import { Input } from "@/components/Shad-UI/input";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { supabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { compareTwoObjects } from "@/lib/utils";
 import { Icons } from "@/components/Custom-UI/icons";
+import { brandProfileFormSchema } from "@/lib/schemas";
 
-const profileFormSchema = z.object({
-  username: z
-    .string()
-    .min(2, {
-      message: "Username must be at least 2 characters.",
-    })
-    .max(30, {
-      message: "Username must not be longer than 30 characters.",
-    })
-    .optional(),
-  email: z.string().email().optional(),
-  location: z
-    .string()
-    .min(2, {
-      message: "Location must be at least 2 characters.",
-    })
-    .optional(),
-});
-
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type ProfileFormValues = z.infer<typeof brandProfileFormSchema>;
 
 export function ProfileForm() {
   const [loading, setLoading] = React.useState(false);
-  const router = useRouter();
+  const router = useTransitionRouter();
   const userProfile = useCustomerProfile();
 
   const defaultValues: Partial<ProfileFormValues> = {
@@ -57,7 +39,7 @@ export function ProfileForm() {
   };
 
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+    resolver: zodResolver(brandProfileFormSchema),
     defaultValues,
     mode: "onChange",
   });

@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/Shad-UI/card";
 import { Input } from "@/components/Shad-UI/input";
 import { Label } from "@/components/Shad-UI/label";
 import Image from "next/image";
-import Link from "next/link"
+import { Link } from "next-view-transitions";
 import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";

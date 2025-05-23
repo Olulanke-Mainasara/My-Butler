@@ -16,7 +16,7 @@ const CarouselWithSlideTracker = ({
 }: {
   items: object[];
   className?: string;
-  children: ReactElement<{ item: object }>;
+  children: ReactElement<{ item: object; form: "static" | "carousel" }>;
 }) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
@@ -36,21 +36,24 @@ const CarouselWithSlideTracker = ({
   }, [api]);
 
   return (
-    <div className={`w-full h-64 xl:h-72 px-4 md:px-0 ${className}`}>
+    <div className={`w-full h-60 px-4 md:px-5 ${className}`}>
       <Carousel
         opts={{ align: "center" }}
         setApi={setApi}
         className="h-full xl:pr-0"
       >
         <CarouselContent className="h-full -ml-4 md:-ml-0">
-          {items.map((item, index) => (
-            <CarouselItem
-              key={index}
-              className="md:basis-1/2 xl:basis-1/3 h-full pl-4 md:pl-0"
-            >
-              {React.cloneElement(children, { item })}
-            </CarouselItem>
-          ))}
+          {items.map((item, index) => {
+            const form = "carousel"; // Initialize the 'form' variable
+            return (
+              <CarouselItem
+                key={index}
+                className="md:basis-1/2 xl:basis-1/3 h-full pl-4 md:pl-0"
+              >
+                {React.cloneElement(children, { item, form })}
+              </CarouselItem>
+            );
+          })}
         </CarouselContent>
         <CarouselPrevious className="left-5 disabled:hidden hidden md:flex" />
         <CarouselNext className="right-5 disabled:hidden hidden md:flex" />

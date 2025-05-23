@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 type Button = {
