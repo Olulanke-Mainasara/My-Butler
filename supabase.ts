@@ -185,24 +185,24 @@ export type Database = {
       }
       chats: {
         Row: {
-          chat_id: string
-          chat_title: string
           created_at: string
+          id: string
           messages: Json[]
+          title: string
           user_id: string
         }
         Insert: {
-          chat_id?: string
-          chat_title?: string
           created_at?: string
+          id?: string
           messages: Json[]
+          title?: string
           user_id?: string
         }
         Update: {
-          chat_id?: string
-          chat_title?: string
           created_at?: string
+          id?: string
           messages?: Json[]
+          title?: string
           user_id?: string
         }
         Relationships: [
@@ -300,6 +300,7 @@ export type Database = {
       }
       events: {
         Row: {
+          brand_id: string
           created_at: string | null
           description: string | null
           display_image: string | null
@@ -314,6 +315,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          brand_id?: string
           created_at?: string | null
           description?: string | null
           display_image?: string | null
@@ -328,6 +330,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          brand_id?: string
           created_at?: string | null
           description?: string | null
           display_image?: string | null
@@ -341,11 +344,20 @@ export type Database = {
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       news: {
         Row: {
           author: string | null
+          brand_id: string
           content: string
           created_at: string | null
           description: string | null
@@ -358,6 +370,7 @@ export type Database = {
         }
         Insert: {
           author?: string | null
+          brand_id?: string
           content: string
           created_at?: string | null
           description?: string | null
@@ -370,6 +383,7 @@ export type Database = {
         }
         Update: {
           author?: string | null
+          brand_id?: string
           content?: string
           created_at?: string | null
           description?: string | null
@@ -380,7 +394,15 @@ export type Database = {
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "news_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {

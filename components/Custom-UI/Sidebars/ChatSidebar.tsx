@@ -31,7 +31,7 @@ export function ChatSidebar() {
   const router = useTransitionRouter();
   const pathname = usePathname();
   const [conversations, setConversations] = React.useState<
-    { chat_id: string; chat_title: string }[] | null
+    { id: string; title: string }[] | null
   >(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -42,23 +42,21 @@ export function ChatSidebar() {
     console.log("Change received!", payload);
     if (payload.eventType === "DELETE") {
       setConversations((prev) =>
-        prev
-          ? prev.filter((convo) => convo.chat_id !== payload.old.chat_id)
-          : null
+        prev ? prev.filter((convo) => convo.id !== payload.old.id) : null
       );
       return;
     } else if (payload.eventType === "INSERT") {
       setConversations((prev) =>
         prev
-          ? [...prev, payload.new as { chat_id: string; chat_title: string }]
-          : [payload.new as { chat_id: string; chat_title: string }]
+          ? [...prev, payload.new as { id: string; title: string }]
+          : [payload.new as { id: string; title: string }]
       );
     } else if (payload.eventType === "UPDATE") {
       setConversations((prev) =>
         prev
           ? prev.map((convo) =>
-              convo.chat_id === payload.new.chat_id
-                ? (payload.new as { chat_id: string; chat_title: string })
+              convo.id === payload.new.id
+                ? (payload.new as { id: string; title: string })
                 : convo
             )
           : null
@@ -67,10 +65,7 @@ export function ChatSidebar() {
   };
 
   const handleChatDelete = async (chatId: string) => {
-    const { error } = await supabase
-      .from("chats")
-      .delete()
-      .eq("chat_id", chatId);
+    const { error } = await supabase.from("chats").delete().eq("id", chatId);
     if (error) {
       console.error("Error deleting chat", error);
     } else {
@@ -91,7 +86,7 @@ export function ChatSidebar() {
       setLoading(true);
       const { data, error } = await supabase
         .from("chats")
-        .select("chat_id,chat_title")
+        .select("id,title")
         .eq("user_id", customerProfile.id);
 
       if (error) {
@@ -151,23 +146,23 @@ export function ChatSidebar() {
               <SidebarGroupContent className="p-2">
                 <SidebarMenu>
                   {conversations.map((convo) => (
-                    <SidebarMenuItem key={convo.chat_id}>
+                    <SidebarMenuItem key={convo.id}>
                       <SidebarMenuButton
                         asChild
-                        isActive={pathname === `/butler/${convo.chat_id}`}
+                        isActive={pathname === `/butler/${convo.id}`}
                         onClick={() => {
                           toggleSidebar();
-                          router.push(`/butler/${convo.chat_id}`);
+                          router.push(`/butler/${convo.id}`);
                         }}
                       >
-                        <Link href={`/butler/${convo.chat_id}`}>
+                        <Link href={`/butler/${convo.id}`}>
                           <span className="truncate text-sm">
-                            {convo.chat_title}
+                            {convo.title}
                           </span>
                         </Link>
                       </SidebarMenuButton>
                       <SidebarMenuAction
-                        onClick={() => handleChatDelete(convo.chat_id)}
+                        onClick={() => handleChatDelete(convo.id)}
                         className="text-red-500"
                       >
                         <Trash2 /> <span className="sr-only">Delete chat</span>

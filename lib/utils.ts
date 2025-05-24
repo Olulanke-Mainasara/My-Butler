@@ -1,8 +1,36 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+
+/**
+ * Merges class names using `clsx` and `tailwind-merge`.
+ *
+ * This function takes multiple class name values, processes them using the
+ * `clsx` utility to handle conditional and array-based class names, and
+ * then merges them using `tailwind-merge` to ensure proper TailwindCSS
+ * class precedence.
+ *
+ * @param inputs - A list of class values, which can be strings, arrays, or
+ *                 conditional objects, to be merged into a single class name
+ *                 string.
+ * @returns A single string containing the merged class names.
+ */
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+/**
+ * Converts a Base64-encoded string into a File object.
+ *
+ * The function extracts the MIME type from the data URL and decodes the Base64
+ * string into a binary Uint8Array. It then creates a File object using the
+ * decoded data, the given filename, and the extracted MIME type.
+ *
+ * @param base64String The Base64-encoded string representing the file data.
+ * @param filename The name to be given to the resulting File object.
+ *
+ * @returns A File object constructed from the Base64-encoded data.
+ */
 
 export function base64ToFile(base64String: string, filename: string): File {
   const arr = base64String.split(",");
@@ -18,6 +46,16 @@ export function base64ToFile(base64String: string, filename: string): File {
   return new File([u8arr], filename, { type: mime });
 }
 
+/**
+ * Compares two objects to determine if they are equal.
+ *
+ * The objects must have the same key-value pairs, and the values must be strings.
+ *
+ * @param obj1 The first object to compare.
+ * @param obj2 The second object to compare.
+ *
+ * @returns true if the objects are equal, false otherwise.
+ */
 export function compareTwoObjects(
   obj1: { [key: string]: string },
   obj2: { [key: string]: string }
@@ -34,6 +72,17 @@ export function compareTwoObjects(
   );
 }
 
+/**
+ * Gets the URL of the site.
+ *
+ * Tries to use the `NEXT_PUBLIC_SITE_URL` environment variable, then falls
+ * back to `NEXT_PUBLIC_VERCEL_URL` if available, and finally uses
+ * `http://localhost:3000/` if neither is set.
+ *
+ * Ensures that the URL has a scheme (`https://`) and a trailing `/`.
+ *
+ * @returns The URL of the site.
+ */
 export function getURL() {
   let url =
     process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
@@ -46,6 +95,20 @@ export function getURL() {
   return url;
 }
 
+/**
+ * Converts a string into a slug, suitable for use in a URL.
+ *
+ * @remarks
+ * Replaces all non-word characters with a space, replaces multiple
+ * spaces with a single hyphen, and trims any extra hyphens from the
+ * beginning and end of the string.
+ *
+ * @example
+ * generateSlug("Hello World!") // => "hello-world"
+ *
+ * @param name - The string to convert to a slug.
+ * @returns The slugified string.
+ */
 export function generateSlug(name: string): string {
   return name
     .toLowerCase()
@@ -55,64 +118,70 @@ export function generateSlug(name: string): string {
     .trim();
 }
 
-// Utility: Format AI text with HTML for display
-export const formatResponseText = (text: string): string => {
-  return text
-    .replace(
-      /--\s*(.*?)\s*--/g,
-      '<h2 class="text-2xl font-bold text-white mt-4">$1</h2>'
-    ) // Headers
-    .replace(
-      /###\s*(.*?)\s*\n/g,
-      '<hr class="my-10"/><h3 class="text-lg font-semibold text-white">$1</h3>'
-    ) // Subsections
-    .replace(/-\s(.*?)\n/g, '<li class="text-base mb-2 pl-5">$1</li>') // Bullet points
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="mb-10">$1</strong>') // Bold text
-    .replace(/\n\n/g, "<br/><br/>") // Paragraph spacing
-    .trim();
-};
-
-// Message type definition
-export type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
-
-// Safely fetch AI response
-export const getAssistantResponse = async (
-  originalMessages: Message[],
-  getTitle: boolean
-): Promise<Message[] | null> => {
-  const messages = [...originalMessages];
-
-  if (getTitle) {
-    const lastPromptContent = messages[messages.length - 1].content;
-    const titlePrompt = `You are to respond to the following user prompt as an assistant. Your response must start with a **raw plain title** on the **first line only**. The title should be a concise summary relevant to developers. Do not style the title, do not prefix it with "Title:", do not wrap it in quotes, markdown, or symbols like **, ##, ###, etc.
-      After the title, add a line with exactly 5 dashes (-----), then write your full assistant response below it. Before returning your response, verify that your output begins with an unstyled title, followed by exactly five dashes on a new line.
-      Here is the user's prompt: "${lastPromptContent}"`;
-
-    // Replace last message safely
-    messages[messages.length - 1] = {
-      ...messages[messages.length - 1],
-      content: titlePrompt,
-    };
+/**
+ * Set a value in local storage.
+ *
+ * Note: This function should only be called on the client side.
+ * It will not work on the server side.
+ *
+ * @param key The key to store the value under.
+ * @param value The value to store.
+ * @returns The value that was stored.
+ */
+export function setLocalStorage(key: string, value: unknown) {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error("Error setting localStorage item:", error);
+    }
   }
+  return value;
+}
 
-  const response = await fetch("/api/butler", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(messages),
-    cache: "no-cache",
+/**
+ * Get a value from local storage.
+ *
+ * Note: This function should only be called on the client side.
+ * It will not work on the server side.
+ *
+ * @param key The key to retrieve the value from.
+ * @returns The value stored under the given key,
+ *          or null if the key does not exist.
+ */
+export function getLocalStorage(key: string) {
+  if (typeof window !== "undefined") {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : null;
+  }
+  return null;
+}
+
+/**
+ * Sanitizes a given string by removing any occurrences of "<has_function_call>".
+ *
+ * This function is used to sanitize text that may contain function calls,
+ * which could potentially be used to inject malicious code.
+ *
+ * @param text The string to sanitize.
+ * @returns The sanitized string.
+ */
+export function sanitizeText(text: string) {
+  return text.replace("<has_function_call>", "");
+}
+
+/**
+ * Generates a UUID (Universally Unique Identifier) string in the format of xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx.
+ *
+ * This function uses the random number generator to generate random numbers, which are then converted to hexadecimal strings.
+ * The resulting string is a valid UUID.
+ *
+ * @returns A string representing a UUID.
+ */
+export function generateUUID(): string {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
   });
-
-  if (!response.ok) return null;
-
-  return await response.json();
-};
-
-export const cleanTitle = (rawTitle: string): string => {
-  return rawTitle
-    .replace(/^["'`*#>\s-]+/, "") // remove leading junk like quotes, backticks, stars, hashes, dashes
-    .replace(/["'`*#<>\s-]+$/, "") // remove trailing junk
-    .trim();
-};
+}
