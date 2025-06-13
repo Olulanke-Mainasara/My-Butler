@@ -1,13 +1,11 @@
 import Image from "next/image";
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from "@/components/Shad-UI/card";
+import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
 import { Event } from "@/types/Event";
 import { Link } from "next-view-transitions";
 import { ArrowRight } from "lucide-react";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
+import { useBookmarks } from "@/components/Providers/AllProviders";
+import BookmarkTrigger from "../Buttons/BookmarkTrigger";
 
 export default function EventCard({
   item,
@@ -16,35 +14,37 @@ export default function EventCard({
   item?: Event;
   form?: "static" | "carousel";
 }) {
+  const customerProfile = useCustomerProfile();
+  const bookmarks = useBookmarks();
+
   if (!item) {
     return;
   }
 
   return (
     <Card
-      className={`hover:shadow-lg flex transition overflow-hidden ${
-        form !== "carousel" ? "flex-row md:flex-col" : "flex-row"
-      }`}
+      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
     >
-      <Link
-        href={item.slug + "&" + item.id}
-        className="basis-1/2 overflow-hidden"
-      >
+      <Link href={item.slug + "&" + item.id}>
         <Image
           src={item.display_image ?? "/placeholder.svg"}
           alt={item.title}
-          width={600}
+          width={500}
           height={300}
-          className="w-full h-52 object-cover hover:scale-110 duration-300"
+          className={`w-full object-cover ${
+            form === "carousel" ? "h-full" : ""
+          }`}
         />
       </Link>
 
-      <CardContent className="flex flex-col gap-2 p-3 basis-1/2">
-        <CardTitle className="text-2xl">{item.title}</CardTitle>
-
-        <CardDescription>
-          {item.description ?? "No description provided."}
-        </CardDescription>
+      <CardContent
+        className={`p-3 flex flex-col justify-center gap-2 ${
+          form === "carousel"
+            ? "absolute inset-0 backdrop-brightness-50 text-white"
+            : ""
+        }`}
+      >
+        <CardTitle>{item.title}</CardTitle>
 
         <p>
           <span className="opacity-70">Location:</span>{" "}
@@ -65,7 +65,14 @@ export default function EventCard({
           )}
         </div>
 
-        <div>
+        <div className="flex items-center gap-2">
+          <BookmarkTrigger
+            customerProfile={customerProfile}
+            item={item}
+            bookmarks={bookmarks}
+            targetType={"event"}
+          />
+
           <Link
             href={`/items/${item.slug + "&" + item.id}`}
             className="hover:underline flex items-center gap-1 text-sm"

@@ -1,25 +1,3 @@
-export const productFilter = {
-  category: [
-    { name: "All", value: "all" },
-    { name: "T-Shirts", value: "shirts" },
-    { name: "Shirts", value: "shirts" },
-    { name: "Dresses", value: "dresses" },
-    { name: "Skirts", value: "skirts" },
-    { name: "Pants", value: "pants" },
-    { name: "Jackets", value: "jackets" },
-    { name: "Hats", value: "hats" },
-    { name: "Shoes", value: "shoes" },
-    { name: "Accessories", value: "accessories" },
-  ],
-  Price: [
-    { name: "All", value: "all" },
-    { name: "Under $25", value: "0-25" },
-    { name: "$25 to $50", value: "25-50" },
-    { name: "$50 to $100", value: "50-100" },
-    { name: "Over $100", value: "100-10000" },
-  ],
-};
-
 export const industries = [
   { value: "Fashion & Apparel" },
   { value: "Beauty & Cosmetics" },
@@ -28,3 +6,28 @@ export const industries = [
   { value: "Luxury & Jewelry" },
   { value: "Entertainment & Media" },
 ];
+
+export const collectionsFilter = {
+  category: [
+    { name: "All", value: "all" },
+    { name: "Fashion", value: "fashion" },
+    { name: "Beauty", value: "beauty" },
+    { name: "Food", value: "food" },
+    { name: "Sports", value: "sports" },
+    { name: "Luxury", value: "luxury" },
+    { name: "Entertainment", value: "entertainment" },
+  ],
+  Brand: [
+    { name: "All", value: "all" },
+    { name: "Nike", value: "nike" },
+    { name: "Adidas", value: "adidas" },
+    { name: "Puma", value: "puma" },
+    { name: "Reebok", value: "reebok" },
+    { name: "Under Armour", value: "under-armour" },
+    { name: "New Balance", value: "new-balance" },
+    { name: "Asics", value: "asics" },
+    { name: "Converse", value: "converse" },
+    { name: "Vans", value: "vans" },
+    { name: "H&M", value: "hm" },
+  ],
+};

@@ -1,14 +1,12 @@
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from "@/components/Shad-UI/card";
+import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
 import { Article } from "@/types/Article";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { usePathname } from "next/navigation";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
+import { useBookmarks } from "@/components/Providers/AllProviders";
+import BookmarkTrigger from "../Buttons/BookmarkTrigger";
 
 export default function ArticleCard({
   item,
@@ -18,6 +16,8 @@ export default function ArticleCard({
   form?: "static" | "carousel";
 }) {
   const pathname = usePathname();
+  const customerProfile = useCustomerProfile();
+  const bookmarks = useBookmarks();
 
   if (!item) {
     return;
@@ -29,26 +29,28 @@ export default function ArticleCard({
 
   return (
     <Card
-      className={`overflow-hidden flex hover:shadow-md transition ${
-        form !== "carousel" ? "flex-row md:flex-col" : "flex-row"
-      }`}
+      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
     >
-      <Link href={relevantLink} className="basis-1/2 overflow-hidden">
+      <Link href={relevantLink}>
         <Image
           src={item.display_image ?? "/placeholder.svg"}
           alt={item.title}
-          width={600}
+          width={500}
           height={300}
-          className="w-full h-52 object-cover hover:scale-110 duration-300"
+          className={`w-full object-cover ${
+            form === "carousel" ? "h-full" : ""
+          }`}
         />
       </Link>
 
-      <CardContent className="p-3 flex flex-col gap-2 basis-1/2 justify-center">
-        <CardTitle className="line-clamp-1 text-2xl">{item.title}</CardTitle>
-
-        <CardDescription className="line-clamp-2">
-          {item.description ?? "No description provided."}
-        </CardDescription>
+      <CardContent
+        className={`p-3 flex flex-col justify-center gap-2 ${
+          form === "carousel"
+            ? "absolute inset-0 backdrop-brightness-50 text-white"
+            : ""
+        }`}
+      >
+        <CardTitle>{item.title}</CardTitle>
 
         <span>
           <span className="opacity-70">By</span> {item.author ?? "Unknown"}{" "}
@@ -56,7 +58,13 @@ export default function ArticleCard({
           {item.created_at?.split("T")[0] ?? "Unpublished"}
         </span>
 
-        <div>
+        <div className="flex items-center gap-2">
+          <BookmarkTrigger
+            customerProfile={customerProfile}
+            item={item}
+            bookmarks={bookmarks}
+            targetType={"article"}
+          />
           <Link
             href={relevantLink}
             className="hover:underline flex items-center gap-1 text-sm"

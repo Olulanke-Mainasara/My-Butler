@@ -44,7 +44,10 @@ export default function CartDrawerTrigger() {
               </DrawerDescription>
             </DrawerHeader>
             {!customerProfile ? (
-              <LoginPlaceholder info="the items in your cart" />
+              <LoginPlaceholder
+                info="the items in your cart"
+                close={setOpenMobile}
+              />
             ) : (
               <section className="px-4 pb-4 h-full overflow-y-scroll">
                 {!cart || cart.length === 0 ? (
@@ -71,7 +74,7 @@ export default function CartDrawerTrigger() {
               </DialogDescription>
             </DialogHeader>
             {!customerProfile ? (
-              <LoginPlaceholder info="the items in your cart" />
+              <LoginPlaceholder info="the items in your cart" close={setOpen} />
             ) : (
               <section className="px-4 pb-4 h-full overflow-y-scroll">
                 {!cart || cart.length === 0 ? (

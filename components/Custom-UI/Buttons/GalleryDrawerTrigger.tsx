@@ -90,7 +90,10 @@ export default function GalleryDrawerTrigger({
               <DrawerDescription>View all your saved photos.</DrawerDescription>
             </DrawerHeader>
             {!customerProfile ? (
-              <LoginPlaceholder info="your saved photos" />
+              <LoginPlaceholder
+                info="your saved photos"
+                close={setOpenMobile}
+              />
             ) : images.length === 0 ? (
               <section>
                 <GalleryPlaceholder />
@@ -121,7 +124,7 @@ export default function GalleryDrawerTrigger({
               <DialogDescription>View all your saved photos.</DialogDescription>
             </DialogHeader>
             {!customerProfile ? (
-              <LoginPlaceholder info="your saved photos" />
+              <LoginPlaceholder info="your saved photos" close={setOpen} />
             ) : images.length === 0 ? (
               <section>
                 <GalleryPlaceholder />

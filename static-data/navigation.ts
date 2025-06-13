@@ -2,10 +2,11 @@ import React from "react";
 import {
   BellIcon,
   Calendar,
-  ForkKnifeCrossed,
   Home,
   ShoppingCart,
   Stars,
+  User,
+  UserCircle,
 } from "lucide-react";
 import {
   GiNewspaper,
@@ -35,18 +36,12 @@ export const groupedNavigation = [
       },
       {
         id: "1-3",
-        url: "/collections",
-        icon: React.createElement(GiShirt),
-        title: "Collection Gallery",
-      },
-      {
-        id: "1-4",
         url: "/combine",
         icon: React.createElement(GiPaintBucket),
         title: "Outfit Creator",
       },
       {
-        id: "1-5",
+        id: "1-4",
         url: "/camera",
         icon: React.createElement(GiPhotoCamera),
         title: "Take a Photo",
@@ -55,61 +50,61 @@ export const groupedNavigation = [
   },
   {
     id: "2",
-    title: "Shop & Events",
+    title: "Stay Active",
     links: [
       {
-        id: "2-1",
+        id: "3-1",
         url: "/shop",
         icon: React.createElement(GiShoppingCart),
         title: "Shop Now",
       },
       {
-        id: "2-2",
-        url: "/food",
-        icon: React.createElement(ForkKnifeCrossed),
-        title: "Tasty Cuisine",
-      },
-    ],
-  },
-  {
-    id: "3",
-    title: "Stay Active",
-    links: [
-      {
-        id: "3-1",
+        id: "3-2",
         url: "/news",
         icon: React.createElement(GiNewspaper),
         title: "Latest News",
       },
       {
-        id: "3-2",
+        id: "3-3",
         url: "/events",
         icon: React.createElement(GiTicket),
         title: "Upcoming Events",
+      },
+      {
+        id: "3-4",
+        url: "/collections",
+        icon: React.createElement(GiShirt),
+        title: "Collection Gallery",
       },
     ],
   },
   {
     id: "4",
-    title: "User Dashboard",
+    title: "Dashboard",
     links: [
       {
         id: "4-1",
-        title: "Your Cart",
-        url: "/cart",
-        icon: React.createElement(ShoppingCart),
+        title: "Profile",
+        url: "/profile",
+        icon: React.createElement(UserCircle),
       },
       {
         id: "4-2",
-        title: "Notifications",
-        url: "/notifications",
-        icon: React.createElement(BellIcon),
+        title: "Your Cart",
+        url: "/cart",
+        icon: React.createElement(ShoppingCart),
       },
       {
         id: "4-3",
         title: "Calendar",
         url: "/calendar",
         icon: React.createElement(Calendar),
+      },
+      {
+        id: "4-4",
+        title: "Notifications",
+        url: "/notifications",
+        icon: React.createElement(BellIcon),
       },
     ],
   },
@@ -142,9 +137,9 @@ export const navigation = [
   },
   {
     id: "5",
-    name: "Food",
-    href: "/food",
-    icon: React.createElement(ForkKnifeCrossed),
+    name: "Profile",
+    href: "/profile",
+    icon: React.createElement(User),
   },
   {
     id: "6",

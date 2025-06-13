@@ -29,9 +29,8 @@ import Image from "next/image";
 import logoDark from "@/public/Logo/logoDark.png";
 import logoLight from "@/public/Logo/logoLight.png";
 import { groupedNavigation } from "@/static-data/navigation";
-import { ChevronUp, LogIn, LogOut, User, UserCircle2 } from "lucide-react";
+import { ChevronUp, LogIn, LogOut, User } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { usePathname } from "next/navigation";
 
@@ -41,7 +40,6 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { theme } = useTheme();
   const { toggleSidebar } = useSidebar();
-  const isMobile = useIsMobile();
 
   const handleSignout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -83,7 +81,7 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname === link.url}
-                      size={isMobile ? "default" : "sm"}
+                      size={"default"}
                       onClick={() => {
                         toggleSidebar();
                         router.push(`${link.url}`);
@@ -135,16 +133,6 @@ export function AppSidebar() {
                   side="top"
                   className="w-[--radix-popper-anchor-width]"
                 >
-                  <DropdownMenuItem
-                    onClick={() => {
-                      toggleSidebar();
-                      router.push("/profile");
-                    }}
-                  >
-                    <span className="flex gap-1 items-center">
-                      <UserCircle2 /> Profile
-                    </span>
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignout}>
                     <span className="flex gap-1 items-center">
                       <LogOut /> Sign out

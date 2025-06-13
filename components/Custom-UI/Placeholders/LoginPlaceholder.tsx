@@ -3,11 +3,26 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import emptyGalleryDark from "@/public/Empty-Gallery/empty-gallery-dark.svg";
 import emptyGalleryLight from "@/public/Empty-Gallery/empty-gallery-light.svg";
-import { Link } from "next-view-transitions";
 import { Button } from "@/components/Shad-UI/button";
+import { useTransitionRouter } from "next-view-transitions";
 
-export function LoginPlaceholder({ info }: { info: string }) {
+export function LoginPlaceholder({
+  info,
+  close,
+}: {
+  info: string;
+  close?: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const { theme } = useTheme();
+  const router = useTransitionRouter();
+
+  const handleLoginTransition = () => {
+    if (close) {
+      close(false);
+    }
+    router.push("/auth/login");
+  };
+
   return (
     <section className="flex flex-col items-center justify-center h-full">
       <Image
@@ -21,9 +36,7 @@ export function LoginPlaceholder({ info }: { info: string }) {
       </h2>
       <p className="text-neutral-500 mt-2 max-w-xs flex">
         You need to login before you can view {info}
-        <Button asChild>
-          <Link href={"/auth/login"}>Login</Link>
-        </Button>
+        <Button onClick={handleLoginTransition}>Login</Button>
       </p>
     </section>
   );

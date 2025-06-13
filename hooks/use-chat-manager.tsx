@@ -6,6 +6,7 @@ import { Message, useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState } from "react";
 import { getLocalStorage } from "@/lib/utils";
 import { generateTitleFromUserMessage } from "@/app/butler/[chat]/action";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 
 type ChatMessage = {
   id: string;
@@ -20,6 +21,8 @@ export const useChatManager = (scrollToBottom: () => void) => {
   const hasAppended = useRef(false);
   const chatId = pathname.split("/").slice(-1)[0];
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(false);
+  const customerProfile = useCustomerProfile();
 
   const {
     messages,
@@ -35,6 +38,10 @@ export const useChatManager = (scrollToBottom: () => void) => {
     experimental_throttle: 50,
     initialMessages,
     onFinish: async (message) => {
+      if (!customerProfile) {
+        return;
+      }
+
       if (messages.length === 0) {
         const localStorageInput = getLocalStorage("input");
         const chatTitle = await generateTitleFromUserMessage({
@@ -65,7 +72,7 @@ export const useChatManager = (scrollToBottom: () => void) => {
         });
 
         if (error) {
-          toast.error("Error inserting chat:");
+          toast.error("Error inserting chat into database");
         }
 
         localStorage.removeItem("input");
@@ -106,13 +113,14 @@ export const useChatManager = (scrollToBottom: () => void) => {
         .eq("id", chatId);
 
       if (error) {
-        toast.error("Error updating chat:");
+        toast.error("Error updating chat in database");
       }
     },
   });
 
   useEffect(() => {
     async function loadChat() {
+      setLoading(true);
       const { data, error } = await supabase
         .from("chats")
         .select("*")
@@ -140,6 +148,9 @@ export const useChatManager = (scrollToBottom: () => void) => {
           append({ role: "user", content: lastMessage.content });
         }
       }
+
+      setLoading(false);
+      hasAppended.current = true;
     }
 
     if (hasAppended.current) {
@@ -157,7 +168,6 @@ export const useChatManager = (scrollToBottom: () => void) => {
       return;
     }
 
-    hasAppended.current = true;
     loadChat();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -178,6 +188,7 @@ export const useChatManager = (scrollToBottom: () => void) => {
   }, [messages, scrollToBottom]);
 
   return {
+    loading,
     messages,
     input,
     setInput,

@@ -6,6 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
+import { Icons } from "../icons";
 
 const NormalCarousel = ({
   items,
@@ -14,7 +15,12 @@ const NormalCarousel = ({
   items: object[];
   children: ReactElement<{ item: object; form: "static" | "carousel" }>;
 }) => {
-  return (
+  return items.length === 0 ? (
+    <div className="text-center py-28 border rounded-lg text-xl flex justify-center gap-1 items-center w-full">
+      <Icons.spinner className="animate-spin" />
+      <p>Loading</p>
+    </div>
+  ) : (
     <div className="w-full xl:px-12">
       <Carousel opts={{ align: "start" }} className="h-full xl:pr-0">
         <CarouselContent className="-ml-5 xl:-ml-8 h-full pr-24 xl:pr-0">
@@ -23,7 +29,7 @@ const NormalCarousel = ({
             return (
               <CarouselItem
                 key={index}
-                className="md:basis-1/2 xl:basis-1/4 pl-5 xl:pl-8 h-full"
+                className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-5 xl:pl-8 h-full"
               >
                 {React.cloneElement(children, { item, form })}
               </CarouselItem>

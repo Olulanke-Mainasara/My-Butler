@@ -5,6 +5,7 @@ import { CustomerProfile } from "@/types/CustomerProfile";
 import { RealtimePostgresChangesPayload, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
 import { BrandProfile } from "@/types/BrandProfile";
+import { Bookmark } from "@/types/Bookmark";
 
 export function useUserInfo() {
   const [userSession, setUserSession] = React.useState<User | null>(null);
@@ -17,6 +18,7 @@ export function useUserInfo() {
   const [notifications, setNotifications] = React.useState<
     Notification[] | null
   >(null);
+  const [bookmarks, setBookmarks] = React.useState<Bookmark[] | null>(null);
   const [cart, setCart] = React.useState<CartItem[] | null>(null);
 
   const handleCustomerProfileEvents = (
@@ -85,6 +87,23 @@ export function useUserInfo() {
         prev
           ? [...prev, payload.new as Notification]
           : [payload.new as Notification]
+      );
+    }
+  };
+
+  const handleBookmarkEvents = (
+    payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
+  ) => {
+    console.log("Change received!", payload);
+
+    if (payload.eventType === "DELETE") {
+      setBookmarks((prev) =>
+        prev ? prev.filter((bookmark) => bookmark.id !== payload.old.id) : null
+      );
+      return;
+    } else if (payload.eventType === "INSERT") {
+      setBookmarks((prev) =>
+        prev ? [...prev, payload.new as Bookmark] : [payload.new as Bookmark]
       );
     }
   };
@@ -198,6 +217,30 @@ export function useUserInfo() {
     return data;
   }, []);
 
+  const fetchBookmarks = useCallback(async (userSession: User) => {
+    const { data, error } = await supabase
+      .from("bookmarks")
+      .select("*")
+      .eq("user_id", userSession.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return null;
+    }
+
+    // Listen to changes in the bookmarks table
+    supabase
+      .channel("bookmarks")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "bookmarks" },
+        (payload) => handleBookmarkEvents(payload)
+      )
+      .subscribe();
+
+    return data;
+  }, []);
+
   const setUserInfo = React.useCallback(async () => {
     if (userSession && !hasFetched.current) {
       hasFetched.current = true;
@@ -207,27 +250,32 @@ export function useUserInfo() {
         brandProfileData,
         cartData,
         notificationsData,
+        bookmarksData,
       ] = await Promise.all([
         fetchCustomerProfile(userSession),
         fetchBrandProfile(userSession),
         fetchCartItems(userSession),
         fetchNotifications(userSession),
+        fetchBookmarks(userSession),
       ]);
 
       setCustomerProfile(customerProfileData);
       setBrandProfile(brandProfileData);
       setCart(cartData);
       setNotifications(notificationsData);
+      setBookmarks(bookmarksData);
     } else if (!userSession) {
       hasFetched.current = false;
       setCustomerProfile(null);
       setBrandProfile(null);
       setCart(null);
       setNotifications(null);
+      setBookmarks(null);
     }
   }, [
     fetchCartItems,
     fetchNotifications,
+    fetchBookmarks,
     fetchCustomerProfile,
     fetchBrandProfile,
     userSession,
@@ -259,5 +307,12 @@ export function useUserInfo() {
     setUserInfo();
   }, [setUserInfo, userSession]);
 
-  return { userSession, customerProfile, brandProfile, cart, notifications };
+  return {
+    userSession,
+    customerProfile,
+    brandProfile,
+    cart,
+    notifications,
+    bookmarks,
+  };
 }

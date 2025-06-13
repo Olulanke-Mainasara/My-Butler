@@ -21,68 +21,86 @@ export default function Chat() {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
   }
 
-  const { messages, input, setInput, handleSubmit, status, stop, error } =
-    useChatManager(scrollToBottom);
+  const {
+    loading,
+    messages,
+    input,
+    setInput,
+    handleSubmit,
+    status,
+    stop,
+    error,
+  } = useChatManager(scrollToBottom);
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <section className="w-full flex flex-col h-screen pt-16">
         <div className="overflow-hidden w-full grow px-3 xl:px-8">
           <div className="space-y-5 overflow-y-scroll h-full scrollbar-none max-w-screen-md m-auto px-1">
-            {messages.map((message, index) => (
-              <React.Fragment key={index}>
-                <div
-                  className={`flex ${
-                    message?.role === "user" && "justify-end"
-                  }`}
-                >
-                  <div className="flex gap-4">
-                    <Avatar
-                      className={`${
-                        message.role === "user" ? "hidden" : "hidden md:flex"
-                      }`}
-                    >
-                      <AvatarImage
-                        src={
-                          theme === "dark"
-                            ? "/Logo/logoDark.png"
-                            : "/Logo/logoLight.png"
-                        }
-                      />
-                      <AvatarFallback className="bg-transparent text-black dark:text-white">
-                        B
-                      </AvatarFallback>
-                    </Avatar>
-                    <div
-                      className={`${
-                        message.role === "user" ? "max-w-xs md:max-w-lg" : ""
-                      }`}
-                    >
-                      <div
+            {loading ? (
+              <div className={`flex justify-end `}>
+                <div className="p-4 bg-gray-400 animate-pulse w-full md:w-2/5 h-20 rounded-xl max-w-xl"></div>
+              </div>
+            ) : (
+              messages.map((message, index) => (
+                <React.Fragment key={index}>
+                  <div
+                    className={`flex ${
+                      message?.role === "user" && "justify-end"
+                    }`}
+                  >
+                    <div className="flex gap-4">
+                      <Avatar
                         className={`${
-                          message.role === "user"
-                            ? "px-4 py-3 bg-darkBackground text-white dark:bg-neutral-800 rounded-3xl rounded-tr-sm"
-                            : ""
+                          message.role === "user" ? "hidden" : "hidden md:flex"
                         }`}
                       >
-                        {message.role === "assistant" ? (
-                          <div
-                            className={`text-lg ${
-                              index === messages.length - 1 ? "min-h-56" : ""
-                            }`}
-                            ref={index === messages.length - 1 ? textRef : null}
-                          >
-                            <Markdown>{sanitizeText(message.content)}</Markdown>
-                          </div>
-                        ) : (
-                          <p className="text-lg">{message.content}</p>
-                        )}
+                        <AvatarImage
+                          src={
+                            theme === "dark"
+                              ? "/Logo/logoDark.png"
+                              : "/Logo/logoLight.png"
+                          }
+                        />
+                        <AvatarFallback className="bg-transparent text-black dark:text-white">
+                          B
+                        </AvatarFallback>
+                      </Avatar>
+                      <div
+                        className={`${
+                          message.role === "user" ? "max-w-xs md:max-w-lg" : ""
+                        }`}
+                      >
+                        <div
+                          className={`${
+                            message.role === "user"
+                              ? "px-4 py-3 bg-darkBackground text-white dark:bg-neutral-800 rounded-3xl rounded-tr-sm"
+                              : ""
+                          }`}
+                        >
+                          {message.role === "assistant" ? (
+                            <div
+                              className={`text-lg ${
+                                index === messages.length - 1 ? "min-h-56" : ""
+                              }`}
+                              ref={
+                                index === messages.length - 1 ? textRef : null
+                              }
+                            >
+                              <Markdown>
+                                {sanitizeText(message.content)}
+                              </Markdown>
+                            </div>
+                          ) : (
+                            <p className="text-lg">{message.content}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </React.Fragment>
-            ))}
+                </React.Fragment>
+              ))
+            )}
             {error && (
               <p className="text-right text-red-500 -translate-y-5">
                 {error.message}

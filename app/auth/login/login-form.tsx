@@ -44,9 +44,9 @@ export function LoginForm({
     }
 
     if (data.user.user_metadata.role_id === 2) {
-      router.push("/");
+      router.replace("/");
     } else {
-      router.push("/brand");
+      router.replace("/brand");
     }
   };
 

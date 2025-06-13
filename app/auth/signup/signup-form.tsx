@@ -72,7 +72,7 @@ export function SignupForm({ ...props }: React.ComponentProps<"div">) {
       return;
     }
 
-    router.push("/auth/verify-email");
+    router.replace("/auth/verify-email");
   };
 
   const handleOAuthLogin = async (provider: Provider) => {

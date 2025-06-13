@@ -52,7 +52,10 @@ export default function NotificationsDrawerTrigger() {
               </DrawerDescription>
             </DrawerHeader>
             {!customerProfile ? (
-              <LoginPlaceholder info="your recent notifications" />
+              <LoginPlaceholder
+                info="your recent notifications"
+                close={setOpenMobile}
+              />
             ) : (
               <section className="px-4 pb-4 h-full overflow-y-scroll">
                 {!notifications || notifications.length === 0 ? (
@@ -87,7 +90,10 @@ export default function NotificationsDrawerTrigger() {
               </DialogDescription>
             </DialogHeader>
             {!customerProfile ? (
-              <LoginPlaceholder info="your recent notifications" />
+              <LoginPlaceholder
+                info="your recent notifications"
+                close={setOpen}
+              />
             ) : (
               <section className="px-4 pb-4 h-full overflow-y-scroll">
                 {!notifications || notifications.length === 0 ? (

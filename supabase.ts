@@ -34,6 +34,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookmarks: {
+        Row: {
+          created_at: string | null
+          id: string
+          target_type_id: string
+          target_type_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          target_type_id: string
+          target_type_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          target_type_id?: string
+          target_type_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           contact_no: string | null
@@ -218,6 +250,7 @@ export type Database = {
       collections: {
         Row: {
           brand_id: string
+          category: string
           created_at: string | null
           description: string | null
           display_image: string | null
@@ -228,6 +261,7 @@ export type Database = {
         }
         Insert: {
           brand_id?: string
+          category?: string
           created_at?: string | null
           description?: string | null
           display_image?: string | null
@@ -238,6 +272,7 @@ export type Database = {
         }
         Update: {
           brand_id?: string
+          category?: string
           created_at?: string | null
           description?: string | null
           display_image?: string | null
@@ -572,6 +607,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      toggle_bookmark: {
+        Args: { target_type: string; target_id: string }
+        Returns: string
+      }
       update_user_details: {
         Args:
           | {

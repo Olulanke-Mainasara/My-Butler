@@ -116,7 +116,8 @@ export function ChatSidebar() {
     <Sidebar side="right">
       <SidebarHeader className="flex flex-row items-center justify-between pt-4">
         <p className="text-2xl">
-          Butler <span className="text-brandLight dark:text-brandDark">AI</span>
+          Butler{" "}
+          <span className="text-brandLight dark:text-brandDark">A.I</span>
         </p>
         <button
           onClick={() => {
