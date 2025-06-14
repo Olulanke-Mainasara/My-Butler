@@ -47,13 +47,13 @@ const CarouselWithSlideTracker = ({
           setApi={setApi}
           className="h-full xl:pr-0"
         >
-          <CarouselContent className="h-full -ml-4 xl:-ml-8">
+          <CarouselContent className="h-full -ml-4 md:-ml-5 xl:-ml-8">
             {items.map((item, index) => {
               const form = "carousel"; // Initialize the 'form' variable
               return (
                 <CarouselItem
                   key={index}
-                  className="md:basis-1/2 lg:basis-1/3 h-full pl-4 xl:pl-8"
+                  className="md:basis-1/2 lg:basis-1/3 h-full pl-4 md:pl-5 xl:pl-8"
                 >
                   {React.cloneElement(children, { item, form })}
                 </CarouselItem>

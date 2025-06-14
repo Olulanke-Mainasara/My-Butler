@@ -100,7 +100,7 @@ const Collections = () => {
               Clear
             </Button>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 xl:gap-8 px-4 xl:px-5">
+          <div className="grid md:grid-cols-3 xl:grid-cols-5 gap-4 xl:gap-8 px-4 xl:px-5">
             {searchResult.map((result) => (
               <CollectionCard item={result} key={result.id} />
             ))}
@@ -111,7 +111,7 @@ const Collections = () => {
           <div className="px-4 xl:px-5">
             <p className="text-3xl md:text-4xl">Filtered Results</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 xl:gap-8 px-4 xl:px-5">
+          <div className="grid md:grid-cols-3 xl:grid-cols-5 gap-4 xl:gap-8 px-4 xl:px-5">
             {filterResult.map((result) => (
               <CollectionCard item={result} key={result.id} />
             ))}
@@ -158,7 +158,7 @@ const Collections = () => {
               <CollectionCard />
             </CarouselWithSlideTracker>
 
-            <section className="space-y-4 px-4 xl:px-5">
+            <section className="space-y-4 px-4 xl:px-5 pt-5">
               <p className="text-3xl md:text-4xl">New &amp; Hot arrivals</p>
               <NormalCarousel items={collections}>
                 <CollectionCard />

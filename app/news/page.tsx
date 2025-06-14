@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React from "react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
 import { Article } from "@/types/Article";
@@ -19,11 +19,11 @@ const News = () => {
     setSearchResult(result as Article[]);
   };
 
-  const fetchPageData = useCallback(async () => {
+  const fetchPageData = async () => {
     const [Articles] = await Promise.all([fetchArticles()]);
 
     setArticles(Articles || []);
-  }, []);
+  };
 
   React.useEffect(() => {
     if (hasRendered.current) {
@@ -32,7 +32,7 @@ const News = () => {
 
     hasRendered.current = true;
     fetchPageData();
-  }, [fetchPageData]);
+  }, []);
 
   return (
     <div className="mt-[141px] md:mt-[136px] xl:mt-36 pb-4 xl:pb-5">

@@ -70,7 +70,7 @@ const CarouselWithSubCarousel = ({
                   return (
                     <CarouselItem
                       key={index}
-                      className="md:basis-1/3 xl:basis-1/4 pl-5 xl:pl-8 h-full"
+                      className="md:basis-1/2 xl:basis-1/4 pl-5 xl:pl-8 h-full"
                     >
                       {React.cloneElement(children, { item, form })}
                     </CarouselItem>

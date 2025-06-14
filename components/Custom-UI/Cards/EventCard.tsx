@@ -51,19 +51,10 @@ export default function EventCard({
           {item.is_virtual ? "Online Event" : item.location ?? "No location"}
         </p>
 
-        <div className="flex flex-col text-sm">
-          <p>
-            <span className="opacity-70">Starts:</span>{" "}
-            {new Date(item.start_date).toLocaleString()}
-          </p>
-
-          {item.end_date && (
-            <p>
-              <span className="opacity-70">Ends:</span>{" "}
-              {new Date(item.end_date).toLocaleString()}
-            </p>
-          )}
-        </div>
+        <p>
+          <span className="opacity-70">Start Date:</span>{" "}
+          {new Date(item.start_date).toLocaleString()}
+        </p>
 
         <div className="flex items-center gap-2">
           <BookmarkTrigger

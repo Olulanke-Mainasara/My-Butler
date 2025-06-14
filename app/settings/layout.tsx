@@ -3,7 +3,7 @@
 import { SidebarNav } from "@/components/Custom-UI/Sidebars/SidebarNav";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { Button } from "@/components/Shad-UI/button";
-import { Paperclip, SunMoon, User } from "lucide-react";
+import { SunMoon, User } from "lucide-react";
 import { Link } from "next-view-transitions";
 import Image from "next/image";
 import React from "react";
@@ -20,12 +20,6 @@ const sidebarNavItems = [
     href: "/settings/appearance",
     title: "Appearance",
     icon: <SunMoon />,
-  },
-  {
-    id: 3,
-    href: "/settings/additional-resources",
-    title: "Additional Resources",
-    icon: <Paperclip />,
   },
 ];
 

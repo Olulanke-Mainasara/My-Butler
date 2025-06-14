@@ -607,6 +607,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_bookmarked_items: {
+        Args: { target: string }
+        Returns: {
+          id: string
+          title: string
+          name: string
+          slug: string
+          description: string
+          display_image: string
+          product_images: string[]
+          price: number
+          rating: number
+          reviews_count: number
+          stock_quantity: number
+          created_at: string
+          bookmarked_at: string
+        }[]
+      }
       toggle_bookmark: {
         Args: { target_type: string; target_id: string }
         Returns: string

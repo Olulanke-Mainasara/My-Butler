@@ -1,4 +1,9 @@
-import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/Shad-UI/card";
 import { Button } from "@/components/Shad-UI/button";
 import { Badge } from "@/components/Shad-UI/badge";
 import { StarIcon } from "lucide-react";
@@ -34,7 +39,7 @@ export default function ProductCard({
         form !== "carousel" ? "flex md:flex-col " : ""
       }`}
     >
-      <Link href={relevantLink} prefetch={false} className="basis-1/2">
+      <Link href={relevantLink} prefetch={false} className="basis-2/5">
         <Image
           src={item.product_images?.[0] ?? "/placeholder.svg"}
           alt={item.name}
@@ -45,27 +50,42 @@ export default function ProductCard({
       </Link>
 
       <CardContent
-        className={`p-3 flex flex-col justify-center gap-2 basis-1/2 ${
+        className={`p-3 flex flex-col justify-center gap-2 basis-3/5 ${
           form === "carousel"
             ? "absolute inset-0 backdrop-brightness-50 text-white"
             : ""
         }`}
       >
-        <CardTitle>{item.name}</CardTitle>
+        <CardTitle
+          className={`${
+            form === "carousel" ? "text-2xl" : "text-xl lg:text-2xl"
+          }`}
+        >
+          {item.name}
+        </CardTitle>
+
+        <CardDescription
+          className={`lg:text-base ${
+            form === "carousel" ? "max-w-60 lg:max-w-72" : "lg:max-w-full "
+          }`}
+        >
+          {item.description}
+        </CardDescription>
 
         <div
           className={`flex items-center  ${
-            form === "carousel" ? "gap-4" : "justify-between"
+            form === "carousel" ? "gap-2" : "justify-between"
           }`}
         >
-          <span className="text-2xl md:text-3xl dark:text-neutral-300">
+          <span className="text-xl md:text-2xl lg:text-2xl dark:text-neutral-300">
             ${item.price.toFixed(2)}
           </span>
 
           {item.rating !== null && (
-            <div className="items-center gap-1 text-xl text-yellow-500 hidden lg:flex">
+            <div className="items-center flex gap-1 text-yellow-500">
               <StarIcon className="w-4 h-4 fill-yellow-500" />
-              {item.rating.toFixed(1)} ({item.reviews_count ?? 0})
+              {item.rating.toFixed(1)}{" "}
+              <span className="hidden lg:block">({item.reviews_count})</span>
             </div>
           )}
 
@@ -76,7 +96,7 @@ export default function ProductCard({
           ) : (
             <Badge
               variant="outline"
-              className={`gap-1 hidden md:block ${
+              className={`gap-1 ${
                 form === "carousel"
                   ? "text-white bg-black"
                   : "bg-black text-white dark:bg-white dark:text-black"

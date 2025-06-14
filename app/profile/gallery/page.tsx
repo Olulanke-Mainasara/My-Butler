@@ -72,7 +72,7 @@ const GalleryPage = () => {
           <GalleryPlaceholder />
         </section>
       ) : (
-        <section className="h-full overflow-y-scroll grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-[2px]">
+        <section className="overflow-y-scroll grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-[2px]">
           {images.map((imageData, index) => (
             <PictureDialogTrigger
               image={imageData}

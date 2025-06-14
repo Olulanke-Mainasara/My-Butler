@@ -103,7 +103,7 @@ const PictureDialogTrigger = ({
           alt="Picture"
           width={40}
           height={40}
-          className="w-full h-full max-h-32 object-cover"
+          className="w-full h-32 object-cover"
         />
       </DialogTrigger>
       <DialogContent className="w-[95%] max-h-[90dvh] sm:max-w-[85vw] h-full md:max-h-[55dvh] xl:max-h-[90dvh] p-0 border-none overflow-hidden">

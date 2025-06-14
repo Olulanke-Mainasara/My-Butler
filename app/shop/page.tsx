@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, Suspense } from "react";
+import React, { Suspense } from "react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
 import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
@@ -28,7 +28,7 @@ const Shop = () => {
     setSearchResult(result as Product[]);
   };
 
-  const fetchPageData = useCallback(async () => {
+  const fetchPageData = async () => {
     const [Products, categories] = await Promise.all([
       fetchProducts(),
       fetchCategories(),
@@ -36,7 +36,7 @@ const Shop = () => {
 
     setProducts(Products || []);
     setCategories(categories || []);
-  }, []);
+  };
 
   React.useEffect(() => {
     if (hasRendered.current) {
@@ -45,7 +45,7 @@ const Shop = () => {
 
     hasRendered.current = true;
     fetchPageData();
-  }, [fetchPageData]);
+  }, []);
 
   return (
     <div className="mt-[141px] md:mt-[136px] xl:mt-36 pb-4 xl:pb-5">
@@ -74,7 +74,7 @@ const Shop = () => {
       </div>
 
       {searchResult.length > 0 ? (
-        <div className="pt-16 md:pt-28 space-y-4">
+        <div className="space-y-4">
           <div className="px-4 xl:px-5 flex items-center gap-4">
             <p className="text-3xl md:text-4xl">Search Results</p>
             <Button
@@ -87,7 +87,7 @@ const Shop = () => {
               Clear
             </Button>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 xl:gap-8 px-4 xl:px-5">
+          <div className="grid md:grid-cols-3 xl:grid-cols-5 gap-4 xl:gap-8 px-4 xl:px-5">
             {searchResult.map((result) => (
               <ProductCard item={result} key={result.id} />
             ))}

@@ -100,3 +100,20 @@ export async function fetchEvents() {
 
   return data || [];
 }
+
+export async function getBookmarkedItems(
+  filteredBookmarkIds: string[],
+  targetType: "products" | "collections" | "news" | "events"
+) {
+  const { data, error } = await supabase
+    .from(targetType)
+    .select("*")
+    .in("id", filteredBookmarkIds);
+
+  if (error) {
+    toast.error("Error fetching bookmarks");
+    return [];
+  }
+
+  return data || [];
+}

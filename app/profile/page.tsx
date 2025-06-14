@@ -1,10 +1,7 @@
-"use client";
-
-import React from "react";
-import Saved from "./saved";
+import Products from "./products";
 
 const Profile = () => {
-  return <Saved />;
+  return <Products />;
 };
 
 export default Profile;
