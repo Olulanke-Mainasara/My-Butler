@@ -61,7 +61,7 @@ const Collections = () => {
   }, []);
 
   return (
-    <div className="mt-[76px] md:mt-6 pb-5 xl:pb-5 space-y-7 xl:space-y-0">
+    <div className="mt-[76px] md:mt-6 pb-5 space-y-7 xl:space-y-0">
       <div className="flex flex-col md:flex-row xl:items-center gap-4 py-3 justify-center fixed top-12 left-0 w-full bg-lightBackground dark:bg-darkBackground z-10">
         <div className="flex gap-3 px-4 xl:px-0 md:w-4/6 xl:w-3/6">
           <FullTextSearchInput
@@ -119,8 +119,8 @@ const Collections = () => {
         </div>
       ) : (
         <>
-          <section className="xl:mx-auto xl:w-4/5 pt-16 md:pt-[113px] xl:pt-[120px] px-4 xl:px-0 relative grid grid-cols-2 gap-2 xl:gap-8 items-center ">
-            <div className="h-44 md:h-60 rounded-3xl relative object-cover object-top overflow-hidden">
+          <section className="lg:mx-auto xl:w-4/5 lg:max-w-screen-md xl:max-w-full pt-16 md:pt-28 xl:pt-[120px] px-4 xl:px-0 relative grid grid-cols-2 gap-2 lg:gap-5 xl:gap-8 items-center ">
+            <div className="h-44 md:h-60 rounded-2xl relative object-cover object-top overflow-hidden">
               <Image
                 src={"/Pages/Collections/collection.webp"}
                 fill
@@ -130,19 +130,19 @@ const Collections = () => {
                 className="w-full h-full object-cover object-top"
               />
             </div>
-            <p className="text-4xl md:text-6xl xl:text-8xl p-2">
+            <p className="text-5xl md:text-6xl xl:text-8xl p-2">
               Different{" "}
               <span className="text-brandLight dark:text-brandDark">
                 styles
               </span>
             </p>
-            <p className="text-4xl md:text-6xl xl:text-8xl text-right p-2">
+            <p className="text-5xl md:text-6xl xl:text-8xl text-right p-2">
               Different{" "}
               <span className="text-brandLight dark:text-brandDark">
                 stories
               </span>
             </p>
-            <div className="h-44 md:h-60 rounded-3xl relative object-cover object-top overflow-hidden">
+            <div className="h-44 md:h-60 rounded-2xl relative object-cover object-top overflow-hidden">
               <Image
                 src={"/Pages/Collections/collection2.png"}
                 fill
@@ -153,8 +153,9 @@ const Collections = () => {
               />
             </div>
           </section>
-          <section className="space-y-10">
-            <CarouselWithSlideTracker items={collections} className="xl:mt-10">
+
+          <section className="space-y-10 xl:pt-10">
+            <CarouselWithSlideTracker items={collections}>
               <CollectionCard />
             </CarouselWithSlideTracker>
 
