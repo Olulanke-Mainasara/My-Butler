@@ -9,6 +9,7 @@ import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
+import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
 
 const News = () => {
   const [articles, setArticles] = React.useState<Article[]>([]);
@@ -23,7 +24,7 @@ const News = () => {
   const fetchPageData = async () => {
     const [Articles] = await Promise.all([fetchArticles()]);
 
-    setArticles(Articles || []);
+    setArticles(Array.isArray(Articles) ? Articles : []);
   };
 
   React.useEffect(() => {
@@ -110,11 +111,15 @@ const News = () => {
                 <p className="text-3xl md:text-4xl">Latest</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
-                {articles.map((article, index) => (
-                  <ArticleCard key={index} item={article} />
-                ))}
-              </div>
+              {articles.length === 0 ? (
+                <LoadingSkeleton />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+                  {articles.map((article, index) => (
+                    <ArticleCard key={index} item={article} />
+                  ))}
+                </div>
+              )}
             </section>
 
             <section className="space-y-4 px-4 md:px-5">
@@ -132,11 +137,15 @@ const News = () => {
                 <p className="text-3xl md:text-4xl">Recommended</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
-                {articles.map((article, index) => (
-                  <ArticleCard key={index} item={article} />
-                ))}
-              </div>
+              {articles.length === 0 ? (
+                <LoadingSkeleton />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+                  {articles.map((article, index) => (
+                    <ArticleCard key={index} item={article} />
+                  ))}
+                </div>
+              )}
             </section>
           </section>
         </>

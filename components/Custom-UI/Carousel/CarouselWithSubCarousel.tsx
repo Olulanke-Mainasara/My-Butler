@@ -8,6 +8,7 @@ import {
 } from "@/components/Shad-UI/carousel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Icons } from "../icons";
+import LoadingSkeleton from "../Placeholders/LoadingSkeleton";
 
 const CarouselWithSubCarousel = ({
   items,
@@ -56,10 +57,7 @@ const CarouselWithSubCarousel = ({
       )}
 
       {items.length === 0 ? (
-        <div className="text-center py-28 border rounded-lg text-xl flex justify-center gap-1 items-center w-full">
-          <Icons.spinner className="animate-spin" />
-          <p>Loading</p>
-        </div>
+        <LoadingSkeleton length={1} className="md:grid-cols-1" />
       ) : (
         <div className="xl:basis-5/6 xl:w-11/12 flex items-center h-full xl:pl-16 xl:pr-4">
           <div className="w-full h-full">

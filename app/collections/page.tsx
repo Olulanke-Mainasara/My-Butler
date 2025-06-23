@@ -45,8 +45,8 @@ const Collections = () => {
       fetchCategories(),
     ]);
 
-    setCollections(Collections || []);
-    setBrands(Brands || []);
+    setCollections(Array.isArray(Collections) ? Collections : []);
+    setBrands(Array.isArray(Brands) ? Brands : []);
     setCategories(Categories || []);
   };
 
@@ -180,7 +180,7 @@ const Collections = () => {
               <p className="text-center text-3xl md:text-4xl">
                 Everyone gets something
               </p>
-              <div className="grid md:grid-cols-3 gap-4 xl:gap-8 mx-auto xl:w-full">
+              <div className="grid md:grid-cols-3 gap-4 md:gap-5 mx-auto xl:w-full">
                 <div className="rounded-3xl row-span-2 relative overflow-hidden">
                   <Image
                     src={"/Pages/Collections/collection3.jpeg"}

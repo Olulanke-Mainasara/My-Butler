@@ -1,16 +1,17 @@
 "use client";
 
 import { Button } from "@/components/Shad-UI/button";
-import { PlusCircle } from "lucide-react";
+import { Newspaper, PlusCircle } from "lucide-react";
 import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 import { getBookmarkedItems } from "@/lib/DatabaseFetches";
 import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
 import { Article } from "@/types/Article";
 import { useBookmarks } from "@/components/Providers/AllProviders";
+import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
 
 export default function Products() {
-  const [bookmarkItems, setBookmarkItems] = useState<Article[]>([]);
+  const [bookmarkItems, setBookmarkItems] = useState<Article[] | null>(null);
   const bookmarks = useBookmarks();
 
   const fetchPageData = async (filteredBookmarkIds: string[]) => {
@@ -52,14 +53,19 @@ export default function Products() {
         </Button>
       </div>
 
-      {bookmarkItems.length > 0 ? (
+      {!bookmarkItems ? (
+        <LoadingSkeleton />
+      ) : bookmarkItems.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6">
           {bookmarkItems.map((bookmark, index) => (
             <ArticleCard item={bookmark} key={index} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 border rounded-lg text-xl flex justify-center items-center">
+        <div className="text-center py-20 border rounded-lg text-xl flex justify-center items-center gap-2">
+          <span className="text-brandLight dark:text-brandDark">
+            <Newspaper />
+          </span>
           <p>No articles found.</p>
         </div>
       )}

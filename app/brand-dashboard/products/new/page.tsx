@@ -106,7 +106,7 @@ export default function CollectionForm() {
       }
 
       toast.success("product added successfully!");
-      router.push(`/brand/products`);
+      router.push(`/brand-dashboard/products`);
     } catch {
       toast.error("Failed to create collection. Please try again.");
     } finally {
@@ -324,7 +324,7 @@ export default function CollectionForm() {
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <Icons.spinner />
+                  <Icons.spinner className="animate-spin" />
                   Adding
                 </span>
               ) : (

@@ -6,6 +6,10 @@ import { ArrowRight } from "lucide-react";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { useBookmarks } from "@/components/Providers/AllProviders";
 import BookmarkTrigger from "../Buttons/BookmarkTrigger";
+import {
+  convertRawDateToReadableDate,
+  convertRawDateToReadableTime,
+} from "@/lib/utils";
 
 export default function EventCard({
   item,
@@ -25,7 +29,7 @@ export default function EventCard({
     <Card
       className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
     >
-      <Link href={item.slug + "&" + item.id}>
+      <Link href={item.slug + "&" + item.id} prefetch={false}>
         <Image
           src={item.display_image ?? "/placeholder.svg"}
           alt={item.title}
@@ -44,7 +48,7 @@ export default function EventCard({
             : ""
         }`}
       >
-        <CardTitle>{item.title}</CardTitle>
+        <CardTitle className="md:text-xl">{item.title}</CardTitle>
 
         <p>
           <span className="opacity-70">Location:</span>{" "}
@@ -52,8 +56,13 @@ export default function EventCard({
         </p>
 
         <p>
-          <span className="opacity-70">Start Date:</span>{" "}
-          {new Date(item.start_date).toLocaleString()}
+          <span className="opacity-70">Date:</span>{" "}
+          {convertRawDateToReadableDate(item.start_date)}
+        </p>
+
+        <p>
+          <span className="opacity-70">Time:</span>{" "}
+          {convertRawDateToReadableTime(item.start_date)}
         </p>
 
         <div className="flex items-center gap-2">
@@ -65,7 +74,8 @@ export default function EventCard({
           />
 
           <Link
-            href={`/items/${item.slug + "&" + item.id}`}
+            href={`/events/${item.slug + "&" + item.id}`}
+            prefetch={false}
             className="hover:underline flex items-center gap-1 text-sm"
           >
             View Details

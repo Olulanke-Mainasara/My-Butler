@@ -48,7 +48,7 @@ export default async function updateSession(request: NextRequest) {
   if (!user) {
     if (
       url.pathname.startsWith("/profile") ||
-      url.pathname.startsWith("/brand")
+      url.pathname.startsWith("/brand-dashboard")
     ) {
       url.pathname = "/auth/login";
       return NextResponse.redirect(url);
@@ -58,14 +58,14 @@ export default async function updateSession(request: NextRequest) {
 
     if (
       (role_id === 2 && url.pathname.startsWith("/auth")) ||
-      (role_id === 2 && url.pathname.startsWith("/brand"))
+      (role_id === 2 && url.pathname.startsWith("/brand-dashboard"))
     ) {
       url.pathname = "/profile";
       return NextResponse.redirect(url);
     }
 
-    if (role_id === 4 && !url.pathname.startsWith("/brand")) {
-      url.pathname = "/brand";
+    if (role_id === 4 && !url.pathname.startsWith("/brand-dashboard")) {
+      url.pathname = "/brand-dashboard";
       return NextResponse.redirect(url);
     }
   }

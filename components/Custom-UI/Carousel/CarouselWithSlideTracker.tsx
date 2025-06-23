@@ -8,7 +8,7 @@ import {
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
 import { motion } from "framer-motion";
-import { Icons } from "../icons";
+import LoadingSkeleton from "../Placeholders/LoadingSkeleton";
 
 const CarouselWithSlideTracker = ({
   items,
@@ -37,10 +37,7 @@ const CarouselWithSlideTracker = ({
   return (
     <section className={`w-full h-60 px-4 md:px-5 ${className}`}>
       {items.length === 0 ? (
-        <div className="text-center py-28 border rounded-lg text-xl flex justify-center gap-1 items-center w-full">
-          <Icons.spinner className="animate-spin" />
-          <p>Loading</p>
-        </div>
+        <LoadingSkeleton length={1} className="md:grid-cols-1 xl:grid-cols-1" />
       ) : (
         <Carousel
           opts={{ align: "center" }}

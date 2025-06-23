@@ -2,10 +2,10 @@ import React from "react";
 import {
   BellIcon,
   Calendar,
+  Factory,
   Home,
   ShoppingCart,
   Stars,
-  User,
   UserCircle,
 } from "lucide-react";
 import {
@@ -54,24 +54,30 @@ export const groupedNavigation = [
     links: [
       {
         id: "3-1",
+        url: "/brands",
+        icon: React.createElement(Factory),
+        title: "Brands",
+      },
+      {
+        id: "3-2",
         url: "/shop",
         icon: React.createElement(GiShoppingCart),
         title: "Shop Now",
       },
       {
-        id: "3-2",
+        id: "3-3",
         url: "/news",
         icon: React.createElement(GiNewspaper),
         title: "Latest News",
       },
       {
-        id: "3-3",
+        id: "3-4",
         url: "/events",
         icon: React.createElement(GiTicket),
         title: "Upcoming Events",
       },
       {
-        id: "3-4",
+        id: "3-5",
         url: "/collections",
         icon: React.createElement(GiShirt),
         title: "Collection Gallery",
@@ -137,9 +143,9 @@ export const navigation = [
   },
   {
     id: "5",
-    name: "Profile",
-    href: "/profile",
-    icon: React.createElement(User),
+    name: "Brands",
+    href: "/brands",
+    icon: React.createElement(Factory),
   },
   {
     id: "6",

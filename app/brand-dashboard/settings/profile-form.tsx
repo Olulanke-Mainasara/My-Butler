@@ -18,30 +18,33 @@ import {
 } from "@/components/Shad-UI/form";
 
 import { Input } from "@/components/Shad-UI/input";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
+import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { supabase } from "@/lib/supabase/client";
 import { useTransitionRouter } from "next-view-transitions";
 import { compareTwoObjects } from "@/lib/utils";
 import { Icons } from "@/components/Custom-UI/icons";
-import { profileFormSchema } from "@/lib/schemas";
+import { brandProfileFormSchema } from "@/lib/schemas";
 import { ProfilePictureUpload } from "@/components/Custom-UI/Cards/ProfilePictureUpload";
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type ProfileFormValues = z.infer<typeof brandProfileFormSchema>;
 
 export function ProfileForm() {
   const [loading, setLoading] = React.useState(false);
   const [profilePicture, setProfilePicture] = React.useState<string>("");
   const router = useTransitionRouter();
-  const customerProfile = useCustomerProfile();
+  const userProfile = useBrandProfile();
 
   const defaultValues: Partial<ProfileFormValues> = {
-    username: customerProfile?.display_name,
-    email: customerProfile?.email,
-    location: customerProfile?.location || "N/A",
+    name: userProfile?.name,
+    email: userProfile?.email,
+    location: userProfile?.location || "N/A",
+    url: userProfile?.url || "N/A",
+    contact: userProfile?.contact || "N/A",
+    description: userProfile?.description || "N/A",
   };
 
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+    resolver: zodResolver(brandProfileFormSchema),
     defaultValues,
     mode: "onChange",
   });
@@ -52,10 +55,7 @@ export function ProfileForm() {
 
   async function onSubmit(data: ProfileFormValues) {
     const noChanges = compareTwoObjects(
-      {
-        ...defaultValues,
-        profile_picture: customerProfile?.profile_picture || "",
-      },
+      { ...defaultValues, profile_picture: userProfile?.profile_picture || "" },
       { ...data, profile_picture: profilePicture }
     );
 
@@ -64,7 +64,7 @@ export function ProfileForm() {
       return;
     }
 
-    if (!customerProfile) {
+    if (!userProfile) {
       toast.info("You need to log in first", {
         action: {
           label: "Login",
@@ -76,12 +76,15 @@ export function ProfileForm() {
 
     setLoading(true);
 
-    const { error } = await supabase.rpc("update_customer_details", {
-      _display_name: data.username === "N/A" ? "" : data.username ?? "",
-      _profile_picture: profilePicture,
+    const { error } = await supabase.rpc("update_brand_details", {
+      _name: data.name === "N/A" ? "" : data.name ?? "",
       _email: data.email === "N/A" ? "" : data.email ?? "",
       _location: data.location === "N/A" ? "" : data.location ?? "",
-      _supabase_user_id: customerProfile?.supabase_user_id ?? "",
+      _description: data.description === "N/A" ? "" : data.description ?? "",
+      _url: data.url === "N/A" ? "" : data.url ?? "",
+      _profile_picture: profilePicture,
+      _contact: data.contact === "N/A" ? "" : data.contact ?? "",
+      _supabase_user_id: userProfile?.supabase_user_id ?? "",
     });
 
     if (error) {
@@ -103,72 +106,129 @@ export function ProfileForm() {
         className="space-y-8 max-w-2xl"
       >
         <ProfilePictureUpload
-          userId={customerProfile?.supabase_user_id || ""}
-          currentImageUrl={customerProfile?.profile_picture || ""}
+          userId={userProfile?.supabase_user_id || ""}
+          currentImageUrl={userProfile?.profile_picture || ""}
           onUpload={handleProfilePictureUpload}
         />
 
         <FormField
           control={form.control}
-          name="username"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Brand name</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={customerProfile?.display_name}
+                  placeholder="Your brand name"
                   {...field}
+                  value={field.value === "N/A" ? "" : field.value}
                   disabled={loading}
                 />
               </FormControl>
-              <FormDescription>
-                This is your public display name. It can be your real name or a
-                pseudonym.
-              </FormDescription>
+              <FormDescription>Your brand&apos;s name.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Brand description</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Describe your brand"
+                  {...field}
+                  value={field.value === "N/A" ? "" : field.value}
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormDescription>Your brand&apos;s description.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Brand email</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={customerProfile?.email}
+                  placeholder="example@brand.com"
                   {...field}
                   disabled={loading}
                 />
               </FormControl>
-              <FormDescription>This is your contact email.</FormDescription>
+              <FormDescription>
+                Your brand&apos;s contact email.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="location"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Location</FormLabel>
+              <FormLabel>Brand location</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={
-                    !customerProfile?.location ||
-                    customerProfile.location === "N/A"
-                      ? "Where are you located?"
-                      : customerProfile.location
-                  }
+                  placeholder="Where are you located?"
+                  {...field}
+                  value={field.value === "N/A" ? "" : field.value}
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormDescription>Your brand&apos;s location.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Brand URL</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Your website or social media link"
                   {...field}
                   value={field.value === "N/A" ? "" : field.value}
                   disabled={loading}
                 />
               </FormControl>
               <FormDescription>
-                Could be your personal location or brand location.
+                Could be your brand website or main social handle.
               </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="contact"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Brand Contact No</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="How can you be contacted?"
+                  {...field}
+                  value={field.value === "N/A" ? "" : field.value}
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormDescription>Your brand contact number.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

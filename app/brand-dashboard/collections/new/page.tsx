@@ -94,7 +94,7 @@ export default function CollectionForm() {
 
       toast.success("Collection created successfully!");
       router.push(
-        `/brand/products/new?collectionID=${
+        `/brand-dashboard/products/new?collectionID=${
           generateSlug(collectionData.name) + "/" + collectionData.id
         }`
       );
@@ -183,7 +183,7 @@ export default function CollectionForm() {
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <Icons.spinner />
+                  <Icons.spinner className="animate-spin" />
                   Adding
                 </span>
               ) : (

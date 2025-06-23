@@ -12,6 +12,7 @@ import { fetchCategories, fetchProducts } from "@/lib/DatabaseFetches";
 import { Button } from "@/components/Shad-UI/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
 
 const Shop = () => {
   const [products, setProducts] = React.useState<Product[]>([]);
@@ -35,7 +36,7 @@ const Shop = () => {
       fetchCategories(),
     ]);
 
-    setProducts(Products || []);
+    setProducts(Array.isArray(Products) ? Products : []);
     setCategories(categories || []);
   };
 
@@ -170,11 +171,15 @@ const Shop = () => {
             <section className="space-y-4 px-4 md:px-5 pt-5">
               <p className="text-3xl md:text-4xl">Latest drops</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
-                {products.map((product, index) => (
-                  <ProductCard item={product} key={index} />
-                ))}
-              </div>
+              {products.length === 0 ? (
+                <LoadingSkeleton />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
+                  {products.map((product, index) => (
+                    <ProductCard item={product} key={index} />
+                  ))}
+                </div>
+              )}
             </section>
 
             <section className="space-y-4 px-4 md:px-5">
@@ -192,11 +197,15 @@ const Shop = () => {
             <section className="space-y-4 px-4 md:px-5">
               <p className="text-3xl md:text-4xl">Recommended</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
-                {products.map((product, index) => (
-                  <ProductCard item={product} key={index} />
-                ))}
-              </div>
+              {products.length === 0 ? (
+                <LoadingSkeleton />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
+                  {products.map((product, index) => (
+                    <ProductCard item={product} key={index} />
+                  ))}
+                </div>
+              )}
             </section>
           </section>
         </>

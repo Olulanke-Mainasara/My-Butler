@@ -29,7 +29,7 @@ export default function ProductCard({
   if (!item) {
     return;
   }
-  const relevantLink = pathname.startsWith("/brand")
+  const relevantLink = pathname.startsWith("/brand-dashboard")
     ? `/products/${item.slug + "&" + item.id}`
     : `/shop/${item.slug + "&" + item.id}`;
 
@@ -57,15 +57,13 @@ export default function ProductCard({
         }`}
       >
         <CardTitle
-          className={`${
-            form === "carousel" ? "text-2xl" : "text-xl lg:text-2xl"
-          }`}
+          className={`${form === "carousel" ? "text-2xl" : "text-xl"}`}
         >
           {item.name}
         </CardTitle>
 
         <CardDescription
-          className={`lg:text-base ${
+          className={`${
             form === "carousel" ? "max-w-60 lg:max-w-72" : "lg:max-w-full "
           }`}
         >

@@ -32,29 +32,30 @@ export const handleBookmark = async (
   }
 };
 
-export async function fetchCollections() {
-  const { data, error } = await supabase
-    .from("collections")
-    .select("*")
-    .order("created_at", { ascending: false });
+export async function fetchBrands({
+  filters = {},
+  countOnly = false,
+}: {
+  filters?: Record<string, string | number | boolean>;
+  countOnly?: boolean;
+} = {}) {
+  let query = supabase
+    .from("brands")
+    .select("*", countOnly ? { count: "exact" } : {});
 
-  if (error) {
-    toast.error("Failed to fetch collections.");
-    return;
-  }
+  // Apply filters dynamically
+  Object.entries(filters).forEach(([key, value]) => {
+    query = query.eq(key, value);
+  });
 
-  return data;
-}
-
-export async function fetchBrands() {
-  const { data, error } = await supabase.from("brands").select("*");
+  const { data, count, error } = await query;
 
   if (error) {
     toast.error("Failed to fetch brands.");
-    return;
+    return countOnly ? 0 : [];
   }
 
-  return data;
+  return countOnly ? count ?? 0 : data ?? [];
 }
 
 export async function fetchCategories() {
@@ -68,37 +69,108 @@ export async function fetchCategories() {
   return data;
 }
 
-export async function fetchProducts() {
-  const { data, error } = await supabase.from("products").select("*");
+export async function fetchCollections({
+  filters = {},
+  countOnly = false,
+}: {
+  filters?: Record<string, string | number | boolean>;
+  countOnly?: boolean;
+} = {}) {
+  let query = supabase
+    .from("collections")
+    .select("*", countOnly ? { count: "exact" } : {});
+
+  // Apply filters dynamically
+  Object.entries(filters).forEach(([key, value]) => {
+    query = query.eq(key, value);
+  });
+
+  const { data, count, error } = await query;
+
+  if (error) {
+    toast.error("Failed to fetch collections.");
+    return countOnly ? 0 : [];
+  }
+
+  return countOnly ? count ?? 0 : data ?? [];
+}
+
+export async function fetchProducts({
+  filters = {},
+  countOnly = false,
+}: {
+  filters?: Record<string, string | number | boolean>;
+  countOnly?: boolean;
+} = {}) {
+  let query = supabase
+    .from("products")
+    .select("*", countOnly ? { head: true, count: "exact" } : {});
+
+  // Apply filters dynamically
+  Object.entries(filters).forEach(([key, value]) => {
+    query = query.eq(key, value);
+  });
+
+  const { data, count, error } = await query;
 
   if (error) {
     toast.error("Failed to fetch products.");
-    return [];
+    return countOnly ? 0 : [];
   }
 
-  return data || [];
+  return countOnly ? count ?? 0 : data ?? [];
 }
 
-export async function fetchArticles() {
-  const { data, error } = await supabase.from("news").select("*");
+export async function fetchArticles({
+  filters = {},
+  countOnly = false,
+}: {
+  filters?: Record<string, string | number | boolean>;
+  countOnly?: boolean;
+} = {}) {
+  let query = supabase
+    .from("news")
+    .select("*", countOnly ? { count: "exact" } : {});
+
+  // Apply filters dynamically
+  Object.entries(filters).forEach(([key, value]) => {
+    query = query.eq(key, value);
+  });
+
+  const { data, count, error } = await query;
 
   if (error) {
     toast.error("Failed to fetch articles.");
-    return [];
+    return countOnly ? 0 : [];
   }
 
-  return data || [];
+  return countOnly ? count ?? 0 : data ?? [];
 }
 
-export async function fetchEvents() {
-  const { data, error } = await supabase.from("events").select("*");
+export async function fetchEvents({
+  filters = {},
+  countOnly = false,
+}: {
+  filters?: Record<string, string | number | boolean>;
+  countOnly?: boolean;
+} = {}) {
+  let query = supabase
+    .from("events")
+    .select("*", countOnly ? { count: "exact" } : {});
+
+  // Apply filters dynamically
+  Object.entries(filters).forEach(([key, value]) => {
+    query = query.eq(key, value);
+  });
+
+  const { data, count, error } = await query;
 
   if (error) {
     toast.error("Failed to fetch events.");
-    return [];
+    return countOnly ? 0 : [];
   }
 
-  return data || [];
+  return countOnly ? count ?? 0 : data ?? [];
 }
 
 export async function getBookmarkedItems(

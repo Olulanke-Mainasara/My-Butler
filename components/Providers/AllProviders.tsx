@@ -60,7 +60,11 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
               <notificationsContext.Provider value={notifications}>
                 <cartContext.Provider value={cart}>
                   <bookmarksContext.Provider value={bookmarks}>
-                    {!pathname.startsWith("/brand") ? <AppSidebar /> : <></>}
+                    {!pathname.startsWith("/brand-dashboard") ? (
+                      <AppSidebar />
+                    ) : (
+                      <></>
+                    )}
 
                     <main className="w-full relative">
                       <div
@@ -73,7 +77,7 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                             : "text-white"
                         }`}
                       >
-                        {!pathname.startsWith("/brand") ? (
+                        {!pathname.startsWith("/brand-dashboard") ? (
                           <SidebarTrigger />
                         ) : (
                           <></>
@@ -81,8 +85,8 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
 
                         <Link
                           href={
-                            pathname.startsWith("/brand")
-                              ? "/brand"
+                            pathname.startsWith("/brand-dashboard")
+                              ? "/brand-dashboard"
                               : "/?splashed=true"
                           }
                           className={`text-2xl ${
@@ -97,7 +101,7 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                             Butler
                           </span>
                         </Link>
-                        {pathname.startsWith("/brand") ? (
+                        {pathname.startsWith("/brand-dashboard") ? (
                           <ThemeToggler />
                         ) : pathname !== "/notifications" ? (
                           <NotificationsDrawerTrigger />

@@ -37,6 +37,10 @@ export default function FullTextSearchInput({
       toast.error("Error fetching search results");
     }
 
+    if (data?.length === 0) {
+      toast.info("No results found");
+    }
+
     handleSearchResult(data || []);
     setSearching(false);
   };
@@ -50,7 +54,7 @@ export default function FullTextSearchInput({
           </p>
         </div>
       )}
-      <div className="w-full items-center border border-black dark:border-white overflow-hidden rounded-3xl flex h-14">
+      <div className="w-full items-center border border-black dark:border-white overflow-hidden rounded-3xl flex h-12">
         <div className="flex items-center p-3">
           <button onClick={handleSearch}>
             <Search className="" />

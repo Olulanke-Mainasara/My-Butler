@@ -68,10 +68,9 @@ export type Database = {
       }
       brands: {
         Row: {
-          contact_no: string | null
+          contact: string | null
           created_at: string | null
           description: string
-          display_name: string
           email: string
           id: string
           location: string | null
@@ -82,10 +81,9 @@ export type Database = {
           url: string | null
         }
         Insert: {
-          contact_no?: string | null
+          contact?: string | null
           created_at?: string | null
           description: string
-          display_name: string
           email: string
           id?: string
           location?: string | null
@@ -96,10 +94,9 @@ export type Database = {
           url?: string | null
         }
         Update: {
-          contact_no?: string | null
+          contact?: string | null
           created_at?: string | null
           description?: string
-          display_name?: string
           email?: string
           id?: string
           location?: string | null
@@ -607,45 +604,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_bookmarked_items: {
-        Args: { target: string }
-        Returns: {
-          id: string
-          title: string
-          name: string
-          slug: string
-          description: string
-          display_image: string
-          product_images: string[]
-          price: number
-          rating: number
-          reviews_count: number
-          stock_quantity: number
-          created_at: string
-          bookmarked_at: string
-        }[]
-      }
       toggle_bookmark: {
         Args: { target_type: string; target_id: string }
         Returns: string
       }
-      update_user_details: {
-        Args:
-          | {
-              _supabase_user_id: string
-              _display_name: string
-              _email: string
-              _bio: string
-              _url: string
-              _location: string
-              _category: string
-            }
-          | {
-              _supabase_user_id: string
-              _display_name: string
-              _email: string
-              _location: string
-            }
+      update_brand_details: {
+        Args: {
+          _supabase_user_id: string
+          _name: string
+          _email: string
+          _location: string
+          _description: string
+          _url: string
+          _profile_picture: string
+          _contact: string
+        }
+        Returns: undefined
+      }
+      update_customer_details: {
+        Args: {
+          _supabase_user_id: string
+          _display_name: string
+          _profile_picture: string
+          _email: string
+          _location: string
+        }
         Returns: undefined
       }
     }

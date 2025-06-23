@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { articleSchema } from "@/lib/schemas";
+import { eventSchema } from "@/lib/schemas";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase/client";
 
@@ -35,7 +35,7 @@ import { useState } from "react";
 import { useTransitionRouter } from "next-view-transitions";
 import { generateSlug } from "@/lib/utils";
 
-type FormValues = z.infer<typeof articleSchema>;
+type FormValues = z.infer<typeof eventSchema>;
 
 export default function NewsForm() {
   const router = useTransitionRouter();
@@ -45,18 +45,21 @@ export default function NewsForm() {
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(articleSchema),
+    resolver: zodResolver(eventSchema),
     defaultValues: {
-      author: "",
-      content: "",
-      description: "",
       title: "",
+      description: "",
+      start_date: "",
+      end_date: "",
+      location: "",
+      is_virtual: false,
+      tickets_url: "",
     },
   });
 
   const onSubmit = async (data: FormValues) => {
     if (!uploadedImageName) {
-      toast.info("Please upload an image for the article.");
+      toast.info("Please upload an image for the event.");
       return;
     }
 
@@ -65,33 +68,36 @@ export default function NewsForm() {
       let displayImageUrl = "";
       if (uploadedImageName) {
         const { data } = supabase.storage
-          .from(`news/${brandProfile?.id}`) // Bucket name
+          .from(`events/${brandProfile?.id}`) // Bucket name
           .getPublicUrl(uploadedImageName);
 
         displayImageUrl = data.publicUrl;
       }
 
-      // Create the article in the database
-      const { error } = await supabase.from("news").insert([
+      // Create the event in the database
+      const { error } = await supabase.from("events").insert([
         {
-          author: data.author,
-          content: data.content,
+          title: data.title,
+          slug: generateSlug(data.title),
           description: data.description,
           display_image: displayImageUrl,
-          slug: generateSlug(data.title),
-          title: data.title,
+          start_date: data.start_date,
+          end_date: data.end_date,
+          location: data.location,
+          is_virtual: data.is_virtual,
+          tickets_url: data.tickets_url,
         },
       ]);
 
       if (error) {
-        toast.error("Failed to publish article.");
+        toast.error("Failed to post events.");
         return;
       }
 
-      toast.success("Article published successfully!");
-      router.push("/brand/articles");
+      toast.success("Event posted successfully!");
+      router.push("/brand-dashboard/events");
     } catch {
-      toast.error("Failed to publish article. Please try again.");
+      toast.error("Failed to post event. Please try again.");
     } finally {
       form.reset();
     }
@@ -102,9 +108,9 @@ export default function NewsForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="px-0 pb-4 pt-0 text-center lg:text-left">
-            <CardTitle className="text-4xl">Publish new Article</CardTitle>
+            <CardTitle className="text-4xl">Post new Event</CardTitle>
             <CardDescription className="text-lg">
-              Fill in the details to publish a new article
+              Fill in the details to post a new event
             </CardDescription>
           </CardHeader>
 
@@ -112,7 +118,7 @@ export default function NewsForm() {
             <FormItem>
               <FormLabel>Display Image</FormLabel>
               <ImageUpload
-                bucketName="news"
+                bucketName="events"
                 path={brandProfile?.id || ""}
                 maxFiles={1}
                 maxFileSize={5 * 1000 * 1000} // 5 MB
@@ -121,7 +127,7 @@ export default function NewsForm() {
                 } // Capture the uploaded images names
               />
               <FormDescription>
-                Upload an image for the article&apos;s display.
+                Upload an image for the event&apos;s display.
               </FormDescription>
             </FormItem>
 
@@ -132,30 +138,7 @@ export default function NewsForm() {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Article title"
-                      {...field}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="author"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Author</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Author name"
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled={form.formState.isSubmitting}
-                    />
+                    <Input placeholder="Event title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -170,10 +153,62 @@ export default function NewsForm() {
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Short summary"
+                      placeholder="Optional event description..."
                       {...field}
                       value={field.value ?? ""}
-                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="start_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Date</FormLabel>
+                    <FormControl>
+                      <Input type="datetime-local" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="end_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>End Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        type="datetime-local"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Event location or venue"
+                      {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -183,16 +218,54 @@ export default function NewsForm() {
 
             <FormField
               control={form.control}
-              name="content"
+              name="is_virtual"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Content</FormLabel>
+                  <FormLabel>Is Virtual?</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Full article content..."
-                      className="min-h-40"
+                    <select
+                      name={field.name}
+                      ref={field.ref}
+                      className="w-full p-2 border rounded-md"
+                      value={
+                        field.value === true
+                          ? "true"
+                          : field.value === false
+                          ? "false"
+                          : ""
+                      }
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === "true"
+                            ? true
+                            : e.target.value === "false"
+                            ? false
+                            : null
+                        )
+                      }
+                      onBlur={field.onBlur}
+                    >
+                      <option value="">Select option</option>
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="tickets_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tickets URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://tickets.example.com"
                       {...field}
-                      disabled={form.formState.isSubmitting}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -209,11 +282,11 @@ export default function NewsForm() {
             >
               {form.formState.isSubmitting ? (
                 <span className="flex items-center gap-2">
-                  <Icons.spinner />
-                  Publishing
+                  <Icons.spinner className="animate-spin" />
+                  Posting
                 </span>
               ) : (
-                "Publish Article"
+                "Post Event"
               )}
             </Button>
           </CardFooter>

@@ -185,3 +185,79 @@ export function generateUUID(): string {
     return v.toString(16);
   });
 }
+
+/**
+ * Normalizes and formats a phone number to a standardized international format.
+ *
+ * This function processes the input string to ensure it conforms to an international phone number format,
+ * specifically handling Nigerian local numbers by converting them to their international equivalent.
+ * It removes non-digit characters (except for the leading plus sign), converts local Nigerian numbers
+ * to international format, and formats the number into segments.
+ *
+ * @param input - The phone number string to be normalized and formatted.
+ * @returns The phone number formatted as +[countryCode]-[first]-[middle]-[last],
+ *          or the original input if it cannot be properly formatted.
+ */
+
+export function normalizeAndFormatPhoneNumber(input: string | null) {
+  if (!input) return input;
+
+  let cleaned = input.replace(/[^\d+]/g, "");
+
+  // Convert local Nigerian numbers (e.g. 0818...) to international
+  if (/^0\d{10}$/.test(cleaned)) {
+    cleaned = "+234" + cleaned.slice(1);
+  }
+
+  // Convert leading "234" (without plus) to "+234"
+  if (/^234\d{10}$/.test(cleaned)) {
+    cleaned = "+" + cleaned;
+  }
+
+  // Match +2348182445786
+  const match = cleaned.match(/^\+?(\d{1,4})(\d{3})(\d{3})(\d{4})$/);
+
+  if (!match) return input; // fallback
+
+  const [, countryCode, first, middle, last] = match;
+
+  return `+${countryCode}-${first}-${middle}-${last}`;
+}
+
+/**
+ * Converts a raw date string to a readable date string.
+ *
+ * The function takes a raw date string (in the format of "YYYY-MM-DDTHH:MM:SS.SSSZ") and
+ * returns a string in the format of "Month DD, YYYY".
+ *
+ * @param rawDate - The raw date string to be converted.
+ * @returns A string in the format of "Month DD, YYYY".
+ */
+export function convertRawDateToReadableDate(rawDate: string) {
+  const date = new Date(rawDate);
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  return date.toLocaleDateString("en-US", options);
+}
+
+/**
+ * Converts a raw date string to a readable time string.
+ *
+ * The function takes a raw date string (in the format of "YYYY-MM-DDTHH:MM:SS.SSSZ") and
+ * returns a string in the format of "HH:MM AM/PM".
+ *
+ * @param rawDate - The raw date string to be converted.
+ * @returns A string in the format of "HH:MM AM/PM".
+ */
+export function convertRawDateToReadableTime(rawDate: string) {
+  const date = new Date(rawDate);
+  const options: Intl.DateTimeFormatOptions = {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+  return date.toLocaleTimeString("en-US", options);
+}

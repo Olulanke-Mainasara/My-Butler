@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
-import { Icons } from "../icons";
+import LoadingSkeleton from "../Placeholders/LoadingSkeleton";
 
 const NormalCarousel = ({
   items,
@@ -16,10 +16,7 @@ const NormalCarousel = ({
   children: ReactElement<{ item: object; form: "static" | "carousel" }>;
 }) => {
   return items.length === 0 ? (
-    <div className="text-center py-28 border rounded-lg text-xl flex justify-center gap-1 items-center w-full">
-      <Icons.spinner className="animate-spin" />
-      <p>Loading</p>
-    </div>
+    <LoadingSkeleton length={1} className="md:grid-cols-1" />
   ) : (
     <div className="w-full xl:px-12">
       <Carousel opts={{ align: "start" }} className="h-full xl:pr-0">

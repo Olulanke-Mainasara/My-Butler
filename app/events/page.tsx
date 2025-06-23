@@ -9,6 +9,7 @@ import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
+import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
 
 const Events = () => {
   const [events, setEvents] = React.useState<Event[]>([]);
@@ -23,7 +24,7 @@ const Events = () => {
   const fetchPageData = async () => {
     const [Events] = await Promise.all([fetchEvents()]);
 
-    setEvents(Events || []);
+    setEvents(Array.isArray(Events) ? Events : []);
   };
 
   React.useEffect(() => {
@@ -132,11 +133,15 @@ const Events = () => {
             <section className="space-y-4 px-4 md:px-5 pt-5">
               <p className="text-3xl md:text-4xl">Upcoming</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
-                {events.map((event) => (
-                  <EventCard key={event.id} item={event} />
-                ))}
-              </div>
+              {events.length === 0 ? (
+                <LoadingSkeleton />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+                  {events.map((event) => (
+                    <EventCard key={event.id} item={event} />
+                  ))}
+                </div>
+              )}
             </section>
 
             <section className="space-y-4 px-4 md:px-5">
@@ -156,11 +161,15 @@ const Events = () => {
                 <p className="text-3xl md:text-4xl">Recommended</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
-                {events.map((event) => (
-                  <EventCard key={event.id} item={event} />
-                ))}
-              </div>
+              {events.length === 0 ? (
+                <LoadingSkeleton />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+                  {events.map((event) => (
+                    <EventCard key={event.id} item={event} />
+                  ))}
+                </div>
+              )}
             </section>
           </section>
         </>

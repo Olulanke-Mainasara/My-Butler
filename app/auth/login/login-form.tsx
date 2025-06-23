@@ -46,7 +46,7 @@ export function LoginForm({
     if (data.user.user_metadata.role_id === 2) {
       router.replace("/");
     } else {
-      router.replace("/brand");
+      router.replace("/brand-dashboard");
     }
   };
 

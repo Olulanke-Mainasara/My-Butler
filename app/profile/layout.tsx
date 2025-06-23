@@ -6,14 +6,17 @@ import { Button } from "@/components/Shad-UI/button";
 import {
   BookCopy,
   ImageIcon,
+  LogOut,
   Newspaper,
   PartyPopper,
+  Pencil,
   ShoppingBag,
   User,
 } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 import React from "react";
+import { supabase } from "@/lib/supabase/client";
 
 const SidebarNavItems = [
   {
@@ -51,6 +54,16 @@ const SidebarNavItems = [
 const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
   const customerProfile = useCustomerProfile();
 
+  const handleSignout = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Error signing out:", error.message);
+    } else {
+      window.location.reload();
+    }
+  };
+
   return (
     <div className="px-4 xl:px-3 pt-16 pb-4 xl:pb-5 h-screen overflow-y-scroll flex flex-col gap-6">
       <div className="flex flex-col gap-4 md:flex-row md:justify-between lg:items-center">
@@ -59,10 +72,11 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
             {customerProfile?.profile_picture ? (
               <Image
                 src={customerProfile.profile_picture}
-                className="w-8 h-8 rounded-full"
+                className="w-16 h-16 rounded-full"
                 alt="Profile picture"
                 width={40}
                 height={40}
+                quality={75}
               />
             ) : (
               <span className="p-2 rounded-full bg-darkBackground text-white dark:bg-lightBackground dark:text-black">
@@ -78,9 +92,24 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </div>
 
-        <Button asChild variant="outline" className="w-full md:w-fit">
-          <Link href={"/settings"}>Edit Profile</Link>
-        </Button>
+        <div className="flex gap-4">
+          <Button asChild variant="outline" className="w-full md:w-fit">
+            <Link href={"/settings"}>
+              <Pencil />
+              Edit Profile
+            </Link>
+          </Button>
+
+          <Button
+            onClick={handleSignout}
+            variant="outline"
+            className="w-full md:w-fit"
+          >
+            <span className="flex gap-1 items-center">
+              <LogOut /> Sign out
+            </span>
+          </Button>
+        </div>
       </div>
       <hr />
       <div className="flex flex-col gap-4 lg:gap-8 lg:flex-row lg:space-y-0 h-full overflow-scroll">

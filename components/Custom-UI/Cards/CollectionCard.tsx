@@ -53,7 +53,7 @@ export default function CollectionCard({
             : ""
         }`}
       >
-        <CardTitle>{item.name}</CardTitle>
+        <CardTitle className="md:text-xl">{item.name}</CardTitle>
 
         <CardDescription className={`${form === "carousel" ? "hidden" : ""}`}>
           {item.description ?? "No description provided."}
@@ -66,9 +66,14 @@ export default function CollectionCard({
                 ? "bg-white text-black hover:bg-neutral-300 w-fit"
                 : ""
             } `}
+            asChild
           >
-            <Link href={`/collections/${item.slug + "&" + item.id}`}></Link>
-            View Collection
+            <Link
+              href={`/collections/${item.slug + "&" + item.id}`}
+              prefetch={false}
+            >
+              View Collection
+            </Link>
           </Button>
 
           <BookmarkTrigger

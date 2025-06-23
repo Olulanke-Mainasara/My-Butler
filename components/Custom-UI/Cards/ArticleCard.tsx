@@ -1,12 +1,13 @@
 import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
 import { Article } from "@/types/Article";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Calendar, User } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { usePathname } from "next/navigation";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { useBookmarks } from "@/components/Providers/AllProviders";
 import BookmarkTrigger from "../Buttons/BookmarkTrigger";
+import { convertRawDateToReadableDate } from "@/lib/utils";
 
 export default function ArticleCard({
   item,
@@ -23,7 +24,7 @@ export default function ArticleCard({
     return;
   }
 
-  const relevantLink = pathname.startsWith("/brand")
+  const relevantLink = pathname.startsWith("/brand-dashboard")
     ? `/items/${item.slug + "&" + item.id}`
     : `/news/${item.slug + "&" + item.id}`;
 
@@ -31,7 +32,7 @@ export default function ArticleCard({
     <Card
       className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
     >
-      <Link href={relevantLink}>
+      <Link href={relevantLink} prefetch={false}>
         <Image
           src={item.display_image ?? "/placeholder.svg"}
           alt={item.title}
@@ -50,12 +51,18 @@ export default function ArticleCard({
             : ""
         }`}
       >
-        <CardTitle>{item.title}</CardTitle>
+        <CardTitle className="md:text-xl">{item.title}</CardTitle>
 
-        <span>
-          <span className="opacity-70">By</span> {item.author ?? "Unknown"}{" "}
-          <span className="opacity-70">•</span>{" "}
-          {item.created_at?.split("T")[0] ?? "Unpublished"}
+        <span className="flex items-center gap-1">
+          <User size={16} />
+          {item.author ?? "Unknown"}
+        </span>
+
+        <span className="flex items-center gap-1">
+          <Calendar size={16} />
+          {item.created_at
+            ? convertRawDateToReadableDate(item.created_at)
+            : "Unpublished"}
         </span>
 
         <div className="flex items-center gap-2">
@@ -67,6 +74,7 @@ export default function ArticleCard({
           />
           <Link
             href={relevantLink}
+            prefetch={false}
             className="hover:underline flex items-center gap-1 text-sm"
           >
             Read More{" "}

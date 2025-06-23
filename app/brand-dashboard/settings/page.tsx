@@ -1,23 +1,21 @@
 "use client";
 
 import { ProfileForm } from "./profile-form";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
+import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Button } from "@/components/Shad-UI/button";
 import { Link } from "next-view-transitions";
 import React from "react";
 
 const Settings = () => {
-  const customerProfile = useCustomerProfile();
+  const userProfile = useBrandProfile();
   return (
     <div className="h-full flex flex-col gap-6">
       <div>
         <h3 className="text-2xl font-medium">Profile</h3>
-        <p className="opacity-70">
-          This is how others will see you on the site.
-        </p>
+        <p className="opacity-70">Edit how customers see you.</p>
       </div>
       <hr />
-      {customerProfile ? (
+      {userProfile ? (
         <ProfileForm />
       ) : (
         <div className="h-full flex flex-col gap-2 items-center justify-center text-xl text-center grow">
