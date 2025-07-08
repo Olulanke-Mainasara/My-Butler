@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { getBookmarkedItems } from "@/lib/DatabaseFetches";
 import { useBookmarks } from "@/components/Providers/AllProviders";
 import { Product } from "@/types/Product";
-import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 
 export default function Products() {
   const [bookmarkItems, setBookmarkItems] = useState<Product[] | null>(null);

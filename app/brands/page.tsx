@@ -2,7 +2,7 @@
 
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import BrandCard from "@/components/Custom-UI/Cards/BrandCard";
-import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { Brand } from "@/types/Brand";
 import { Factory } from "lucide-react";
 import React, { useEffect } from "react";
@@ -28,7 +28,7 @@ const Brands = () => {
   }, []);
 
   return (
-    <div className="pt-16 md:pt-14 flex flex-col h-full gap-10">
+    <div className="pt-16 md:pt-14 flex flex-col h-full gap-4 md:gap-5">
       <div className="flex flex-col md:flex-row gap-2 items-center w-full md:w-3/5 xl:w-2/5 mx-auto px-4">
         <h1 className="px-3 text-4xl">Brands</h1>
         <FullTextSearchInput
@@ -59,7 +59,7 @@ const Brands = () => {
           </section>
         </div>
       ) : (
-        <section className="px-4 h-full">
+        <section className="px-4 md:px-5 h-full">
           {!brands ? (
             <LoadingSkeleton
               length={5}

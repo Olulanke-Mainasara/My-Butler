@@ -21,11 +21,7 @@ const BrandCard = ({
     <Card
       className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-[245px] flex flex-col`}
     >
-      <Link
-        href={`/brands/${item?.id}`}
-        prefetch={false}
-        className="h-2/5 xl:h-[48%]"
-      >
+      <Link href={`/brands/${item?.id}`} prefetch={false} className="h-2/5">
         <Image
           src={item?.profile_picture ?? "/placeholder.svg"}
           alt={item?.name ?? "Brand"}

@@ -8,7 +8,7 @@ import { getBookmarkedItems } from "@/lib/DatabaseFetches";
 import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
 import { Article } from "@/types/Article";
 import { useBookmarks } from "@/components/Providers/AllProviders";
-import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 
 export default function Products() {
   const [bookmarkItems, setBookmarkItems] = useState<Article[] | null>(null);

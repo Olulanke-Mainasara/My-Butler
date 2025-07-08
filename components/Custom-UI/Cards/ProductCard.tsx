@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/Shad-UI/card";
+import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
 import { Button } from "@/components/Shad-UI/button";
 import { Badge } from "@/components/Shad-UI/badge";
 import { StarIcon } from "lucide-react";
@@ -36,7 +31,9 @@ export default function ProductCard({
   return (
     <Card
       className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full ${
-        form !== "carousel" ? "flex md:flex-col " : ""
+        form !== "carousel" && !pathname.startsWith("/brands")
+          ? "flex md:flex-col"
+          : ""
       }`}
     >
       <Link href={relevantLink} prefetch={false} className="basis-2/5">
@@ -61,14 +58,6 @@ export default function ProductCard({
         >
           {item.name}
         </CardTitle>
-
-        <CardDescription
-          className={`${
-            form === "carousel" ? "max-w-60 lg:max-w-72" : "lg:max-w-full "
-          }`}
-        >
-          {item.description}
-        </CardDescription>
 
         <div
           className={`flex items-center  ${

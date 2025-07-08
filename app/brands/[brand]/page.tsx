@@ -5,7 +5,7 @@ import CollectionCard from "@/components/Custom-UI/Cards/CollectionCard";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
 import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import NormalCarousel from "@/components/Custom-UI/Carousel/NormalCarousel";
-import BrandLoadingSkeleton from "@/components/Custom-UI/Placeholders/BrandLoadingSkeleton";
+import BrandLoadingSkeleton from "@/components/Custom-UI/Skeletons/BrandLoadingSkeleton";
 import {
   fetchArticles,
   fetchBrands,

@@ -27,10 +27,10 @@ const BookmarkTrigger = ({
       size={"icon"}
       onClick={() => handleBookmark(customerProfile, item, targetType)}
       className={cn(
-        "min-w-10 border-none text-white hover:text-white",
+        "min-w-10 hover:text-white",
         bookmarks?.some((bookmark) => bookmark.target_type_id === item.id)
           ? "bg-brandLight hover:bg-brandLight/70 dark:bg-brandDark text-white dark:text-gray-900"
-          : "bg-neutral-600 hover:bg-neutral-500"
+          : "bg-transparent dark:bg-transparent hover:bg-neutral-600"
       )}
     >
       <BookmarkIcon />

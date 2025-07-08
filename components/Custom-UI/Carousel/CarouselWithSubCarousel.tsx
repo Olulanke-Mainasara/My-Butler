@@ -8,7 +8,7 @@ import {
 } from "@/components/Shad-UI/carousel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Icons } from "../icons";
-import LoadingSkeleton from "../Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "../Skeletons/LoadingSkeleton";
 
 const CarouselWithSubCarousel = ({
   items,

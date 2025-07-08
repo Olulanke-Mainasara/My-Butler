@@ -9,7 +9,7 @@ import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
-import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 
 const News = () => {
   const [articles, setArticles] = React.useState<Article[]>([]);

@@ -8,7 +8,7 @@ import { getBookmarkedItems } from "@/lib/DatabaseFetches";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
 import { useBookmarks } from "@/components/Providers/AllProviders";
 import { Event } from "@/types/Event";
-import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 
 export default function Products() {
   const [bookmarkItems, setBookmarkItems] = useState<Event[] | null>(null);

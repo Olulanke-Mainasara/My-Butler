@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { supabase } from "./supabase/client";
 import { CustomerProfile } from "@/types/CustomerProfile";
+import { notFound } from "next/navigation";
 
 export const handleBookmark = async (
   customerProfile: CustomerProfile | null,
@@ -188,4 +189,60 @@ export async function getBookmarkedItems(
   }
 
   return data || [];
+}
+
+export async function fetchProduct(productId: string) {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", productId)
+    .single();
+
+  if (error || !data) {
+    notFound();
+  }
+
+  return data;
+}
+
+export async function fetchCollection(collectionId: string) {
+  const { data, error } = await supabase
+    .from("collections")
+    .select("*")
+    .eq("id", collectionId)
+    .single();
+
+  if (error || !data) {
+    notFound();
+  }
+
+  return data;
+}
+
+export async function fetchEvent(eventId: string) {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", eventId)
+    .single();
+
+  if (error || !data) {
+    notFound();
+  }
+
+  return data;
+}
+
+export async function fetchArticle(articleId: string) {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", articleId)
+    .single();
+
+  if (error || !data) {
+    notFound();
+  }
+
+  return data;
 }

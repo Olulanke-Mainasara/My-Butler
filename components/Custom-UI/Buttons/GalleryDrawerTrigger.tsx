@@ -99,7 +99,7 @@ export default function GalleryDrawerTrigger({
                 <GalleryPlaceholder />
               </section>
             ) : (
-              <section className="h-full overflow-y-scroll grid grid-cols-3 gap-[2px] px-2">
+              <section className="overflow-y-scroll grid grid-cols-3 gap-[2px] px-2">
                 {images.map((imageData, index) => (
                   <PictureDialogTrigger
                     image={imageData}

@@ -69,17 +69,15 @@ const Combine = () => {
                       }`,
                     })}
                   </div>
-                  <div className="absolute inset-0 z-10 backdrop-brightness-[20%] dark:backdrop-brightness-[15%] h-full w-full space-y-4 flex flex-col justify-center items-center px-4 xl:px-0 text-white">
+                  <div className="absolute inset-0 z-10 backdrop-brightness-[20%] dark:backdrop-brightness-[15%] h-full w-full space-y-4 flex flex-col justify-center items-center px-4 xl:px-0">
                     {link.icon}
-                    <p className="text-2xl md:text-4xl font-bold">
+                    <p className="text-2xl md:text-4xl font-bold text-white">
                       {link.title}
                     </p>
-                    <p className="text-center max-w-xl">{link.description}</p>
-                    <Button
-                      variant={"secondary"}
-                      asChild
-                      className="text-base bg-lightBackground text-black hover:opacity-70 dark:hover:bg-lightBackground dark:hover:text-black dark:hover:opacity-100"
-                    >
+                    <p className="text-center max-w-xl text-white">
+                      {link.description}
+                    </p>
+                    <Button variant={"outline"} asChild>
                       <Link href={link.url}>Use this</Link>
                     </Button>
                   </div>

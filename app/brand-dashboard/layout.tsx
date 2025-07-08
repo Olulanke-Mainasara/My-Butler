@@ -18,7 +18,7 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 import NextLink from "next/link";
 import React from "react";
-import BrandLoadingSkeleton from "@/components/Custom-UI/Placeholders/BrandLoadingSkeleton";
+import BrandLoadingSkeleton from "@/components/Custom-UI/Skeletons/BrandLoadingSkeleton";
 
 const SidebarNavItems = [
   {

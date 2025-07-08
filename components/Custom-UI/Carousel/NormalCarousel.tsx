@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
-import LoadingSkeleton from "../Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "../Skeletons/LoadingSkeleton";
 
 const NormalCarousel = ({
   items,

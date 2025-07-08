@@ -8,7 +8,7 @@ import { getBookmarkedItems } from "@/lib/DatabaseFetches";
 import CollectionCard from "@/components/Custom-UI/Cards/CollectionCard";
 import { Collection } from "@/types/Collection";
 import { useBookmarks } from "@/components/Providers/AllProviders";
-import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 
 export default function Products() {
   const [bookmarkItems, setBookmarkItems] = useState<Collection[] | null>(null);

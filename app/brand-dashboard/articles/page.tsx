@@ -6,7 +6,7 @@ import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 import { Article } from "@/types/Article";
 import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
-import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { fetchArticles } from "@/lib/DatabaseFetches";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 

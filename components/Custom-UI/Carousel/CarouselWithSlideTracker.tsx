@@ -8,7 +8,7 @@ import {
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
 import { motion } from "framer-motion";
-import LoadingSkeleton from "../Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "../Skeletons/LoadingSkeleton";
 
 const CarouselWithSlideTracker = ({
   items,

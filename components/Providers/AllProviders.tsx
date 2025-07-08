@@ -69,7 +69,7 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                     <main className="w-full relative">
                       <div
                         suppressHydrationWarning
-                        className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full p-3 ${
+                        className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full py-3 px-4 md:px-5 ${
                           pathname !== "/camera" &&
                           pathname !== "/combine" &&
                           pathname !== "/combine/personal"

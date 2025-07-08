@@ -12,7 +12,7 @@ import { fetchCategories, fetchProducts } from "@/lib/DatabaseFetches";
 import { Button } from "@/components/Shad-UI/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import LoadingSkeleton from "@/components/Custom-UI/Placeholders/LoadingSkeleton";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 
 const Shop = () => {
   const [products, setProducts] = React.useState<Product[]>([]);

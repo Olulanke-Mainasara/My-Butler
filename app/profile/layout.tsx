@@ -69,26 +69,38 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex flex-col gap-4 md:flex-row md:justify-between lg:items-center">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-2">
           <div className="flex items-center gap-2">
-            {customerProfile?.profile_picture ? (
-              <Image
-                src={customerProfile.profile_picture}
-                className="w-16 h-16 rounded-full"
-                alt="Profile picture"
-                width={40}
-                height={40}
-                quality={75}
-              />
+            {!customerProfile ? (
+              <div className="flex items-center gap-2">
+                <div className="w-14 h-14 rounded-full bg-neutral-200" />
+                <div className="space-y-2">
+                  <div className="h-6 w-40 bg-neutral-200 rounded" />
+                  <div className="h-4 w-32 bg-neutral-200 rounded opacity-70" />
+                </div>
+              </div>
             ) : (
-              <span className="p-2 rounded-full bg-darkBackground text-white dark:bg-lightBackground dark:text-black">
-                <User size={40} />
-              </span>
+              <>
+                {customerProfile?.profile_picture ? (
+                  <Image
+                    src={customerProfile.profile_picture}
+                    className="w-16 h-16 rounded-full"
+                    alt="Profile picture"
+                    width={40}
+                    height={40}
+                    quality={75}
+                  />
+                ) : (
+                  <span className="p-2 rounded-full bg-darkBackground text-white dark:bg-lightBackground dark:text-black">
+                    <User size={40} />
+                  </span>
+                )}
+                <div className="space-y-0.5">
+                  <h2 className="text-3xl md:text-4xl">
+                    {customerProfile?.display_name}
+                  </h2>
+                  <p className="opacity-70">{customerProfile?.email}</p>
+                </div>
+              </>
             )}
-            <div className="space-y-0.5">
-              <h2 className="text-3xl md:text-4xl">
-                {customerProfile?.display_name}
-              </h2>
-              <p className="opacity-70">{customerProfile?.email}</p>
-            </div>
           </div>
         </div>
 
