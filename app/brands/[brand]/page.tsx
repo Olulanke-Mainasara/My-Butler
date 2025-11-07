@@ -78,14 +78,14 @@ const Brand = () => {
         <BrandLoadingSkeleton />
       ) : (
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:gap-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 xl:pr-6">
             {brand?.profile_picture ? (
               <Image
                 src={brand.profile_picture}
-                className="w-14 h-14 rounded-full"
+                className="w-14 h-14 aspect-square rounded-full object-cover"
                 alt="Profile picture"
                 width={40}
-                height={40}
+                height={30}
                 quality={75}
               />
             ) : (
@@ -99,18 +99,18 @@ const Brand = () => {
             </div>
           </div>
           <div className="md:flex flex-wrap">
-            <div className="p-2 xl:px-6 border-l border-l-neutral-500">
+            <div className="p-2 xl:px-4 border-l border-l-neutral-500">
               <p>{brand?.description}</p>
             </div>
-            <div className="p-2 xl:px-6 border-l border-l-neutral-500 hidden md:block">
+            <div className="p-2 xl:px-4 border-l border-l-neutral-500 hidden md:block">
               <Link href={brand?.url || ""} prefetch={false} target="_blank">
                 {brand?.url}
               </Link>
             </div>
-            <div className="p-2 xl:px-6 border-l border-l-neutral-500 hidden md:block">
+            <div className="p-2 xl:px-4 border-l border-l-neutral-500 hidden md:block">
               <p>{brand?.location}</p>
             </div>
-            <div className="p-2 xl:px-6 border-l border-l-neutral-500 hidden md:block">
+            <div className="p-2 xl:px-4 border-l border-l-neutral-500 hidden md:block">
               <p>{normalizeAndFormatPhoneNumber(brand?.contact)}</p>
             </div>
           </div>

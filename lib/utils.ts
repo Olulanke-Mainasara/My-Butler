@@ -261,3 +261,42 @@ export function convertRawDateToReadableTime(rawDate: string) {
   };
   return date.toLocaleTimeString("en-US", options);
 }
+
+// utils.ts
+
+/**
+ * Regex for validating UUID v1–v5 formats
+ */
+const uuidRegex =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Build a slug-id string from a slug and UUID
+ * Example: buildProductSlugId("apple-juice-1l", "123e4567-e89b-12d3-a456-426614174000")
+ * -> "apple-juice-1l-123e4567-e89b-12d3-a456-426614174000"
+ */
+export function buildItemSlugId(slug: string, id: string): string {
+  if (!uuidRegex.test(id)) {
+    throw new Error("Invalid UUID format");
+  }
+  return `${slug}-${id}`;
+}
+
+/**
+ * Extracts the product UUID from a slug-id string.
+ * Returns null if the UUID is invalid.
+ */
+export function getItemId(slugAndId: string): string | null {
+  const id = slugAndId.slice(-36);
+  return uuidRegex.test(id) ? id : null;
+}
+
+/**
+ * Extracts the product slug from a slug-id string.
+ * Returns null if the UUID part is invalid.
+ */
+export function getItemSlug(slugAndId: string): string | null {
+  const id = getItemId(slugAndId);
+  if (!id) return null;
+  return slugAndId.slice(0, -37); // remove "-" + uuid
+}

@@ -9,6 +9,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Icons } from "../icons";
 import LoadingSkeleton from "../Skeletons/LoadingSkeleton";
+import Image from "next/image";
 
 const CarouselWithSubCarousel = ({
   items,
@@ -16,7 +17,7 @@ const CarouselWithSubCarousel = ({
   children,
 }: {
   items: object[];
-  subItems: { name: string }[];
+  subItems: { name: string; profile_picture?: string }[];
   children: ReactElement<{ item: object; form: "static" | "carousel" }>;
 }) => {
   const isMobile = useIsMobile();
@@ -43,8 +44,19 @@ const CarouselWithSubCarousel = ({
                     key={index}
                     className="pt-5 basis-1/2 md:basis-1/4 lg:basis-1/5 xl:basis-1/3"
                   >
-                    <div className="p-1 border h-full flex items-center justify-center rounded-3xl xl:rounded-lg text-xl xl:text-base">
-                      {subItem.name}
+                    <div className="p-1 border h-full flex items-center justify-center gap-1.5 rounded-xl text-xl xl:text-base">
+                      {subItem.profile_picture && (
+                        <div className="w-8 h-8 rounded-full overflow-hidden">
+                          <Image
+                            src={subItem.profile_picture}
+                            width={100}
+                            height={100}
+                            alt={subItem.name}
+                          />
+                        </div>
+                      )}
+
+                      <span className="">{subItem.name}</span>
                     </div>
                   </CarouselItem>
                 ))}

@@ -88,7 +88,7 @@ const News = () => {
                 </p>
               </div>
 
-              <div className="h-[368px] md:h-[512px] rounded-2xl relative object-cover object-top overflow-hidden">
+              <div className="h-[300px] md:h-[512px] rounded-2xl relative object-cover object-top overflow-hidden">
                 <Image
                   src={"/Pages/Collections/collection.webp"}
                   fill

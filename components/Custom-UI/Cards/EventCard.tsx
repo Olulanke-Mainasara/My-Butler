@@ -2,11 +2,8 @@ import Image from "next/image";
 import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
 import { Event } from "@/types/Event";
 import { Link } from "next-view-transitions";
-import { ArrowRight } from "lucide-react";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
-import { useBookmarks } from "@/components/Providers/AllProviders";
-import BookmarkTrigger from "../Buttons/BookmarkTrigger";
 import {
+  buildItemSlugId,
   convertRawDateToReadableDate,
   convertRawDateToReadableTime,
 } from "@/lib/utils";
@@ -18,37 +15,50 @@ export default function EventCard({
   item?: Event;
   form?: "static" | "carousel";
 }) {
-  const customerProfile = useCustomerProfile();
-  const bookmarks = useBookmarks();
-
   if (!item) {
     return;
   }
 
   return (
     <Card
-      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
+      className={`relative overflow-hidden h-fit md:h-full bg-transparent dark:bg-transparent border-none p-0 gap-3 ${
+        form !== "carousel" ? "flex flex-col" : "rounded-xl"
+      }`}
     >
-      <Link href={item.slug + "&" + item.id} prefetch={false}>
+      <Link
+        href={`/events/${buildItemSlugId(item.slug, item.id)}`}
+        prefetch={false}
+        className={`rounded-xl overflow-hidden h-44 ${
+          form === "carousel" ? "md:h-full" : ""
+        }`}
+      >
         <Image
           src={item.display_image ?? "/placeholder.svg"}
           alt={item.title}
           width={500}
           height={300}
-          className={`w-full object-cover ${
-            form === "carousel" ? "h-full" : ""
-          }`}
+          className={`w-full h-full object-cover`}
         />
       </Link>
 
       <CardContent
-        className={`p-3 flex flex-col justify-center gap-2 ${
+        className={`flex flex-col justify-center gap-2 ${
           form === "carousel"
-            ? "absolute inset-0 backdrop-brightness-50 text-white"
-            : ""
+            ? "absolute inset-0 backdrop-brightness-50 text-white p-3"
+            : "p-0"
         }`}
       >
-        <CardTitle className="md:text-xl">{item.title}</CardTitle>
+        <p>
+          <span className="opacity-70">Date:</span>{" "}
+          {convertRawDateToReadableDate(item.start_date)}
+        </p>
+
+        <Link
+          href={`/events/${buildItemSlugId(item.slug, item.id)}`}
+          prefetch={false}
+        >
+          <CardTitle className="text-xl">{item.title}</CardTitle>
+        </Link>
 
         <p>
           <span className="opacity-70">Location:</span>{" "}
@@ -56,34 +66,9 @@ export default function EventCard({
         </p>
 
         <p>
-          <span className="opacity-70">Date:</span>{" "}
-          {convertRawDateToReadableDate(item.start_date)}
-        </p>
-
-        <p>
           <span className="opacity-70">Time:</span>{" "}
           {convertRawDateToReadableTime(item.start_date)}
         </p>
-
-        <div className="flex items-center gap-2">
-          <BookmarkTrigger
-            customerProfile={customerProfile}
-            item={item}
-            bookmarks={bookmarks}
-            targetType={"event"}
-          />
-
-          <Link
-            href={`/events/${item.slug + "&" + item.id}`}
-            prefetch={false}
-            className="hover:underline flex items-center gap-1 text-sm"
-          >
-            View Details
-            <span className="opacity-70">
-              <ArrowRight />
-            </span>
-          </Link>
-        </div>
       </CardContent>
     </Card>
   );

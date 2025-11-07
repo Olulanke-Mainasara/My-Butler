@@ -6,9 +6,7 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { Product } from "@/types/Product";
 import { usePathname } from "next/navigation";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
-import { useBookmarks } from "@/components/Providers/AllProviders";
-import BookmarkTrigger from "../Buttons/BookmarkTrigger";
+import { buildItemSlugId } from "@/lib/utils";
 
 export default function ProductCard({
   item,
@@ -18,15 +16,13 @@ export default function ProductCard({
   form?: "static" | "carousel";
 }) {
   const pathname = usePathname();
-  const customerProfile = useCustomerProfile();
-  const bookmarks = useBookmarks();
 
   if (!item) {
     return;
   }
   const relevantLink = pathname.startsWith("/brand-dashboard")
-    ? `/products/${item.slug + "&" + item.id}`
-    : `/shop/${item.slug + "&" + item.id}`;
+    ? `/products/${buildItemSlugId(item.slug, item.id)}`
+    : `/shop/${buildItemSlugId(item.slug, item.id)}`;
 
   return (
     <Card
@@ -108,13 +104,6 @@ export default function ProductCard({
               View Product
             </Link>
           </Button>
-
-          <BookmarkTrigger
-            customerProfile={customerProfile}
-            item={item}
-            bookmarks={bookmarks}
-            targetType={"product"}
-          />
         </div>
       </CardContent>
     </Card>

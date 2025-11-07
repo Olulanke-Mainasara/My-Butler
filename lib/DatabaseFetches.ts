@@ -221,7 +221,7 @@ export async function fetchCollection(collectionId: string) {
 
 export async function fetchEvent(eventId: string) {
   const { data, error } = await supabase
-    .from("products")
+    .from("events")
     .select("*")
     .eq("id", eventId)
     .single();
@@ -235,7 +235,7 @@ export async function fetchEvent(eventId: string) {
 
 export async function fetchArticle(articleId: string) {
   const { data, error } = await supabase
-    .from("products")
+    .from("news")
     .select("*")
     .eq("id", articleId)
     .single();

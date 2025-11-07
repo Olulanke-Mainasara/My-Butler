@@ -1,13 +1,10 @@
 import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
 import { Article } from "@/types/Article";
-import { ArrowRight, Calendar, User } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { usePathname } from "next/navigation";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
-import { useBookmarks } from "@/components/Providers/AllProviders";
-import BookmarkTrigger from "../Buttons/BookmarkTrigger";
-import { convertRawDateToReadableDate } from "@/lib/utils";
+import { buildItemSlugId, convertRawDateToReadableDate } from "@/lib/utils";
 
 export default function ArticleCard({
   item,
@@ -17,72 +14,75 @@ export default function ArticleCard({
   form?: "static" | "carousel";
 }) {
   const pathname = usePathname();
-  const customerProfile = useCustomerProfile();
-  const bookmarks = useBookmarks();
 
   if (!item) {
     return;
   }
 
   const relevantLink = pathname.startsWith("/brand-dashboard")
-    ? `/items/${item.slug + "&" + item.id}`
-    : `/news/${item.slug + "&" + item.id}`;
+    ? `/articles/${buildItemSlugId(item.slug, item.id)}`
+    : `/news/${buildItemSlugId(item.slug, item.id)}`;
 
   return (
     <Card
-      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
+      className={`relative overflow-hidden h-fit md:h-full bg-transparent dark:bg-transparent border-none p-0 gap-3 ${
+        form !== "carousel" || !pathname.startsWith("/brands")
+          ? "flex flex-col"
+          : "rounded-xl"
+      }`}
     >
-      <Link href={relevantLink} prefetch={false}>
+      <Link
+        href={relevantLink}
+        prefetch={false}
+        className={`rounded-xl overflow-hidden h-44 ${
+          form === "carousel" ? "md:h-full" : ""
+        }`}
+      >
         <Image
           src={item.display_image ?? "/placeholder.svg"}
           alt={item.title}
           width={500}
           height={300}
-          className={`w-full object-cover ${
-            form === "carousel" ? "h-full" : ""
-          }`}
+          className={`w-full h-full object-cover`}
         />
       </Link>
 
       <CardContent
-        className={`p-3 flex flex-col justify-center gap-2 ${
+        className={`flex flex-col justify-center gap-2 ${
           form === "carousel"
-            ? "absolute inset-0 backdrop-brightness-50 text-white"
-            : ""
+            ? "absolute inset-0 backdrop-brightness-50 text-white p-3"
+            : "p-0"
         }`}
       >
-        <CardTitle className="md:text-xl">{item.title}</CardTitle>
-
-        <span className="flex items-center gap-1">
-          <User size={16} />
-          {item.author ?? "Unknown"}
-        </span>
-
-        <span className="flex items-center gap-1">
+        <span
+          className={`flex items-center gap-1  ${
+            form === "carousel" ? "text-base" : "text-sm md:text-base"
+          }`}
+        >
           <Calendar size={16} />
           {item.created_at
             ? convertRawDateToReadableDate(item.created_at)
             : "Unpublished"}
         </span>
 
-        <div className="flex items-center gap-2">
-          <BookmarkTrigger
-            customerProfile={customerProfile}
-            item={item}
-            bookmarks={bookmarks}
-            targetType={"article"}
-          />
-          <Link
-            href={relevantLink}
-            prefetch={false}
-            className="hover:underline flex items-center gap-1 text-sm"
+        <Link href={relevantLink} prefetch={false}>
+          <CardTitle
+            className={`${
+              form === "carousel" ? "text-2xl" : "text-lg md:text-xl"
+            }`}
           >
-            Read More{" "}
-            <span className="opacity-70">
-              <ArrowRight />
-            </span>
-          </Link>
-        </div>
+            {item.title}
+          </CardTitle>
+        </Link>
+
+        <span
+          className={`flex items-center gap-1  ${
+            form === "carousel" ? "text-base" : "text-sm md:text-base"
+          }`}
+        >
+          <User size={16} />
+          {item.author ?? "Unknown"}
+        </span>
       </CardContent>
     </Card>
   );

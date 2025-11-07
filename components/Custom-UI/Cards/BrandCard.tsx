@@ -19,9 +19,13 @@ const BrandCard = ({
 }) => {
   return (
     <Card
-      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-[245px] flex flex-col`}
+      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-fit flex flex-col`}
     >
-      <Link href={`/brands/${item?.id}`} prefetch={false} className="h-2/5">
+      <Link
+        href={`/brands/${item?.id}`}
+        prefetch={false}
+        className="h-20 md:h-32"
+      >
         <Image
           src={item?.profile_picture ?? "/placeholder.svg"}
           alt={item?.name ?? "Brand"}
@@ -40,7 +44,11 @@ const BrandCard = ({
       >
         <CardTitle>{item?.name}</CardTitle>
 
-        <CardDescription className={`${form === "carousel" ? "hidden" : ""}`}>
+        <CardDescription
+          className={`${
+            form === "carousel" ? "hidden" : ""
+          } text-sm md:text-base`}
+        >
           {item?.description ?? "No description provided."}
         </CardDescription>
 

@@ -8,9 +8,7 @@ import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { Collection } from "@/types/Collection";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
-import { useBookmarks } from "@/components/Providers/AllProviders";
-import BookmarkTrigger from "../Buttons/BookmarkTrigger";
+import { buildItemSlugId } from "@/lib/utils";
 
 export default function CollectionCard({
   item,
@@ -19,9 +17,6 @@ export default function CollectionCard({
   item?: Collection;
   form?: "static" | "carousel";
 }) {
-  const customerProfile = useCustomerProfile();
-  const bookmarks = useBookmarks();
-
   if (!item) {
     return;
   }
@@ -31,7 +26,7 @@ export default function CollectionCard({
       className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
     >
       <Link
-        href={`/collections/${item.slug + "&" + item.id}`}
+        href={`/collections/${buildItemSlugId(item.slug, item.id)}`}
         prefetch={false}
         className="basis-1/2"
       >
@@ -55,7 +50,7 @@ export default function CollectionCard({
       >
         <CardTitle className="md:text-xl">{item.name}</CardTitle>
 
-        <CardDescription className={`${form === "carousel" ? "hidden" : ""}`}>
+        <CardDescription className={`${form === "carousel" ? "max-w-xs" : ""}`}>
           {item.description ?? "No description provided."}
         </CardDescription>
 
@@ -69,19 +64,12 @@ export default function CollectionCard({
             asChild
           >
             <Link
-              href={`/collections/${item.slug + "&" + item.id}`}
+              href={`/collections/${buildItemSlugId(item.slug, item.id)}`}
               prefetch={false}
             >
               View Collection
             </Link>
           </Button>
-
-          <BookmarkTrigger
-            customerProfile={customerProfile}
-            item={item}
-            bookmarks={bookmarks}
-            targetType={"collection"}
-          />
         </div>
       </CardContent>
     </Card>

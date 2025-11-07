@@ -229,7 +229,13 @@ const Collections = () => {
 
             <section className="space-y-4 px-4 xl:px-5">
               <p className="text-3xl md:text-4xl">Brands and Collections</p>
-              <CarouselWithSubCarousel items={collections} subItems={brands}>
+              <CarouselWithSubCarousel
+                items={collections}
+                subItems={brands.map(({ name, profile_picture }) => ({
+                  name,
+                  profile_picture: profile_picture ?? undefined,
+                }))}
+              >
                 <CollectionCard />
               </CarouselWithSubCarousel>
             </section>
