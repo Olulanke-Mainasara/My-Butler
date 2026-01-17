@@ -1,6 +1,6 @@
 import Image from "next/image";
-import noNotificationsDark from "@/public/No-Notifications/no-notifications-dark.svg";
-import noNotificationsLight from "@/public/No-Notifications/no-notifications-light.svg";
+import noNotificationsDark from "@/public/Placeholders/No-Notifications/no-notifications-dark.svg";
+import noNotificationsLight from "@/public/Placeholders/No-Notifications/no-notifications-light.svg";
 import { useTheme } from "next-themes";
 
 export function NotificationsPlaceholder() {

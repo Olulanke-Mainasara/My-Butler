@@ -21,13 +21,17 @@ import { Bookmark } from "@/types/Bookmark";
 const authContext = React.createContext<User | null>(null);
 export const useAuth = () => React.useContext(authContext);
 
-const notificationsContext = React.createContext<Notification[] | null>(null);
+const notificationsContext = React.createContext<
+  Notification[] | null | undefined
+>(null);
 export const useNotifications = () => React.useContext(notificationsContext);
 
-const cartContext = React.createContext<CartItem[] | null>(null);
+const cartContext = React.createContext<CartItem[] | null | undefined>(null);
 export const useCart = () => React.useContext(cartContext);
 
-const bookmarksContext = React.createContext<Bookmark[] | null>(null);
+const bookmarksContext = React.createContext<Bookmark[] | null | undefined>(
+  null
+);
 export const useBookmarks = () => React.useContext(bookmarksContext);
 
 const AllProviders = ({ children }: React.PropsWithChildren) => {
@@ -87,11 +91,12 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                           href={
                             pathname.startsWith("/brand-dashboard")
                               ? "/brand-dashboard"
-                              : "/?splashed=true"
+                              : "/"
                           }
                           className={`text-2xl ${
                             pathname === "/camera" ||
-                            pathname === "/combine/personal"
+                            pathname === "/combine/personal" ||
+                            pathname === "/"
                               ? "hidden"
                               : ""
                           }`}
@@ -101,13 +106,23 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                             Butler
                           </span>
                         </Link>
-                        {pathname.startsWith("/brand-dashboard") ? (
-                          <ThemeToggler />
-                        ) : pathname !== "/notifications" ? (
-                          <NotificationsDrawerTrigger />
-                        ) : (
-                          <CartDrawerTrigger />
-                        )}
+
+                        <div
+                          className={`flex items-center gap-4 md:gap-5 ${
+                            pathname.startsWith("/butler") ? "pr-11" : ""
+                          }`}
+                        >
+                          {pathname !== "/cart" &&
+                          !pathname.startsWith("/brand-dashboard") ? (
+                            <CartDrawerTrigger />
+                          ) : null}
+
+                          {pathname.startsWith("/brand-dashboard") ? (
+                            <ThemeToggler />
+                          ) : (
+                            <NotificationsDrawerTrigger />
+                          )}
+                        </div>
                       </div>
                       {children}
                     </main>

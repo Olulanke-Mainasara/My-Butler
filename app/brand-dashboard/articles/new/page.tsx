@@ -34,6 +34,8 @@ import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { useState } from "react";
 import { useTransitionRouter } from "next-view-transitions";
 import { generateSlug } from "@/lib/utils";
+import { Badge } from "@/components/Shad-UI/badge";
+import { X } from "lucide-react";
 
 type FormValues = z.infer<typeof articleSchema>;
 
@@ -43,16 +45,39 @@ export default function NewsForm() {
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
     null
   );
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(articleSchema),
     defaultValues: {
       author: "",
+      author_bio: "",
       content: "",
       description: "",
+      reading_time_minutes: 5,
       title: "",
     },
   });
+
+  const handleAddTag = () => {
+    const trimmedTag = tagInput.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      setTags([...tags, trimmedTag]);
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
 
   const onSubmit = async (data: FormValues) => {
     if (!uploadedImageName) {
@@ -75,10 +100,13 @@ export default function NewsForm() {
       const { error } = await supabase.from("news").insert([
         {
           author: data.author,
+          author_bio: data.author_bio,
           content: data.content,
           description: data.description,
           display_image: displayImageUrl,
+          reading_time_minutes: data.reading_time_minutes,
           slug: generateSlug(data.title),
+          tags: tags.length > 0 ? tags : null,
           title: data.title,
         },
       ]);
@@ -93,7 +121,7 @@ export default function NewsForm() {
     } catch {
       toast.error("Failed to publish article. Please try again.");
     } finally {
-      form.reset();
+      setTags([]);
     }
   };
 
@@ -118,7 +146,7 @@ export default function NewsForm() {
                 maxFileSize={5 * 1000 * 1000} // 5 MB
                 onUploadSuccess={(imageNames) =>
                   setUploadedImageName(imageNames[0])
-                } // Capture the uploaded images names
+                }
               />
               <FormDescription>
                 Upload an image for the article&apos;s display.
@@ -164,6 +192,28 @@ export default function NewsForm() {
 
             <FormField
               control={form.control}
+              name="author_bio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Author Bio</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Brief author biography..."
+                      {...field}
+                      value={field.value ?? ""}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    A short description about the author (optional)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
@@ -183,18 +233,94 @@ export default function NewsForm() {
 
             <FormField
               control={form.control}
+              name="reading_time_minutes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Reading Time (minutes)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={1}
+                      placeholder="5"
+                      {...field}
+                      value={field.value ?? 5}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value) || 5)
+                      }
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Estimated reading time in minutes
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormItem>
+              <FormLabel>Tags</FormLabel>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add a tag (e.g., Technology, Audio)"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={form.formState.isSubmitting}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAddTag}
+                    disabled={form.formState.isSubmitting}
+                  >
+                    Add
+                  </Button>
+                </div>
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="ml-1 hover:text-destructive"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <FormDescription>
+                Add tags to categorize your article (press Enter to add)
+              </FormDescription>
+            </FormItem>
+
+            <FormField
+              control={form.control}
               name="content"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Full article content..."
+                      placeholder="Full article content in markdown format..."
                       className="min-h-40"
                       {...field}
                       disabled={form.formState.isSubmitting}
                     />
                   </FormControl>
+                  <FormDescription>
+                    Write your article content in markdown format
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

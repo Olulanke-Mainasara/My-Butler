@@ -10,7 +10,10 @@ const components: Partial<Components> = {
   pre: ({ children }) => <>{children}</>,
   ol: ({ children, ...props }) => {
     return (
-      <ol className="list-decimal list-outside ml-4" {...props}>
+      <ol
+        className="list-decimal list-outside ml-4 [&_ol]:list-[lower-alpha] [&_ol_ol]:list-[lower-roman]"
+        {...props}
+      >
         {children}
       </ol>
     );
@@ -24,7 +27,10 @@ const components: Partial<Components> = {
   },
   ul: ({ children, ...props }) => {
     return (
-      <ul className="list-decimal list-outside ml-4" {...props}>
+      <ul
+        className="list-disc list-outside ml-4 [&_ul]:list-circle [&_ul_ul]:list-square"
+        {...props}
+      >
         {children}
       </ul>
     );
@@ -90,6 +96,9 @@ const components: Partial<Components> = {
         {children}
       </h6>
     );
+  },
+  hr: (props) => {
+    return <hr className="my-6 border-gray-300" {...props} />;
   },
 };
 

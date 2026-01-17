@@ -6,71 +6,71 @@ import EventCard from "@/components/Custom-UI/Cards/EventCard";
 import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import NormalCarousel from "@/components/Custom-UI/Carousel/NormalCarousel";
 import BrandLoadingSkeleton from "@/components/Custom-UI/Skeletons/BrandLoadingSkeleton";
-import {
-  fetchArticles,
-  fetchBrands,
-  fetchCollections,
-  fetchEvents,
-  fetchProducts,
-} from "@/lib/DatabaseFetches";
+import { getBrand } from "@/lib/fetches";
 import { normalizeAndFormatPhoneNumber } from "@/lib/utils";
-import { Article } from "@/types/Article";
-import { Brand as BrandType } from "@/types/Brand";
-import { Collection } from "@/types/Collection";
-import { Event } from "@/types/Event";
-import { Product } from "@/types/Product";
 import { User } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { supabase } from "@/lib/supabase/client";
 
 const Brand = () => {
-  const [brand, setBrand] = useState<BrandType | null>(null);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
   const pathname = usePathname();
   const brandId = pathname.split("/").pop() || "";
   const router = useTransitionRouter();
 
-  useEffect(() => {
-    if (!brandId) {
-      toast.error("Brand ID is missing in the URL.");
-      router.push("/brands");
-      return;
+  const { data: brand } = useQuery(getBrand(brandId || ""), {
+    enabled: !!brandId,
+  });
+
+  const { data: products } = useQuery(
+    supabase
+      .from("products")
+      .select("*")
+      .eq("brand_id", brandId || ""),
+    {
+      enabled: !!brandId,
     }
+  );
 
-    const fetchPageData = async () => {
-      const [brands, products, collections, articles, events] =
-        await Promise.all([
-          fetchBrands({ filters: { id: brandId ?? "" } }),
-          fetchProducts({
-            filters: { brand_id: brandId ?? "" },
-          }),
-          fetchCollections({
-            filters: { brand_id: brandId ?? "" },
-          }),
-          fetchArticles({
-            filters: { brand_id: brandId ?? "" },
-          }),
-          fetchEvents({
-            filters: { brand_id: brandId ?? "" },
-          }),
-        ]);
+  const { data: collections } = useQuery(
+    supabase
+      .from("collections")
+      .select("*")
+      .eq("brand_id", brandId || ""),
+    {
+      enabled: !!brandId,
+    }
+  );
 
-      setBrand(Array.isArray(brands) && brands.length > 0 ? brands[0] : null);
-      setProducts(Array.isArray(products) ? products : []);
-      setCollections(Array.isArray(collections) ? collections : []);
-      setArticles(Array.isArray(articles) ? articles : []);
-      setEvents(Array.isArray(events) ? events : []);
-    };
+  const { data: articles } = useQuery(
+    supabase
+      .from("news")
+      .select("*")
+      .eq("brand_id", brandId || ""),
+    {
+      enabled: !!brandId,
+    }
+  );
 
-    fetchPageData();
-  }, [brandId, router]);
+  const { data: events } = useQuery(
+    supabase
+      .from("events")
+      .select("*")
+      .eq("brand_id", brandId || ""),
+    {
+      enabled: !!brandId,
+    }
+  );
+
+  if (!brandId) {
+    toast.error("Brand ID is missing in the URL.");
+    router.push("/brands");
+    return;
+  }
 
   return (
     <div className="px-3 pt-16 pb-4 xl:pb-5 lg:h-screen lg:overflow-y-scroll flex flex-col gap-4">
@@ -122,28 +122,28 @@ const Brand = () => {
       <div className="h-full overflow-y-scroll w-full space-y-10">
         <section className="space-y-4">
           <p className="text-3xl md:text-4xl">Products</p>
-          <NormalCarousel items={products}>
+          <NormalCarousel items={products ?? []}>
             <ProductCard />
           </NormalCarousel>
         </section>
 
         <section className="space-y-4">
           <p className="text-3xl md:text-4xl">Collections</p>
-          <NormalCarousel items={collections}>
+          <NormalCarousel items={collections ?? []}>
             <CollectionCard />
           </NormalCarousel>
         </section>
 
         <section className="space-y-4">
           <p className="text-3xl md:text-4xl">Articles</p>
-          <NormalCarousel items={articles}>
+          <NormalCarousel items={articles ?? []}>
             <ArticleCard />
           </NormalCarousel>
         </section>
 
         <section className="space-y-4">
           <p className="text-3xl md:text-4xl">Events</p>
-          <NormalCarousel items={events}>
+          <NormalCarousel items={events ?? []}>
             <EventCard />
           </NormalCarousel>
         </section>

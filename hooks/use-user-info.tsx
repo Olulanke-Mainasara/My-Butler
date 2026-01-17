@@ -1,285 +1,121 @@
-import React, { useCallback } from "react";
-import { Notification } from "@/types/Notification";
-import { CartItem } from "@/types/CartItem";
-import { CustomerProfile } from "@/types/CustomerProfile";
-import { RealtimePostgresChangesPayload, User } from "@supabase/supabase-js";
+"use client";
+
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import {
+  getCustomerProfile,
+  getBrandProfile,
+  getCartItems,
+  getNotifications,
+  getBookmarks,
+  getChats,
+} from "@/lib/fetches";
+import { User } from "@supabase/supabase-js";
+import React, { useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { CustomerProfile } from "@/types/CustomerProfile";
 import { BrandProfile } from "@/types/BrandProfile";
+import { CartItem } from "@/types/CartItem";
+import { Notification } from "@/types/Notification";
 import { Bookmark } from "@/types/Bookmark";
+import { useQueryClient } from "@tanstack/react-query";
 
-export function useUserInfo() {
-  const [userSession, setUserSession] = React.useState<User | null>(null);
-  const [customerProfile, setCustomerProfile] =
-    React.useState<CustomerProfile | null>(null);
-  const [brandProfile, setBrandProfile] = React.useState<BrandProfile | null>(
-    null
-  );
-  const hasFetched = React.useRef(false);
-  const [notifications, setNotifications] = React.useState<
-    Notification[] | null
-  >(null);
-  const [bookmarks, setBookmarks] = React.useState<Bookmark[] | null>(null);
-  const [cart, setCart] = React.useState<CartItem[] | null>(null);
+function useUserRealtime(user: User | null) {
+  const queryClient = useQueryClient();
 
-  const handleCustomerProfileEvents = (
-    payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
-  ) => {
-    console.log("Change received!", payload);
+  useEffect(() => {
+    if (!user) return;
 
-    if (payload.eventType === "DELETE") {
-      setCustomerProfile(null);
-      return;
-    } else if (
-      payload.eventType === "INSERT" ||
-      payload.eventType === "UPDATE"
-    ) {
-      setCustomerProfile(payload.new as CustomerProfile);
-    }
-  };
-
-  const handleBrandProfileEvents = (
-    payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
-  ) => {
-    console.log("Change received!", payload);
-
-    if (payload.eventType === "DELETE") {
-      setBrandProfile(null);
-      return;
-    } else if (
-      payload.eventType === "INSERT" ||
-      payload.eventType === "UPDATE"
-    ) {
-      setBrandProfile(payload.new as BrandProfile);
-    }
-  };
-
-  const handleCartEvents = (
-    payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
-  ) => {
-    console.log("Change received!", payload);
-
-    if (payload.eventType === "DELETE") {
-      setCart((prev) =>
-        prev ? prev.filter((item) => item.id !== payload.old.id) : null
-      );
-      return;
-    } else if (payload.eventType === "INSERT") {
-      setCart((prev) =>
-        prev ? [...prev, payload.new as CartItem] : [payload.new as CartItem]
-      );
-    }
-  };
-
-  const handleNotificationsEvents = (
-    payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
-  ) => {
-    console.log("Change received!", payload);
-
-    if (payload.eventType === "DELETE") {
-      setNotifications((prev) =>
-        prev
-          ? prev.filter((notification) => notification.id !== payload.old.id)
-          : null
-      );
-      return;
-    } else if (payload.eventType === "INSERT") {
-      setNotifications((prev) =>
-        prev
-          ? [...prev, payload.new as Notification]
-          : [payload.new as Notification]
-      );
-    }
-  };
-
-  const handleBookmarkEvents = (
-    payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
-  ) => {
-    console.log("Change received!", payload);
-
-    if (payload.eventType === "DELETE") {
-      setBookmarks((prev) =>
-        prev ? prev.filter((bookmark) => bookmark.id !== payload.old.id) : null
-      );
-      return;
-    } else if (payload.eventType === "INSERT") {
-      setBookmarks((prev) =>
-        prev ? [...prev, payload.new as Bookmark] : [payload.new as Bookmark]
-      );
-    }
-  };
-
-  const fetchCustomerProfile = React.useCallback(async (userSession: User) => {
-    if (userSession.user_metadata.role_id !== 2) {
-      return null;
-    }
-
-    const { data, error } = await supabase
-      .from("customers")
-      .select("*")
-      .eq("id", userSession.id)
-      .single();
-
-    if (error) {
-      return null;
-    }
-
-    // Listen to changes in the customers table
-    supabase
-      .channel("customers")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "customers" },
-        (payload) => handleCustomerProfileEvents(payload)
-      )
-      .subscribe();
-
-    return {
-      ...data,
-      role_id: 2,
-    };
-  }, []);
-
-  const fetchBrandProfile = useCallback(async (userSession: User) => {
-    if (userSession.user_metadata.role_id !== 4) {
-      return null;
-    }
-
-    const { data, error } = await supabase
-      .from("brands")
-      .select("*")
-      .eq("id", userSession.id)
-      .single();
-
-    if (error) {
-      return null;
-    }
-
-    // Listen to changes in the brands table
-    supabase
-      .channel("brands")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "brands" },
-        (payload) => handleBrandProfileEvents(payload)
-      )
-      .subscribe();
-
-    return {
-      ...data,
-      role_id: 4,
-    };
-  }, []);
-
-  const fetchCartItems = useCallback(async (userSession: User) => {
-    const { data, error } = await supabase
-      .from("cart")
-      .select("*")
-      .eq("user_id", userSession.id);
-
-    if (error) {
-      return null;
-    }
-
-    // Listen to changes in the cart table
-    supabase
-      .channel("cart")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "cart" },
-        (payload) => handleCartEvents(payload)
-      )
-      .subscribe();
-
-    return data;
-  }, []);
-
-  const fetchNotifications = useCallback(async (userSession: User) => {
-    const { data, error } = await supabase
-      .from("notifications")
-      .select("*")
-      .eq("user_id", userSession.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      return null;
-    }
-
-    // Listen to changes in the notifications table
-    supabase
-      .channel("notifications")
+    const channel = supabase
+      .channel(`realtime:user:${user.id}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications" },
-        (payload) => handleNotificationsEvents(payload)
+        () => {
+          queryClient.invalidateQueries({
+            predicate: (query) =>
+              Array.isArray(query.queryKey) &&
+              query.queryKey.includes("notifications"),
+          });
+        }
       )
       .subscribe();
 
-    return data;
-  }, []);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
+}
 
-  const fetchBookmarks = useCallback(async (userSession: User) => {
-    const { data, error } = await supabase
-      .from("bookmarks")
-      .select("*")
-      .eq("user_id", userSession.id)
-      .order("created_at", { ascending: false });
+function useCustomerProfile(user: User | null) {
+  const query = useQuery(getCustomerProfile(user?.id || ""), {
+    enabled: !!user && user.user_metadata.role_id === 2,
+  });
 
-    if (error) {
-      return null;
-    }
+  return {
+    ...query,
+    data: query.data
+      ? { ...query.data, role_id: user?.user_metadata.role_id || 0 }
+      : query.data,
+  };
+}
 
-    // Listen to changes in the bookmarks table
-    supabase
-      .channel("bookmarks")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "bookmarks" },
-        (payload) => handleBookmarkEvents(payload)
-      )
-      .subscribe();
+function useBrandProfile(user: User | null) {
+  const query = useQuery(getBrandProfile(user?.id || ""), {
+    enabled: !!user && user.user_metadata.role_id === 4,
+  });
 
-    return data;
-  }, []);
+  return {
+    ...query,
+    data: query.data
+      ? { ...query.data, role_id: user?.user_metadata.role_id || 0 }
+      : query.data,
+  };
+}
 
-  const setUserInfo = React.useCallback(async () => {
-    if (userSession && !hasFetched.current) {
-      hasFetched.current = true;
+function useCartItems(user: User | null) {
+  return useQuery(getCartItems(user?.id || ""), {
+    enabled: !!user,
+  });
+}
 
-      const [
-        customerProfileData,
-        brandProfileData,
-        cartData,
-        notificationsData,
-        bookmarksData,
-      ] = await Promise.all([
-        fetchCustomerProfile(userSession),
-        fetchBrandProfile(userSession),
-        fetchCartItems(userSession),
-        fetchNotifications(userSession),
-        fetchBookmarks(userSession),
-      ]);
+function useNotifications(user: User | null) {
+  return useQuery(getNotifications(user?.id || ""), {
+    enabled: !!user,
+  });
+}
 
-      setCustomerProfile(customerProfileData);
-      setBrandProfile(brandProfileData);
-      setCart(cartData);
-      setNotifications(notificationsData);
-      setBookmarks(bookmarksData);
-    } else if (!userSession) {
-      hasFetched.current = false;
-      setCustomerProfile(null);
-      setBrandProfile(null);
-      setCart(null);
-      setNotifications(null);
-      setBookmarks(null);
-    }
-  }, [
-    fetchCartItems,
-    fetchNotifications,
-    fetchBookmarks,
-    fetchCustomerProfile,
-    fetchBrandProfile,
-    userSession,
-  ]);
+function useBookmarks(user: User | null) {
+  return useQuery(getBookmarks(user?.id || ""), {
+    enabled: !!user,
+  });
+}
+
+export function useChats(userId?: string) {
+  return useQuery(getChats(userId || ""), {
+    enabled: !!userId,
+  });
+}
+
+interface UseUserInfoReturn {
+  userSession: User | null;
+  customerProfile: CustomerProfile | null | undefined;
+  brandProfile: BrandProfile | null | undefined;
+  cart: CartItem[] | null | undefined;
+  notifications: Notification[] | null | undefined;
+  bookmarks: Bookmark[] | null | undefined;
+}
+
+export function useUserInfo(): UseUserInfoReturn {
+  const [userSession, setUserSession] = React.useState<User | null>(null);
+
+  useUserRealtime(userSession);
+
+  // Use React Query hooks for all data
+  const { data: customerProfile } = useCustomerProfile(userSession);
+  const { data: brandProfile } = useBrandProfile(userSession);
+  const { data: cart } = useCartItems(userSession);
+  const { data: notifications } = useNotifications(userSession);
+  const { data: bookmarks } = useBookmarks(userSession);
 
   React.useEffect(() => {
     // Auth state change listener
@@ -302,10 +138,6 @@ export function useUserInfo() {
       authListener.subscription.unsubscribe();
     };
   }, []);
-
-  React.useEffect(() => {
-    setUserInfo();
-  }, [setUserInfo, userSession]);
 
   return {
     userSession,

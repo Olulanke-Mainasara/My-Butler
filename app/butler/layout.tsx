@@ -18,7 +18,7 @@ export default function ButlerLayout({
       <main className="flex h-screen w-full">
         {children}
         {customerProfile && (
-          <SidebarTrigger className="absolute top-4 right-14 bg-lightBackground dark:bg-darkBackground z-50">
+          <SidebarTrigger className="absolute top-4 right-4 md:right-5 bg-lightBackground dark:bg-darkBackground z-50">
             <Sidebar />
           </SidebarTrigger>
         )}

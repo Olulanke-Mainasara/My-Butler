@@ -22,11 +22,13 @@ import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { CartPlaceholder } from "../Placeholders/CartPlaceholder";
 import CartItemCard from "../Cards/CartItemCard";
 import { LoginPlaceholder } from "../Placeholders/LoginPlaceholder";
+import { usePathname } from "next/navigation";
 
 export default function CartDrawerTrigger() {
   const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
   const customerProfile = useCustomerProfile();
+  const pathname = usePathname();
   const cart = useCart();
 
   return (
@@ -61,7 +63,13 @@ export default function CartDrawerTrigger() {
         </Drawer>
       </div>
 
-      <div className="hidden md:block">
+      <div
+        className={`hidden ${
+          pathname === "/camera" || pathname === "/combine/personal"
+            ? "md:hidden"
+            : "md:block"
+        }`}
+      >
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild className="cursor-pointer">
             <ShoppingCart />

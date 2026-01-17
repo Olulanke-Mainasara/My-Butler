@@ -22,8 +22,12 @@ import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { GalleryPlaceholder } from "../Placeholders/GalleryPlaceholder";
-import { Image } from "@/types/Image";
 import { LoginPlaceholder } from "../Placeholders/LoginPlaceholder";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteImage } from "@/lib/mutations";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { getImages } from "@/lib/fetches";
+import LoadingSkeleton from "../Skeletons/LoadingSkeleton";
 
 export default function GalleryDrawerTrigger({
   setDeleting,
@@ -32,50 +36,41 @@ export default function GalleryDrawerTrigger({
 }) {
   const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
-  const [images, setImages] = React.useState<Image[]>([]);
   const customerProfile = useCustomerProfile();
+  const queryClient = useQueryClient();
 
-  const handleDelete = async (imagePath: string) => {
-    setDeleting(true);
+  // Fetch images using React Query
+  const {
+    data: images,
+    isPending,
+    isError,
+  } = useQuery(getImages(customerProfile?.id || ""), {
+    enabled: !!customerProfile,
+  });
 
-    const { error } = await supabase.storage
-      .from("camera-pictures")
-      .remove([imagePath]);
+  const { mutate: handleDelete } = useMutation({
+    mutationFn: (imagePath: string) => deleteImage(supabase, imagePath),
 
-    if (error) {
+    onSuccess: () => {
+      setDeleting(false);
+      toast.success("Image deleted successfully.");
+
+      // Simply invalidate all image queries
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey.includes("camera_pictures"),
+      });
+    },
+
+    onError: () => {
       toast.error("Error deleting image, try again.");
-      return;
-    }
+    },
+  });
 
-    setImages((prev) => prev.filter((image) => image.path !== imagePath));
-    setDeleting(false);
-    toast.success("Image deleted successfully.");
-  };
+  const isLoading = customerProfile && isPending;
 
-  React.useEffect(() => {
-    // Check if the user is logged in
-    if (!customerProfile) {
-      return;
-    }
-
-    // Fetch the user's images from the database
-    const fetchImages = async () => {
-      const { data, error } = await supabase
-        .from("camera_pictures")
-        .select("*")
-        .eq("user_id", customerProfile?.id);
-
-      if (error) {
-        toast.error("Error fetching images");
-      }
-
-      if (data) {
-        setImages(data);
-      }
-    };
-
-    fetchImages();
-  }, [customerProfile]);
+  const showEmptyState = images && images.length === 0;
 
   return (
     <>
@@ -94,13 +89,21 @@ export default function GalleryDrawerTrigger({
                 info="your saved photos"
                 close={setOpenMobile}
               />
-            ) : images.length === 0 ? (
+            ) : isLoading ? (
+              <LoadingSkeleton />
+            ) : isError ? (
+              <div className="text-center py-20 border rounded-lg">
+                <p className="text-red-500">
+                  Error loading images. Please try again.
+                </p>
+              </div>
+            ) : showEmptyState ? (
               <section>
                 <GalleryPlaceholder />
               </section>
             ) : (
               <section className="overflow-y-scroll grid grid-cols-3 gap-[2px] px-2">
-                {images.map((imageData, index) => (
+                {images?.map((imageData, index) => (
                   <PictureDialogTrigger
                     image={imageData}
                     key={index}
@@ -125,13 +128,21 @@ export default function GalleryDrawerTrigger({
             </DialogHeader>
             {!customerProfile ? (
               <LoginPlaceholder info="your saved photos" close={setOpen} />
-            ) : images.length === 0 ? (
+            ) : isLoading ? (
+              <LoadingSkeleton />
+            ) : isError ? (
+              <div className="text-center py-20 border rounded-lg">
+                <p className="text-red-500">
+                  Error loading images. Please try again.
+                </p>
+              </div>
+            ) : showEmptyState ? (
               <section>
                 <GalleryPlaceholder />
               </section>
             ) : (
               <section className="h-full overflow-y-scroll grid grid-cols-3 gap-[2px] px-2">
-                {images.map((imageData, index) => (
+                {images?.map((imageData, index) => (
                   <PictureDialogTrigger
                     image={imageData}
                     key={index}

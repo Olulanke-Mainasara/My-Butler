@@ -1,8 +1,8 @@
 import React from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import emptyCartDark from "@/public/Empty-Cart/empty-cart-dark.svg";
-import emptyCartLight from "@/public/Empty-Cart/empty-cart-light.svg";
+import emptyCartDark from "@/public/Placeholders/Empty-Cart/empty-cart-dark.svg";
+import emptyCartLight from "@/public/Placeholders/Empty-Cart/empty-cart-light.svg";
 
 export function CartPlaceholder() {
   const { theme } = useTheme();

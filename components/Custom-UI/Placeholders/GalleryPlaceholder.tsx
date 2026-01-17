@@ -1,8 +1,8 @@
 import React from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import emptyGalleryDark from "@/public/Empty-Gallery/empty-gallery-dark.svg";
-import emptyGalleryLight from "@/public/Empty-Gallery/empty-gallery-light.svg";
+import emptyGalleryDark from "@/public/Placeholders/Empty-Gallery/empty-gallery-dark.svg";
+import emptyGalleryLight from "@/public/Placeholders/Empty-Gallery/empty-gallery-light.svg";
 
 export function GalleryPlaceholder() {
   const { theme } = useTheme();

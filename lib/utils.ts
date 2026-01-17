@@ -119,27 +119,6 @@ export function generateSlug(name: string): string {
 }
 
 /**
- * Set a value in local storage.
- *
- * Note: This function should only be called on the client side.
- * It will not work on the server side.
- *
- * @param key The key to store the value under.
- * @param value The value to store.
- * @returns The value that was stored.
- */
-export function setLocalStorage(key: string, value: unknown) {
-  if (typeof window !== "undefined") {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.error("Error setting localStorage item:", error);
-    }
-  }
-  return value;
-}
-
-/**
  * Get a value from local storage.
  *
  * Note: This function should only be called on the client side.
@@ -169,7 +148,6 @@ export function getLocalStorage(key: string) {
 export function sanitizeText(text: string) {
   return text.replace("<has_function_call>", "");
 }
-
 /**
  * Generates a UUID (Universally Unique Identifier) string in the format of xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx.
  *

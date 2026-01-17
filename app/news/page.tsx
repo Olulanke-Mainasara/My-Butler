@@ -4,37 +4,23 @@ import React from "react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
 import { Article } from "@/types/Article";
-import { fetchArticles } from "@/lib/DatabaseFetches";
+import { getArticles } from "@/lib/fetches";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 const News = () => {
-  const [articles, setArticles] = React.useState<Article[]>([]);
   const [searchResult, setSearchResult] = React.useState<Article[]>([]);
   const router = useRouter();
-  const hasRendered = React.useRef(false);
+
+  const { data: articles } = useQuery(getArticles());
 
   const handleSearchResult = (result: unknown[]) => {
     setSearchResult(result as Article[]);
   };
-
-  const fetchPageData = async () => {
-    const [Articles] = await Promise.all([fetchArticles()]);
-
-    setArticles(Array.isArray(Articles) ? Articles : []);
-  };
-
-  React.useEffect(() => {
-    if (hasRendered.current) {
-      return;
-    }
-
-    hasRendered.current = true;
-    fetchPageData();
-  }, []);
 
   return (
     <div className="mt-[76px] md:mt-6 pb-5 space-y-7 xl:space-y-0">
@@ -102,7 +88,7 @@ const News = () => {
           </section>
 
           <section className="space-y-10 xl:pt-10">
-            <CarouselWithSlideTracker items={articles}>
+            <CarouselWithSlideTracker items={articles ?? []}>
               <ArticleCard />
             </CarouselWithSlideTracker>
 
@@ -111,11 +97,11 @@ const News = () => {
                 <p className="text-3xl md:text-4xl">Latest</p>
               </div>
 
-              {articles.length === 0 ? (
+              {articles?.length === 0 ? (
                 <LoadingSkeleton />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
-                  {articles.map((article, index) => (
+                  {articles?.map((article, index) => (
                     <ArticleCard key={index} item={article} />
                   ))}
                 </div>
@@ -137,11 +123,11 @@ const News = () => {
                 <p className="text-3xl md:text-4xl">Recommended</p>
               </div>
 
-              {articles.length === 0 ? (
+              {articles?.length === 0 ? (
                 <LoadingSkeleton />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
-                  {articles.map((article, index) => (
+                  {articles?.map((article, index) => (
                     <ArticleCard key={index} item={article} />
                   ))}
                 </div>

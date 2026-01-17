@@ -2,25 +2,24 @@
 
 import React, { Suspense } from "react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
-import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
 import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
 import { Product } from "@/types/Product";
 import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
-import { Category } from "@/types/Category";
-import { fetchCategories, fetchProducts } from "@/lib/DatabaseFetches";
+import { getCategories, getProducts } from "@/lib/fetches";
 import { Button } from "@/components/Shad-UI/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 const Shop = () => {
-  const [products, setProducts] = React.useState<Product[]>([]);
-  const [categories, setCategories] = React.useState<Category[]>([]);
   const [filterResult, setFilterResult] = React.useState<Product[]>([]);
   const [searchResult, setSearchResult] = React.useState<Product[]>([]);
   const router = useRouter();
-  const hasRendered = React.useRef(false);
+
+  const { data: products } = useQuery(getProducts());
+  const { data: categories } = useQuery(getCategories());
 
   const handleFilterResult = (result: unknown[]) => {
     setFilterResult(result as Product[]);
@@ -29,25 +28,6 @@ const Shop = () => {
   const handleSearchResult = (result: unknown[]) => {
     setSearchResult(result as Product[]);
   };
-
-  const fetchPageData = async () => {
-    const [Products, categories] = await Promise.all([
-      fetchProducts(),
-      fetchCategories(),
-    ]);
-
-    setProducts(Array.isArray(Products) ? Products : []);
-    setCategories(categories || []);
-  };
-
-  React.useEffect(() => {
-    if (hasRendered.current) {
-      return;
-    }
-
-    hasRendered.current = true;
-    fetchPageData();
-  }, []);
 
   return (
     <div className="mt-[76px] md:mt-6 pb-5 space-y-7 xl:space-y-0">
@@ -59,12 +39,11 @@ const Shop = () => {
             handleSearchResult={handleSearchResult}
           />
           <div className="flex items-center gap-4">
-            <CartDrawerTrigger />
             <Suspense>
               {searchResult.length > 0 ? null : (
                 <FilterDrawerTrigger
                   optionCollection={{
-                    category: categories,
+                    category: categories ?? [],
                   }}
                   table="products"
                   handleFilterResult={handleFilterResult}
@@ -164,18 +143,18 @@ const Shop = () => {
           </section>
 
           <section className="space-y-10 md:pt-5 xl:pt-14">
-            <CarouselWithSlideTracker items={products}>
+            <CarouselWithSlideTracker items={products ?? []}>
               <ProductCard />
             </CarouselWithSlideTracker>
 
             <section className="space-y-4 px-4 md:px-5 pt-5">
               <p className="text-3xl md:text-4xl">Latest drops</p>
 
-              {products.length === 0 ? (
+              {products?.length === 0 ? (
                 <LoadingSkeleton />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
-                  {products.map((product, index) => (
+                  {products?.map((product, index) => (
                     <ProductCard item={product} key={index} />
                   ))}
                 </div>
@@ -197,11 +176,11 @@ const Shop = () => {
             <section className="space-y-4 px-4 md:px-5">
               <p className="text-3xl md:text-4xl">Recommended</p>
 
-              {products.length === 0 ? (
+              {products?.length === 0 ? (
                 <LoadingSkeleton />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
-                  {products.map((product, index) => (
+                  {products?.map((product, index) => (
                     <ProductCard item={product} key={index} />
                   ))}
                 </div>

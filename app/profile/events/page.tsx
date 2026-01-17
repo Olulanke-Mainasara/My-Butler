@@ -3,40 +3,51 @@
 import { Button } from "@/components/Shad-UI/button";
 import { PartyPopper, PlusCircle } from "lucide-react";
 import { Link } from "next-view-transitions";
-import { useEffect, useState } from "react";
-import { getBookmarkedItems } from "@/lib/DatabaseFetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { getBookmarkedItems } from "@/lib/fetches";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
 import { useBookmarks } from "@/components/Providers/AllProviders";
 import { Event } from "@/types/Event";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
+import { useMemo } from "react";
 
-export default function Products() {
-  const [bookmarkItems, setBookmarkItems] = useState<Event[] | null>(null);
+export default function Events() {
   const bookmarks = useBookmarks();
 
-  const fetchPageData = async (filteredBookmarkIds: string[]) => {
-    const [Bookmarks] = await Promise.all([
-      getBookmarkedItems(filteredBookmarkIds, "events"),
-    ]);
-
-    setBookmarkItems(
-      (Bookmarks || []).filter(
-        (item): item is Event =>
-          typeof item === "object" && item !== null && "location" in item
-      )
-    );
-  };
-
-  useEffect(() => {
-    if (!bookmarks) {
-      return;
-    }
-
-    const filteredBookmarkIds = bookmarks
-      .filter((item) => item.target_type_name === "event")
-      .map((item) => item.target_type_id);
-    fetchPageData(filteredBookmarkIds);
+  // Filter bookmark IDs for events
+  const filteredBookmarkIds = useMemo(() => {
+    if (!bookmarks) return [];
+    return bookmarks
+      .filter((item) => item.target_type === "event")
+      .map((item) => item.target_id);
   }, [bookmarks]);
+
+  const hasEventBookmarks = filteredBookmarkIds.length > 0;
+
+  // Fetch bookmarked events using React Query
+  const {
+    data: bookmarkItems,
+    isPending,
+    isError,
+  } = useQuery(getBookmarkedItems(filteredBookmarkIds, "events"), {
+    // Only run query when we have bookmark IDs
+    enabled: hasEventBookmarks,
+  });
+
+  // Type-safe filter for events
+  const events = useMemo(() => {
+    if (!bookmarkItems) return [];
+    return bookmarkItems.filter(
+      (item): item is Event =>
+        typeof item === "object" && item !== null && "location" in item
+    );
+  }, [bookmarkItems]);
+
+  // Loading state: only show loading when we have bookmarks and query is pending
+  const isLoading = hasEventBookmarks && isPending;
+
+  // No bookmarks at all (neither bookmarks loaded yet OR no event bookmarks)
+  const showEmptyState = !bookmarks || !hasEventBookmarks;
 
   return (
     <div className="flex flex-col gap-4">
@@ -53,12 +64,25 @@ export default function Products() {
         </Button>
       </div>
 
-      {!bookmarkItems ? (
+      {showEmptyState ? (
+        <div className="text-center py-20 border rounded-lg text-xl flex justify-center items-center gap-2">
+          <span className="text-brandLight dark:text-brandDark">
+            <PartyPopper />
+          </span>
+          <p>You have no bookmarked events. Start adding some!</p>
+        </div>
+      ) : isLoading ? (
         <LoadingSkeleton />
-      ) : bookmarkItems.length > 0 ? (
+      ) : isError ? (
+        <div className="text-center py-20 border rounded-lg text-xl flex justify-center items-center gap-2">
+          <p className="text-red-500">
+            Error loading events. Please try again.
+          </p>
+        </div>
+      ) : events.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6">
-          {bookmarkItems.map((bookmark, index) => (
-            <EventCard item={bookmark} key={index} />
+          {events.map((bookmark) => (
+            <EventCard item={bookmark} key={bookmark.id} />
           ))}
         </div>
       ) : (

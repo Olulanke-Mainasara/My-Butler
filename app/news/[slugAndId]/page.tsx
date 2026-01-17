@@ -7,57 +7,24 @@ import { Badge } from "@/components/Shad-UI/badge";
 import { Button } from "@/components/Shad-UI/button";
 import { Separator } from "@/components/Shad-UI/separator";
 import { toast } from "sonner";
-import { fetchArticle } from "@/lib/DatabaseFetches";
-import { Article } from "@/types/Article";
+import { getArticle } from "@/lib/fetches";
 import { getItemId } from "@/lib/utils";
 import { useTransitionRouter } from "next-view-transitions";
 import { usePathname } from "next/navigation";
-import BookmarkTrigger from "@/components/Custom-UI/Buttons/BookmarkTrigger";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
-import { useBookmarks } from "@/components/Providers/AllProviders";
-
-// Mock data - replace with actual data fetching
-const mockArticle = {
-  author: "Sarah Johnson",
-  brand_id: "brand-123",
-  content: `
-    <p>The world of audio technology has evolved dramatically over the past decade, with wireless headphones leading the charge in innovation and user experience. As we move into 2024, the landscape continues to shift with new technologies and consumer demands.</p>
-    
-    <h2>The Rise of Adaptive Audio</h2>
-    <p>One of the most significant developments in recent years has been the introduction of adaptive audio technology. This revolutionary approach allows headphones to automatically adjust their sound profile based on your environment, activity, and personal preferences.</p>
-    
-    <p>Unlike traditional noise cancellation, adaptive audio uses machine learning algorithms to understand your listening patterns and environmental context. Whether you're commuting on a busy train, working in a quiet office, or exercising at the gym, your headphones can now intelligently adapt to provide the optimal listening experience.</p>
-    
-    <h2>Sustainability in Audio Design</h2>
-    <p>As consumers become increasingly environmentally conscious, audio manufacturers are responding with sustainable design practices. From recycled materials to modular designs that extend product lifespan, the industry is embracing eco-friendly innovation.</p>
-    
-    <p>Leading brands are now incorporating ocean plastic into their headphone construction, while others focus on creating products that can be easily repaired and upgraded rather than replaced. This shift represents a fundamental change in how we think about consumer electronics.</p>
-    
-    <h2>The Future of Spatial Audio</h2>
-    <p>Spatial audio technology is transforming how we experience sound, creating immersive three-dimensional soundscapes that were previously only possible in professional studio environments. This technology is now becoming accessible to everyday consumers through advanced headphone designs.</p>
-    
-    <p>The implications extend beyond entertainment, with applications in virtual meetings, educational content, and therapeutic audio experiences. As this technology matures, we can expect to see even more innovative applications emerge.</p>
-  `,
-  created_at: "2024-01-18T14:30:00Z",
-  description:
-    "Explore the latest trends and innovations shaping the future of wireless audio technology, from adaptive sound to sustainable design practices.",
-  display_image: "/placeholder.svg?height=600&width=1200",
-  id: "article-123",
-  slug: "future-of-wireless-audio-technology",
-  tags: ["Technology", "Audio", "Innovation", "Wireless", "Future"],
-  title: "The Future of Wireless Audio Technology: Trends to Watch in 2024",
-  updated_at: "2024-01-19T10:15:00Z",
-};
+import AddToBookmarks from "@/components/Custom-UI/Buttons/AddToBookmarks";
+import { Markdown } from "@/app/butler/[chat]/markdown";
+import { Icons } from "@/components/Custom-UI/icons";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 export default function ArticlePage() {
   const pathname = usePathname();
-  const customerProfile = useCustomerProfile();
-  const bookmarks = useBookmarks();
-  const [article, setArticle] = useState<Article | null>(null);
   const [readingProgress, setReadingProgress] = useState(0);
-
   const articleId = getItemId(pathname.split("/").pop() || "");
   const router = useTransitionRouter();
+
+  const { data: article, isError } = useQuery(getArticle(articleId || ""), {
+    enabled: !!articleId,
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,28 +39,24 @@ export default function ArticlePage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (!articleId) {
-      toast.error("Article ID is missing in the URL.");
-      router.push("/news");
-      return;
-    }
-
-    const fetchPageData = async () => {
-      const [Article] = await Promise.all([fetchArticle(articleId)]);
-
-      setArticle(Article);
-    };
-
-    fetchPageData();
-  }, [articleId, router]);
+  if (!articleId) {
+    toast.error("Article ID is missing.");
+    router.push("/news");
+    return;
+  }
 
   if (!article) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        Loading...
+        <Icons.spinner className="w-6 h-6 animate-spin" /> Loading
       </div>
     );
+  }
+
+  if (isError) {
+    toast.error("Failed to load article");
+    router.push("/news");
+    return;
   }
 
   return (
@@ -112,7 +75,7 @@ export default function ArticlePage() {
           src={article.display_image || "/placeholder.svg"}
           alt={article.title}
           fill
-          className="object-cover transition-transform duration-[10s] hover:scale-105"
+          className="object-cover transition-transform duration-500 hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
       </div>
@@ -129,7 +92,7 @@ export default function ArticlePage() {
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className={`bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all duration-300 hover:scale-105 cursor-pointer animate-in slide-in-from-left`}
+                  className={`bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all duration-300 hover:scale-105 cursor-pointer`}
                   style={{ animationDelay: `${300 + index * 100}ms` }}
                 >
                   <Tag className="w-3 h-3 mr-1" />
@@ -138,11 +101,11 @@ export default function ArticlePage() {
               ))}
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight animate-in slide-in-from-left duration-700 delay-500">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
               {article.title}
             </h1>
 
-            <p className="text-xl text-neutral-600 mb-8 leading-relaxed animate-in fade-in duration-700 delay-700">
+            <p className="text-xl text-neutral-600 dark:text-neutral-500 mb-8 leading-relaxed">
               {article.description}
             </p>
 
@@ -160,31 +123,23 @@ export default function ArticlePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>8 min read</span>
+                  <span>{article.reading_time_minutes} min read</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 animate-in slide-in-from-right duration-500 delay-1200">
+              <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm">
                   <Share2 className="w-4 h-4" />
                   Share
                 </Button>
-                <BookmarkTrigger
-                  customerProfile={customerProfile}
-                  item={article}
-                  targetType="article"
-                  bookmarks={bookmarks}
-                />
+                <AddToBookmarks item={article} targetType="article" />
               </div>
             </div>
           </div>
 
           {/* Article Body */}
           <div className={`rounded-xl p-8 md:p-12 border`}>
-            <div
-              className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-p:leading-relaxed prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:transition-colors prose-h2:hover:text-blue-600"
-              dangerouslySetInnerHTML={{ __html: mockArticle.content }}
-            />
+            <Markdown>{article.content}</Markdown>
 
             <Separator className="my-12" />
 
@@ -198,9 +153,7 @@ export default function ArticlePage() {
                   {article.author}
                 </h4>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  Technology journalist and audio enthusiast with over 10 years
-                  of experience covering the latest innovations in consumer
-                  electronics and audio technology.
+                  {article.author_bio || "No bio available"}
                 </p>
               </div>
             </div>

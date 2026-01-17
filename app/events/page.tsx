@@ -4,37 +4,23 @@ import React from "react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
 import { Event } from "@/types/Event";
-import { fetchEvents } from "@/lib/DatabaseFetches";
+import { getEvents } from "@/lib/fetches";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 const Events = () => {
-  const [events, setEvents] = React.useState<Event[]>([]);
   const [searchResult, setSearchResult] = React.useState<Event[]>([]);
   const router = useRouter();
-  const hasRendered = React.useRef(false);
+
+  const { data: events } = useQuery(getEvents());
 
   const handleSearchResult = (result: unknown[]) => {
     setSearchResult(result as Event[]);
   };
-
-  const fetchPageData = async () => {
-    const [Events] = await Promise.all([fetchEvents()]);
-
-    setEvents(Array.isArray(Events) ? Events : []);
-  };
-
-  React.useEffect(() => {
-    if (hasRendered.current) {
-      return;
-    }
-
-    hasRendered.current = true;
-    fetchPageData();
-  }, []);
 
   return (
     <div className="mt-[76px] md:mt-6 pb-5 space-y-7 xl:space-y-0">
@@ -126,18 +112,18 @@ const Events = () => {
           </section>
 
           <section className="space-y-10 xl:pt-10">
-            <CarouselWithSlideTracker items={events}>
+            <CarouselWithSlideTracker items={events ?? []}>
               <EventCard />
             </CarouselWithSlideTracker>
 
             <section className="space-y-4 px-4 md:px-5 pt-5">
               <p className="text-3xl md:text-4xl">Upcoming</p>
 
-              {events.length === 0 ? (
+              {events?.length === 0 ? (
                 <LoadingSkeleton />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
-                  {events.map((event) => (
+                  {events?.map((event) => (
                     <EventCard key={event.id} item={event} />
                   ))}
                 </div>
@@ -161,11 +147,11 @@ const Events = () => {
                 <p className="text-3xl md:text-4xl">Recommended</p>
               </div>
 
-              {events.length === 0 ? (
+              {events?.length === 0 ? (
                 <LoadingSkeleton />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
-                  {events.map((event) => (
+                  {events?.map((event) => (
                     <EventCard key={event.id} item={event} />
                   ))}
                 </div>

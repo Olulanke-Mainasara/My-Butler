@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -16,101 +15,58 @@ import {
   useSidebar,
 } from "@/components/Shad-UI/sidebar";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/Shad-UI/alert-dialog";
+
 import { useTransitionRouter } from "next-view-transitions";
 import { Link } from "next-view-transitions";
 import { Edit, Trash2 } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
-import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
+import { useChats } from "@/hooks/use-user-info";
+import { deleteChat } from "@/lib/mutations";
+import { supabase } from "@/lib/supabase/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function ChatSidebar() {
   const customerProfile = useCustomerProfile();
+  const userId = customerProfile?.id;
   const { toggleSidebar } = useSidebar();
   const router = useTransitionRouter();
   const pathname = usePathname();
-  const [conversations, setConversations] = React.useState<
-    { id: string; title: string }[] | null
-  >(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const handleEvents = (
-    payload: RealtimePostgresChangesPayload<{ [key: string]: unknown }>
-  ) => {
-    console.log("Change received!", payload);
-    if (payload.eventType === "DELETE") {
-      setConversations((prev) =>
-        prev ? prev.filter((convo) => convo.id !== payload.old.id) : null
-      );
-      return;
-    } else if (payload.eventType === "INSERT") {
-      setConversations((prev) =>
-        prev
-          ? [...prev, payload.new as { id: string; title: string }]
-          : [payload.new as { id: string; title: string }]
-      );
-    } else if (payload.eventType === "UPDATE") {
-      setConversations((prev) =>
-        prev
-          ? prev.map((convo) =>
-              convo.id === payload.new.id
-                ? (payload.new as { id: string; title: string })
-                : convo
-            )
-          : null
-      );
-    }
-  };
+  const { data: conversations, isLoading, error } = useChats(userId);
 
-  const handleChatDelete = async (chatId: string) => {
-    const { error } = await supabase.from("chats").delete().eq("id", chatId);
-    if (error) {
-      console.error("Error deleting chat", error);
-    } else {
-      toggleSidebar();
-      toast.success("Chat deleted successfully");
-      if (pathname.startsWith(`/butler/${chatId}`)) {
-        router.push("/butler");
-      }
-    }
-  };
+  const { mutate: handleChatDelete } = useMutation({
+    mutationFn: (chatId: string) => deleteChat(supabase, chatId),
 
-  React.useEffect(() => {
-    const fetchConversations = async () => {
-      if (!customerProfile) {
-        return;
-      }
+    onSuccess: () => {
+      toast.success("Conversation deleted");
 
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("chats")
-        .select("id,title")
-        .eq("user_id", customerProfile.id);
+      // Simply invalidate all chat queries
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey.includes("chats"),
+      });
+    },
 
-      if (error) {
-        setError("Unable to fetch conversations");
-      } else {
-        setConversations(data);
-      }
+    onError: () => {
+      toast.error("Failed to delete conversation");
+    },
+  });
 
-      setLoading(false);
-    };
-
-    fetchConversations();
-  }, [customerProfile]);
-
-  React.useEffect(() => {
-    supabase
-      .channel("chats")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "chats" },
-        (payload) => handleEvents(payload)
-      )
-      .subscribe();
-  }, []);
+  const loading = isLoading;
 
   return (
     <Sidebar side="right">
@@ -141,7 +97,7 @@ export function ChatSidebar() {
             </div>
           ) : conversations && !error ? (
             <SidebarGroup className="p-0 gap-0">
-              <SidebarGroupLabel className="text-black dark:text-white">
+              <SidebarGroupLabel className="text-black dark:text-white font-bold text-xl">
                 Conversations
               </SidebarGroupLabel>
               <SidebarGroupContent className="p-2">
@@ -162,19 +118,41 @@ export function ChatSidebar() {
                           </span>
                         </Link>
                       </SidebarMenuButton>
-                      <SidebarMenuAction
-                        onClick={() => handleChatDelete(convo.id)}
-                        className="text-red-500"
-                      >
-                        <Trash2 /> <span className="sr-only">Delete chat</span>
-                      </SidebarMenuAction>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <SidebarMenuAction className="text-red-500">
+                            <Trash2 />{" "}
+                            <span className="sr-only">Delete chat</span>
+                          </SidebarMenuAction>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-lightBackground dark:bg-darkBackground">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently delete this ({convo.title})
+                              conversation and remove its data from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleChatDelete(convo.id)}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           ) : error ? (
-            <p>{error}</p>
+            <p>{error.message}</p>
           ) : null}
         </div>
       </SidebarContent>

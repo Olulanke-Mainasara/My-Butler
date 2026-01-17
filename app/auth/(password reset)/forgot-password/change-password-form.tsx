@@ -45,7 +45,7 @@ export function ChangePasswordForm({
       setError(error.message);
     } else {
       toast.success("Password reset successfully");
-      router.push("/?splashed=true");
+      router.push("/");
     }
 
     setLoading(false);

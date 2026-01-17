@@ -25,7 +25,7 @@ const CarouselWithSubCarousel = ({
   return (
     <div className="flex flex-col xl:flex-row w-full xl:pr-7 gap-4 xl:gap-0">
       {subItems.length === 0 ? (
-        <div className="text-center px-10 py-5 xl:py-28 border rounded-lg text-xl flex flex-col gap-4 items-center xl:px-2 xl:mr-2 xl:w-1/12">
+        <div className="text-center px-10 py-5 xl:py-28 border rounded-lg text-xl flex flex-col gap-4 items-center xl:px-2 xl:w-1/12">
           <Icons.spinner className="animate-spin" />
         </div>
       ) : (
@@ -69,7 +69,7 @@ const CarouselWithSubCarousel = ({
       )}
 
       {items.length === 0 ? (
-        <LoadingSkeleton length={1} className="md:grid-cols-1" />
+        <LoadingSkeleton length={1} className="md:grid-cols-1 ml-5" />
       ) : (
         <div className="xl:basis-5/6 xl:w-11/12 flex items-center h-full xl:pl-16 xl:pr-4">
           <div className="w-full h-full">

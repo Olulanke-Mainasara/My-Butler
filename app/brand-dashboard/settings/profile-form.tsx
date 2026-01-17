@@ -4,7 +4,8 @@ import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateBrandProfile } from "@/lib/mutations";
 import { toast } from "sonner";
 import { Button } from "@/components/Shad-UI/button";
 import {
@@ -29,10 +30,41 @@ import { ProfilePictureUpload } from "@/components/Custom-UI/Cards/ProfilePictur
 type ProfileFormValues = z.infer<typeof brandProfileFormSchema>;
 
 export function ProfileForm() {
-  const [loading, setLoading] = React.useState(false);
   const [profilePicture, setProfilePicture] = React.useState<string>("");
   const router = useTransitionRouter();
   const userProfile = useBrandProfile();
+  const queryClient = useQueryClient();
+
+  const { mutate: updateProfile, isPending: loading } = useMutation({
+    mutationFn: (details: {
+      supabase_user_id: string;
+      name: string;
+      email: string;
+      location: string;
+      url: string;
+      contact: string;
+      description: string;
+      profile_picture: string;
+    }) => updateBrandProfile(supabase, details),
+
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
+
+      // Invalidate brand profile query to refetch updated data
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey.includes("brands"),
+      });
+
+      router.push("/profile");
+    },
+
+    onError: (error: Error) => {
+      toast.error("Error updating profile", {
+        description: error.message,
+      });
+    },
+  });
 
   const defaultValues: Partial<ProfileFormValues> = {
     name: userProfile?.name,
@@ -74,29 +106,17 @@ export function ProfileForm() {
       return;
     }
 
-    setLoading(true);
-
-    const { error } = await supabase.rpc("update_brand_details", {
-      _name: data.name === "N/A" ? "" : data.name ?? "",
-      _email: data.email === "N/A" ? "" : data.email ?? "",
-      _location: data.location === "N/A" ? "" : data.location ?? "",
-      _description: data.description === "N/A" ? "" : data.description ?? "",
-      _url: data.url === "N/A" ? "" : data.url ?? "",
-      _profile_picture: profilePicture,
-      _contact: data.contact === "N/A" ? "" : data.contact ?? "",
-      _supabase_user_id: userProfile?.supabase_user_id ?? "",
+    // Call the mutation
+    updateProfile({
+      supabase_user_id: userProfile.supabase_user_id,
+      name: data.name === "N/A" ? "" : data.name ?? "",
+      email: data.email === "N/A" ? "" : data.email ?? "",
+      location: data.location === "N/A" ? "" : data.location ?? "",
+      description: data.description === "N/A" ? "" : data.description ?? "",
+      url: data.url === "N/A" ? "" : data.url ?? "",
+      profile_picture: profilePicture,
+      contact: data.contact === "N/A" ? "" : data.contact ?? "",
     });
-
-    if (error) {
-      toast.error("Error updating profile", {
-        description: error.message,
-      });
-    } else {
-      toast.success("Profile updated successfully");
-      router.push("/profile");
-    }
-
-    setLoading(false);
   }
 
   return (
@@ -105,27 +125,36 @@ export function ProfileForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 max-w-2xl"
       >
-        <ProfilePictureUpload
-          userId={userProfile?.supabase_user_id || ""}
-          currentImageUrl={userProfile?.profile_picture || ""}
-          onUpload={handleProfilePictureUpload}
-        />
+        <div className="flex flex-col items-center gap-3">
+          <ProfilePictureUpload
+            userId={userProfile?.supabase_user_id || ""}
+            currentImageUrl={userProfile?.profile_picture || ""}
+            onUpload={handleProfilePictureUpload}
+          />
+          <p className="text-sm text-muted-foreground">
+            Upload your brand logo or profile picture. Recommended size:
+            400x400px. Max file size: 2MB.
+          </p>
+        </div>
 
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Brand name</FormLabel>
+              <FormLabel>Brand Name</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Your brand name"
+                  placeholder="e.g., Acme Corp, TechBrand, Your Company"
                   {...field}
                   value={field.value === "N/A" ? "" : field.value}
                   disabled={loading}
                 />
               </FormControl>
-              <FormDescription>Your brand&apos;s name.</FormDescription>
+              <FormDescription>
+                The official name of your brand as you want it displayed to
+                customers.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -136,16 +165,19 @@ export function ProfileForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Brand description</FormLabel>
+              <FormLabel>Brand Description</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Describe your brand"
+                  placeholder="e.g., Leading provider of innovative tech solutions"
                   {...field}
                   value={field.value === "N/A" ? "" : field.value}
                   disabled={loading}
                 />
               </FormControl>
-              <FormDescription>Your brand&apos;s description.</FormDescription>
+              <FormDescription>
+                A brief tagline or description that captures what your brand
+                does. This will appear on your brand profile.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -156,58 +188,18 @@ export function ProfileForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Brand email</FormLabel>
+              <FormLabel>Brand Email</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="example@brand.com"
+                  type="email"
+                  placeholder="contact@yourbrand.com"
                   {...field}
                   disabled={loading}
                 />
               </FormControl>
               <FormDescription>
-                Your brand&apos;s contact email.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Brand location</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Where are you located?"
-                  {...field}
-                  value={field.value === "N/A" ? "" : field.value}
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormDescription>Your brand&apos;s location.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Brand URL</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Your website or social media link"
-                  {...field}
-                  value={field.value === "N/A" ? "" : field.value}
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormDescription>
-                Could be your brand website or main social handle.
+                Your primary business email address for customer inquiries and
+                official communications.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -219,16 +211,67 @@ export function ProfileForm() {
           name="contact"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Brand Contact No</FormLabel>
+              <FormLabel>Contact Number</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="How can you be contacted?"
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
                   {...field}
                   value={field.value === "N/A" ? "" : field.value}
                   disabled={loading}
                 />
               </FormControl>
-              <FormDescription>Your brand contact number.</FormDescription>
+              <FormDescription>
+                Your business phone number where customers can reach you
+                directly.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g., New York, USA or London, UK"
+                  {...field}
+                  value={field.value === "N/A" ? "" : field.value}
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormDescription>
+                Your brand&apos;s headquarters or primary business location.
+                Helps customers know where you&apos;re based.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Website or Social Media</FormLabel>
+              <FormControl>
+                <Input
+                  type="url"
+                  placeholder="https://www.yourbrand.com or @yourbrand"
+                  {...field}
+                  value={field.value === "N/A" ? "" : field.value}
+                  disabled={loading}
+                />
+              </FormControl>
+              <FormDescription>
+                Your brand&apos;s website URL or main social media handle. This
+                helps customers learn more about your brand.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -242,7 +285,7 @@ export function ProfileForm() {
           {loading ? (
             <span className="flex items-center gap-2">
               <Icons.spinner className="animate-spin" />
-              Updating
+              Updating Profile
             </span>
           ) : (
             "Update Profile"

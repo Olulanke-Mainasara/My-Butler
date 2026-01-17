@@ -3,13 +3,15 @@ import { CustomerProfile } from "@/types/CustomerProfile";
 import { User } from "@supabase/supabase-js";
 import React from "react";
 
-const customerProfileContext = React.createContext<CustomerProfile | null>(
-  null
-);
+const customerProfileContext = React.createContext<
+  CustomerProfile | null | undefined
+>(null);
 export const useCustomerProfile = () =>
   React.useContext(customerProfileContext);
 
-const brandProfileContext = React.createContext<BrandProfile | null>(null);
+const brandProfileContext = React.createContext<
+  BrandProfile | null | undefined
+>(null);
 export const useBrandProfile = () => React.useContext(brandProfileContext);
 
 const UserProvider = ({
@@ -20,8 +22,8 @@ const UserProvider = ({
 }: {
   children: React.ReactNode;
   userSession: User | null;
-  customerProfile: CustomerProfile | null;
-  brandProfile: BrandProfile | null;
+  customerProfile: CustomerProfile | null | undefined;
+  brandProfile: BrandProfile | null | undefined;
 }) => {
   return userSession?.user_metadata.role_id === 2 ? (
     <customerProfileContext.Provider value={customerProfile}>

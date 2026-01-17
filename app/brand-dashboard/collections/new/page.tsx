@@ -29,19 +29,27 @@ import {
 } from "@/components/Shad-UI/card";
 import { Icons } from "@/components/Custom-UI/icons";
 import { ImageUpload } from "@/components/Custom-UI/Cards/ImageUpload";
-import { supabase } from "@/lib/supabase/client"; // Ensure you have a Supabase client instance
+import { supabase } from "@/lib/supabase/client";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { generateSlug } from "@/lib/utils";
 import { collectionFormSchema } from "@/lib/schemas";
+import { getCategories } from "@/lib/fetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 type CollectionFormValues = z.infer<typeof collectionFormSchema>;
 
 export default function CollectionForm() {
   const router = useTransitionRouter();
   const brandProfile = useBrandProfile();
-  const [loading, setLoading] = useState(false);
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
     null
+  );
+
+  const { data: categories } = useQuery(
+    getCategories().eq("brand_id", brandProfile?.id || ""),
+    {
+      enabled: !!brandProfile?.id,
+    }
   );
 
   const form = useForm<CollectionFormValues>({
@@ -49,16 +57,14 @@ export default function CollectionForm() {
     defaultValues: {
       name: "",
       description: "",
+      category_id: 0,
       display_image: "",
     },
   });
 
   async function onSubmit(data: CollectionFormValues) {
-    setLoading(true);
-
     if (!uploadedImageName) {
       toast.info("Please upload an image for the collection.");
-      setLoading(false);
       return;
     }
 
@@ -67,7 +73,7 @@ export default function CollectionForm() {
       let displayImageUrl = "";
       if (uploadedImageName) {
         const { data } = supabase.storage
-          .from(`collections/${brandProfile?.id}`) // Bucket name
+          .from(`collections/${brandProfile?.id}`)
           .getPublicUrl(uploadedImageName);
 
         displayImageUrl = data.publicUrl;
@@ -81,7 +87,10 @@ export default function CollectionForm() {
             name: data.name,
             slug: generateSlug(data.name),
             description: data.description,
+            category_id: data.category_id,
             display_image: displayImageUrl,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           },
         ])
         .select()
@@ -100,8 +109,6 @@ export default function CollectionForm() {
       );
     } catch {
       toast.error("Failed to create collection. Please try again.");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -110,9 +117,9 @@ export default function CollectionForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="px-0 pb-4 pt-0 text-center lg:text-left">
-            <CardTitle className="text-4xl">Add new Collection</CardTitle>
+            <CardTitle className="text-4xl">Add New Collection</CardTitle>
             <CardDescription className="text-lg">
-              Fill in the details to create a new collection
+              Create a new collection to organize and showcase your products
             </CardDescription>
           </CardHeader>
 
@@ -125,18 +132,20 @@ export default function CollectionForm() {
                   <FormLabel>Collection Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter collection name"
+                      placeholder="e.g., Summer 2024, Premium Series, Best Sellers"
                       {...field}
-                      disabled={loading}
+                      disabled={form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the name that will be displayed for your collection.
+                    Choose a descriptive name that represents this collection.
+                    This will be displayed to customers.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="description"
@@ -145,19 +154,57 @@ export default function CollectionForm() {
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Enter collection description"
-                      className="resize-none xl:text-base"
+                      placeholder="Describe what makes this collection special, the theme, or the type of products it contains..."
+                      className="resize-none min-h-24 xl:text-base"
                       {...field}
-                      disabled={loading}
+                      disabled={form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormDescription>
-                    Provide a brief description of your collection.
+                    Provide a compelling description that helps customers
+                    understand what this collection offers (optional but
+                    recommended).
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <select
+                      className="flex h-10 w-full bg-transparent rounded-md border border-neutral-600 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={field.value}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value) || 0)
+                      }
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                      disabled={form.formState.isSubmitting}
+                    >
+                      <option value={0}>Select a category</option>
+                      {categories &&
+                        categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </select>
+                  </FormControl>
+                  <FormDescription>
+                    Choose the category that best fits this collection.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormItem>
               <FormLabel>Display Image</FormLabel>
               <ImageUpload
@@ -167,10 +214,11 @@ export default function CollectionForm() {
                 maxFileSize={5 * 1000 * 1000} // 5 MB
                 onUploadSuccess={(imageNames) =>
                   setUploadedImageName(imageNames[0])
-                } // Capture the uploaded images names
+                }
               />
               <FormDescription>
-                Upload an image for the collection&apos;s display.
+                Upload a banner or hero image for this collection. Recommended
+                size: 1200x600px or larger. Max file size: 5MB.
               </FormDescription>
             </FormItem>
           </CardContent>
@@ -178,16 +226,16 @@ export default function CollectionForm() {
           <CardFooter className="flex justify-center lg:justify-start px-0">
             <Button
               type="submit"
-              disabled={loading}
+              disabled={form.formState.isSubmitting}
               className="w-full md:w-1/2 text-lg"
             >
-              {loading ? (
+              {form.formState.isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <Icons.spinner className="animate-spin" />
-                  Adding
+                  Creating Collection
                 </span>
               ) : (
-                "Add Collection"
+                "Create Collection"
               )}
             </Button>
           </CardFooter>

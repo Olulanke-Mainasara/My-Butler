@@ -33,6 +33,7 @@ import { ChevronUp, LogIn, LogOut, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function AppSidebar() {
   const customerProfile = useCustomerProfile();
@@ -40,16 +41,23 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { theme } = useTheme();
   const { toggleSidebar } = useSidebar();
+  const queryClient = useQueryClient();
 
   const handleSignout = async () => {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
       console.error("Error signing out:", error.message);
-    } else {
-      toggleSidebar();
-      window.location.reload();
+      return;
     }
+
+    // 🔥 Clear all cached user data
+    queryClient.clear();
+
+    toggleSidebar();
+
+    // Optional but recommended for App Router
+    router.replace("/auth/login");
   };
 
   return (
@@ -133,7 +141,10 @@ export function AppSidebar() {
                   side="top"
                   className="w-[--radix-popper-anchor-width]"
                 >
-                  <DropdownMenuItem onClick={handleSignout}>
+                  <DropdownMenuItem
+                    onClick={handleSignout}
+                    className="cursor-pointer"
+                  >
                     <span className="flex gap-1 items-center">
                       <LogOut /> Sign out
                     </span>

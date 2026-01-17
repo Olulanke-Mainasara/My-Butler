@@ -1,51 +1,54 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Calendar } from "lucide-react";
 import { Badge } from "@/components/Shad-UI/badge";
 import { toast } from "sonner";
 import { useTransitionRouter } from "next-view-transitions";
-import { Collection } from "@/types/Collection";
-import { Product } from "@/types/Product";
-import { fetchCollection, fetchProducts } from "@/lib/DatabaseFetches";
-import BrandLoadingSkeleton from "@/components/Custom-UI/Skeletons/BrandLoadingSkeleton";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { getCollection, getProducts } from "@/lib/fetches";
 import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import { getItemId } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { Icons } from "@/components/Custom-UI/icons";
 
 export default function CollectionPage() {
-  const [collection, setCollection] = useState<Collection | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
   const pathname = usePathname();
-
   const collectionId = getItemId(pathname.split("/").pop() || "");
   const router = useTransitionRouter();
 
-  useEffect(() => {
-    if (!collectionId) {
-      toast.error("Collection ID is missing in the URL.");
-      router.push("/collections");
-      return;
+  const { data: collection, isError: collectionError } = useQuery(
+    getCollection(collectionId || ""),
+    {
+      enabled: !!collectionId,
     }
+  );
 
-    const fetchPageData = async () => {
-      const [products, collection] = await Promise.all([
-        fetchProducts({
-          filters: { collection_id: collectionId ?? "" },
-        }),
-        fetchCollection(collectionId),
-      ]);
+  const { data: products, isError: productsError } = useQuery(
+    getProducts().eq("collection_id", collectionId || ""),
+    {
+      enabled: !!collectionId,
+    }
+  );
 
-      setProducts(Array.isArray(products) ? products : []);
-      setCollection(collection);
-    };
+  if (!collectionId) {
+    toast.error("Collection ID is missing.");
+    router.push("/collections");
+    return;
+  }
 
-    fetchPageData();
-  }, [collectionId, router]);
+  if (!collection || !products) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Icons.spinner className="w-6 h-6 animate-spin" /> Loading
+      </div>
+    );
+  }
 
-  if (!collection) {
-    return <BrandLoadingSkeleton />;
+  if (collectionError || productsError) {
+    toast.error("Failed to load collection");
+    router.push("/collections");
+    return;
   }
 
   return (
@@ -61,11 +64,11 @@ export default function CollectionPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20" />
         <div className="absolute inset-0 flex items-center">
           <div className="px-4 md:px-5">
-            <div className={`text-white transition-all duration-1000`}>
-              <Badge className="mb-4 bg-white/20 text-white border-white/30">
-                {collection.category}
+            <div className={`text-white`}>
+              <Badge className="mb-2 bg-white/20 text-white border-white/30">
+                {collection.category_id}
               </Badge>
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
                 {collection.name}
               </h1>
             </div>
@@ -92,7 +95,7 @@ export default function CollectionPage() {
 
             {/* Products Grid */}
             <div className="grid md:grid-cols-2 gap-4 md:gap-5">
-              {products.map((product) => (
+              {products?.map((product) => (
                 <ProductCard item={product} key={product.id} />
               ))}
             </div>

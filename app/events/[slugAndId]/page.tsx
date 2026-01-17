@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import {
   Calendar,
@@ -18,25 +18,43 @@ import { usePathname } from "next/navigation";
 import { getItemId } from "@/lib/utils";
 import { useTransitionRouter } from "next-view-transitions";
 import { toast } from "sonner";
-import { fetchEvent } from "@/lib/DatabaseFetches";
-import { Event } from "@/types/Event";
+import { getEvent } from "@/lib/fetches";
 import { Icons } from "@/components/Custom-UI/icons";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
-import { useBookmarks } from "@/components/Providers/AllProviders";
-import BookmarkTrigger from "@/components/Custom-UI/Buttons/BookmarkTrigger";
+import AddToBookmarks from "@/components/Custom-UI/Buttons/AddToBookmarks";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 // Mock data - replace with actual data fetching
 
 export default function EventPage() {
   const pathname = usePathname();
-  const [event, setEvent] = useState<Event | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-
   const eventId = getItemId(pathname.split("/").pop() || "");
-  const customerProfile = useCustomerProfile();
-  const bookmarks = useBookmarks();
   const router = useTransitionRouter();
+
+  const { data: event, isError } = useQuery(getEvent(eventId || ""), {
+    enabled: !!eventId,
+  });
+
+  if (!eventId) {
+    toast.error("Event ID is missing.");
+    router.push("/events");
+    return;
+  }
+
+  if (!event) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Icons.spinner className="w-6 h-6 animate-spin" /> Loading
+      </div>
+    );
+  }
+
+  if (isError) {
+    toast.error("Failed to load event");
+    router.push("/events");
+    return;
+  }
 
   const handleRegister = async () => {
     setIsRegistering(true);
@@ -45,30 +63,6 @@ export default function EventPage() {
     setIsRegistered(true);
     setIsRegistering(false);
   };
-
-  useEffect(() => {
-    if (!eventId) {
-      toast.error("Event ID is missing in the URL.");
-      router.push("/events");
-      return;
-    }
-
-    const fetchPageData = async () => {
-      const [Event] = await Promise.all([fetchEvent(eventId)]);
-
-      setEvent(Event);
-    };
-
-    fetchPageData();
-  }, [eventId, router]);
-
-  if (!event) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        Loading...
-      </div>
-    );
-  }
 
   const startDate = new Date(event.start_date || "");
   const endDate = new Date(event.end_date || "");
@@ -81,7 +75,7 @@ export default function EventPage() {
           src={event.display_image || "/placeholder.svg"}
           alt={event.title}
           fill
-          className="object-cover transition-transform duration-[10s] hover:scale-105"
+          className="object-cover transition-transform duration-500 hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black to-black/70" />
         <div className="absolute inset-0 flex items-center">
@@ -106,7 +100,7 @@ export default function EventPage() {
                 </Badge>
               </div>
 
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
                 {event.title}
               </h1>
 
@@ -135,12 +129,7 @@ export default function EventPage() {
                   <Share2 className="w-5 h-5" />
                 </Button>
 
-                <BookmarkTrigger
-                  customerProfile={customerProfile}
-                  item={event}
-                  bookmarks={bookmarks}
-                  targetType="event"
-                />
+                <AddToBookmarks item={event} targetType="event" />
               </div>
             </div>
           </div>
@@ -156,7 +145,6 @@ export default function EventPage() {
               {
                 icon: Calendar,
                 title: "Date & Time",
-                subtitle: "Event Schedule",
                 content: startDate.toLocaleDateString("en-US", {
                   weekday: "long",
                   year: "numeric",
@@ -176,16 +164,20 @@ export default function EventPage() {
               {
                 icon: MapPin,
                 title: "Location",
-                subtitle: "Event Venue",
                 content: event.location,
-                detail: "Parking available on-site",
+                detail: event.is_virtual
+                  ? "Limited to Google Meet"
+                  : event.parking_available
+                  ? "Parking available on-site"
+                  : "Limited parking available",
               },
               {
                 icon: Users,
                 title: "Capacity",
                 subtitle: "Expected Attendance",
                 content: `${event.capacity}+ attendees`,
-                detail: "First come, first served basis",
+                detail:
+                  event.registration_basis || "First come, first served basis",
               },
             ].map((item, index) => (
               <Card
@@ -193,18 +185,13 @@ export default function EventPage() {
                 className={`dark:bg-neutral-900`}
                 style={{ transitionDelay: `${800 + index * 200}ms` }}
               >
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-110`}
-                    >
-                      <item.icon className={`w-6 h-6`} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{item.title}</h3>
-                      <p className="text-sm text-neutral-600">
-                        {item.subtitle}
-                      </p>
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="flex items-center gap-2">
+                      <item.icon
+                        className={`w-6 h-6 transition-transform duration-300 hover:scale-110`}
+                      />
+                      <h3 className="font-semibold text-lg">{item.title}</h3>
                     </div>
                   </div>
                   <p className="font-medium">{item.content}</p>
@@ -230,13 +217,7 @@ export default function EventPage() {
                     What to Expect
                   </h3>
                   <ul className="space-y-3">
-                    {[
-                      "Live product demonstrations from leading audio brands",
-                      "Keynote presentations from industry experts",
-                      "Hands-on experience with unreleased products",
-                      "Networking opportunities with fellow enthusiasts",
-                      "Exclusive discounts on featured products",
-                    ].map((item, index) => (
+                    {event.what_to_expect?.map((item, index) => (
                       <li
                         key={index}
                         className={`flex items-start gap-3 animate-in slide-in-from-left duration-500`}
@@ -252,10 +233,7 @@ export default function EventPage() {
                     Featured Speakers
                   </h3>
                   <p className="animate-in fade-in duration-700 delay-2700">
-                    Join renowned audio engineers, product designers, and
-                    technology innovators as they share insights into the future
-                    of wireless audio, spatial sound, and sustainable design
-                    practices.
+                    {event.featured_speakers_description}
                   </p>
                 </div>
               </div>
@@ -268,18 +246,38 @@ export default function EventPage() {
                   <h3 className="text-xl font-bold mb-4">Event Highlights</h3>
                   <div className="space-y-4">
                     {[
-                      { icon: Clock, text: "8 hours of content" },
-                      { icon: Users, text: "20+ exhibitors" },
-                      { icon: Ticket, text: "Free admission" },
-                    ].map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-3 transition-all duration-300 hover:scale-105 cursor-pointer"
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.text}</span>
-                      </div>
-                    ))}
+                      event.duration_hours && {
+                        icon: React.createElement(Clock, {
+                          className: "w-5 h-5",
+                        }),
+                        text: `${event.duration_hours} hours of content`,
+                      },
+                      event.exhibitor_count && {
+                        icon: React.createElement(Users, {
+                          className: "w-5 h-5",
+                        }),
+                        text: `${event.exhibitor_count}+ exhibitors`,
+                      },
+                      {
+                        icon: React.createElement(Ticket, {
+                          className: "w-5 h-5",
+                        }),
+                        text:
+                          event.admission_price === 0 || !event.admission_price
+                            ? "Free admission"
+                            : `$${event.admission_price} admission`,
+                      },
+                    ]
+                      .filter((item) => item !== null && item !== 0)
+                      .map((item, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-3 transition-all duration-300 hover:scale-105 cursor-pointer"
+                        >
+                          {item.icon}
+                          <span>{item.text}</span>
+                        </div>
+                      ))}
                   </div>
                 </CardContent>
               </Card>

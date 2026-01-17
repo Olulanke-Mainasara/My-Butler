@@ -1,17 +1,18 @@
-import { streamText } from "ai";
-import { myProvider } from "@/lib/ai/provider";
-
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
-
+import { convertToModelMessages, streamText, UIMessage } from "ai";
+import { google } from "@ai-sdk/google";
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  try {
+    const { messages }: { messages: UIMessage[] } = await req.json();
 
-  const result = streamText({
-    model: myProvider.languageModel("chat-model"),
-    system: "You are a helpful assistant.",
-    messages,
-  });
+    const result = streamText({
+      model: google("gemini-2.5-flash"),
+      system: "You are a helpful assistant.",
+      messages: convertToModelMessages(messages),
+    });
 
-  return result.toDataStreamResponse();
+    return result.toUIMessageStreamResponse();
+  } catch (error) {
+    console.error("Chat API error:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
 }

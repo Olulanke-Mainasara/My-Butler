@@ -1,34 +1,15 @@
 "use client";
 
 import { Calendar } from "@/components/Shad-UI/calendar";
-import { fetchEvents } from "@/lib/DatabaseFetches";
+import { getEvents } from "@/lib/fetches";
 import { convertRawDateToReadableDate } from "@/lib/utils";
-import { Event } from "@/types/Event";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React from "react";
 const CalendarPage = () => {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [events, setEvents] = React.useState<Event[] | null>(null);
-  const hasRendered = React.useRef(false);
 
-  useEffect(() => {
-    const fetchPageData = async () => {
-      const [events] = await Promise.all([
-        fetchEvents({
-          filters: { start_date: date ? date.toLocaleString() : "" },
-        }),
-      ]);
-
-      setEvents(Array.isArray(events) ? events : []);
-    };
-
-    if (hasRendered.current) {
-      return;
-    }
-
-    hasRendered.current = true;
-    fetchPageData();
-  }, [date]);
+  const { data: events } = useQuery(getEvents());
 
   return (
     <div className="pt-16 md:pt-14 pb-4 xl:pb-5 flex flex-col md:flex-row md:gap-x-5 gap-y-4 justify-start grow px-4 xl:px-5 h-full">

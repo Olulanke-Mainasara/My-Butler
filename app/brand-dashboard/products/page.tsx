@@ -3,32 +3,21 @@
 import { Button } from "@/components/Shad-UI/button";
 import { PlusCircle } from "lucide-react";
 import { Link } from "next-view-transitions";
-import { useEffect, useState } from "react";
-import { Product } from "@/types/Product";
 import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
-import { fetchProducts } from "@/lib/DatabaseFetches";
+import { getProducts } from "@/lib/fetches";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 export default function Products() {
-  const [products, setProducts] = useState<Product[] | null>(null);
   const brandProfile = useBrandProfile();
 
-  useEffect(() => {
-    if (!brandProfile) {
-      return;
+  const { data: products } = useQuery(
+    getProducts().eq("brand_id", brandProfile?.id || ""),
+    {
+      enabled: !!brandProfile?.id,
     }
-
-    const fetchPageData = async () => {
-      const [products] = await Promise.all([
-        fetchProducts({ filters: { brand_id: brandProfile?.id ?? "" } }),
-      ]);
-
-      setProducts(Array.isArray(products) ? products : []);
-    };
-
-    fetchPageData();
-  }, [brandProfile]);
+  );
 
   return (
     <div className="flex flex-col gap-4">

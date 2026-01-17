@@ -6,17 +6,16 @@ import { Button } from "@/components/Shad-UI/button";
 import {
   BookCopy,
   ImageIcon,
-  LogOut,
   Newspaper,
   PartyPopper,
   Pencil,
+  Settings,
   ShoppingBag,
   User,
 } from "lucide-react";
-import Image from "next/image";
 import { Link } from "next-view-transitions";
+import Image from "next/image";
 import React from "react";
-import { supabase } from "@/lib/supabase/client";
 
 const SidebarNavItems = [
   {
@@ -49,20 +48,16 @@ const SidebarNavItems = [
     title: "Gallery",
     icon: <ImageIcon />,
   },
+  {
+    id: 6,
+    href: "/settings",
+    title: "Settings",
+    icon: <Settings />,
+  },
 ];
 
 const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
   const customerProfile = useCustomerProfile();
-
-  const handleSignout = async () => {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      console.error("Error signing out:", error.message);
-    } else {
-      window.location.reload();
-    }
-  };
 
   return (
     <div className="px-4 xl:px-3 pt-16 pb-4 xl:pb-5 h-screen overflow-y-scroll flex flex-col gap-6">
@@ -110,16 +105,6 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
               <Pencil />
               Edit Profile
             </Link>
-          </Button>
-
-          <Button
-            onClick={handleSignout}
-            variant="outline"
-            className="w-full md:w-fit"
-          >
-            <span className="flex gap-1 items-center">
-              <LogOut /> Sign out
-            </span>
           </Button>
         </div>
       </div>

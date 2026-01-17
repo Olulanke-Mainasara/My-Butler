@@ -4,28 +4,21 @@ import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import BrandCard from "@/components/Custom-UI/Cards/BrandCard";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { Brand } from "@/types/Brand";
-import { Factory } from "lucide-react";
-import React, { useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";
-import { fetchBrands } from "@/lib/DatabaseFetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { getBrands } from "@/lib/fetches";
 
 const Brands = () => {
-  const [brands, setBrands] = React.useState<Brand[] | null>();
-  const [searchResult, setSearchResult] = React.useState<Brand[]>([]);
+  const [searchResult, setSearchResult] = useState<Brand[]>([]);
   const router = useRouter();
+
+  const { data: brands } = useQuery(getBrands());
 
   const handleSearchResult = (result: unknown[]) => {
     setSearchResult(result as Brand[]);
   };
-
-  useEffect(() => {
-    const onPageLoad = async () => {
-      const brands = await fetchBrands();
-      setBrands(Array.isArray(brands) ? brands : []);
-    };
-    onPageLoad();
-  }, []);
 
   return (
     <div className="pt-16 md:pt-14 flex flex-col h-full gap-4 md:gap-5">
@@ -60,27 +53,18 @@ const Brands = () => {
         </div>
       ) : (
         <section className="px-4 md:px-5 h-full">
-          {!brands ? (
+          {!brands || brands.length === 0 ? (
             <LoadingSkeleton
               length={5}
               className="grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5"
             />
           ) : (
             <section className="pb-4 h-full overflow-y-scroll">
-              {brands.length === 0 ? (
-                <div className="text-center py-20 border rounded-lg text-xl flex justify-center items-center gap-2">
-                  <span className="text-brandLight dark:text-brandDark">
-                    <Factory />
-                  </span>
-                  <p>No brands found.</p>
-                </div>
-              ) : (
-                <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {brands.map((brand) => (
-                    <BrandCard key={brand.id} item={brand} />
-                  ))}
-                </section>
-              )}
+              <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {brands.map((brand) => (
+                  <BrandCard key={brand.id} item={brand} />
+                ))}
+              </section>
             </section>
           )}
         </section>

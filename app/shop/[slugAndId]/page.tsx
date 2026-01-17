@@ -3,14 +3,12 @@
 import Image from "next/image";
 import {
   Star,
-  ShoppingCart,
   Truck,
   Shield,
   RotateCcw,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "@/components/Shad-UI/button";
 import { Badge } from "@/components/Shad-UI/badge";
 import {
   Tabs,
@@ -18,59 +16,46 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/Shad-UI/tabs";
-import { fetchProduct } from "@/lib/DatabaseFetches";
-import { useEffect, useState } from "react";
-import { Product } from "@/types/Product";
-import BookmarkTrigger from "@/components/Custom-UI/Buttons/BookmarkTrigger";
+import React, { useState } from "react";
+import AddToBookmarks from "@/components/Custom-UI/Buttons/AddToBookmarks";
 import { usePathname } from "next/navigation";
-import { useCustomerProfile } from "@/components/Providers/UserProvider";
-import { useBookmarks } from "@/components/Providers/AllProviders";
-import { Icons } from "@/components/Custom-UI/icons";
 import { getItemId } from "@/lib/utils";
 import { toast } from "sonner";
 import { useTransitionRouter } from "next-view-transitions";
+import AddToCart from "@/components/Custom-UI/Buttons/AddToCart";
+import { getProduct } from "@/lib/fetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { Icons } from "@/components/Custom-UI/icons";
 
 export default function ProductPage() {
   const pathname = usePathname();
-  const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const customerProfile = useCustomerProfile();
-  const bookmarks = useBookmarks();
-
   const productId = getItemId(pathname.split("/").pop() || "");
   const router = useTransitionRouter();
 
-  const handleAddToCart = async () => {
-    setIsAddingToCart(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsAddingToCart(false);
-  };
+  const { data: product, isError } = useQuery(getProduct(productId || ""), {
+    enabled: !!productId,
+  });
 
-  useEffect(() => {
-    if (!productId) {
-      toast.error("Collection ID is missing in the URL.");
-      router.push("/collections");
-      return;
-    }
-
-    const fetchPageData = async () => {
-      const [Product] = await Promise.all([fetchProduct(productId)]);
-
-      setProduct(Product);
-    };
-
-    fetchPageData();
-  }, [productId, router]);
+  if (!productId) {
+    toast.error("Product ID is missing.");
+    router.push("/shop");
+    return;
+  }
 
   if (!product) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        Loading...
+        <Icons.spinner className="w-6 h-6 animate-spin" /> Loading
       </div>
     );
+  }
+
+  if (isError) {
+    toast.error("Failed to load product");
+    router.push("/shop");
+    return;
   }
 
   return (
@@ -229,35 +214,40 @@ export default function ProductPage() {
 
           {/* Action Buttons */}
           <div className="flex gap-3 items-center">
-            <Button onClick={handleAddToCart} disabled={isAddingToCart}>
-              {isAddingToCart ? (
-                <Icons.spinner className="animate-spin w-5 h-5" />
-              ) : (
-                <ShoppingCart className="w-5 h-5" />
-              )}
-              {isAddingToCart ? "Adding" : "Add to Cart"}
-            </Button>
-            <BookmarkTrigger
-              customerProfile={customerProfile}
+            <AddToCart
               item={product}
-              bookmarks={bookmarks}
-              targetType={"product"}
+              quantity={quantity}
+              itemType={"product"}
             />
+            <AddToBookmarks item={product} targetType={"product"} />
           </div>
         </div>
 
         {/* Trust Badges */}
         <div className="flex items-center gap-6 pt-4 border-t">
           {[
-            { icon: Truck, text: "Free shipping" },
-            { icon: Shield, text: "2-year warranty" },
-            { icon: RotateCcw, text: "30-day returns" },
-          ].map((item, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
-              <item.icon className="w-4 h-4" />
-              <span>{item.text}</span>
-            </div>
-          ))}
+            product.free_shipping && {
+              icon: React.createElement(Truck),
+              text: "Free shipping",
+            },
+            product.warranty_years &&
+              product.warranty_years > 0 && {
+                icon: React.createElement(Shield, { className: "w-4 h-4" }),
+                text: `${product.warranty_years}-year warranty`,
+              },
+            product.return_days &&
+              product.return_days > 0 && {
+                icon: React.createElement(RotateCcw, { className: "w-4 h-4" }),
+                text: `${product.return_days}-day returns`,
+              },
+          ]
+            .filter((item) => item !== null && item !== 0 && item !== false)
+            .map((item, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                {item.icon}
+                <span>{item.text}</span>
+              </div>
+            ))}
         </div>
 
         {/* Specifications */}

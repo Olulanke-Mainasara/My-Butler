@@ -10,12 +10,11 @@ import {
   LogOut,
   Newspaper,
   PartyPopper,
-  Pencil,
+  Settings,
   ShoppingBag,
   User,
 } from "lucide-react";
 import Image from "next/image";
-import { Link } from "next-view-transitions";
 import NextLink from "next/link";
 import React from "react";
 import BrandLoadingSkeleton from "@/components/Custom-UI/Skeletons/BrandLoadingSkeleton";
@@ -50,6 +49,12 @@ const SidebarNavItems = [
     href: "/brand-dashboard/events",
     title: "Events",
     icon: <PartyPopper />,
+  },
+  {
+    id: 6,
+    href: "/brand-dashboard/settings",
+    title: "Settings",
+    icon: <Settings />,
   },
 ];
 
@@ -93,7 +98,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <p className="opacity-70">{brandProfile?.email}</p>
               </div>
             </div>
-            <div className="md:flex">
+            <div className="md:flex items-center">
               <div className="p-2 xl:px-6 border-l border-l-neutral-500">
                 <p>{brandProfile?.description}</p>
               </div>
@@ -114,13 +119,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         )}
 
         <div className="flex gap-4">
-          <Button asChild variant="outline" className="w-full md:w-fit">
-            <Link href={"/brand-dashboard/settings"}>
-              <Pencil />
-              Edit Profile
-            </Link>
-          </Button>
-
           <Button
             onClick={handleSignout}
             variant="outline"

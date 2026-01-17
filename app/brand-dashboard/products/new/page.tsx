@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTransitionRouter } from "next-view-transitions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,25 +28,37 @@ import {
   CardTitle,
 } from "@/components/Shad-UI/card";
 import { ImageUpload } from "@/components/Custom-UI/Cards/ImageUpload";
-import { supabase } from "@/lib/supabase/client"; // Ensure you have a Supabase client instance
+import { Checkbox } from "@/components/Shad-UI/checkbox";
+import { supabase } from "@/lib/supabase/client";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { generateSlug } from "@/lib/utils";
 import { FeaturesInput } from "./features-input";
 import { SpecificationsInput } from "./specifications-input";
 import { Icons } from "@/components/Custom-UI/icons";
 import { productFormSchema } from "@/lib/schemas";
+import { getCategories, getCollections } from "@/lib/fetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 type CollectionFormValues = z.infer<typeof productFormSchema>;
 
-export default function CollectionForm() {
+export default function ProductForm() {
   const router = useTransitionRouter();
   const brandProfile = useBrandProfile();
-  const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<
-    { id: number; name: string }[] | null
-  >(null);
   const [uploadedImageNames, setUploadedImageNames] = useState<string[] | null>(
     null
+  );
+
+  const { data: categories } = useQuery(
+    getCategories().eq("brand_id", brandProfile?.id || ""),
+    {
+      enabled: !!brandProfile?.id,
+    }
+  );
+  const { data: collections } = useQuery(
+    getCollections().eq("brand_id", brandProfile?.id || ""),
+    {
+      enabled: !!brandProfile?.id,
+    }
   );
 
   const form = useForm<CollectionFormValues>({
@@ -57,18 +69,19 @@ export default function CollectionForm() {
       price: 0,
       stock_quantity: 0,
       category_id: 0,
+      collection_id: "",
       features: [],
       specifications: {},
+      free_shipping: false,
+      warranty_years: 0,
+      return_days: 0,
     },
   });
 
   // Function to handle form submission
   async function onSubmit(data: CollectionFormValues) {
-    setLoading(true);
-
     if (!uploadedImageNames) {
-      toast.error("Please upload an image for the collection.");
-      setLoading(false);
+      toast.error("Please upload an image for the product.");
       return;
     }
 
@@ -94,8 +107,12 @@ export default function CollectionForm() {
             price: data.price,
             stock_quantity: data.stock_quantity,
             category_id: data.category_id,
+            collection_id: data.collection_id || null,
             features: data.features,
             specifications: data.specifications,
+            free_shipping: data.free_shipping,
+            warranty_years: data.warranty_years,
+            return_days: data.return_days,
           },
         ])
         .select();
@@ -105,40 +122,12 @@ export default function CollectionForm() {
         return;
       }
 
-      toast.success("product added successfully!");
+      toast.success("Product added successfully!");
       router.push(`/brand-dashboard/products`);
     } catch {
-      toast.error("Failed to create collection. Please try again.");
-    } finally {
-      setLoading(false);
+      toast.error("Failed to create product. Please try again.");
     }
   }
-
-  useEffect(() => {
-    // Fetch categories from the database
-    const fetchCategories = async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("id, name");
-
-      if (error) {
-        toast.error("Failed to fetch categories.");
-        return;
-      }
-
-      setCategories(data);
-    };
-
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      console.log("Form updated:", name, value, type);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form]);
 
   return (
     <Card className="bg-transparent dark:bg-transparent border-none xl:max-w-screen-sm">
@@ -162,7 +151,7 @@ export default function CollectionForm() {
                     <Input
                       placeholder="Enter product name"
                       {...field}
-                      disabled={loading}
+                      disabled={form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -181,7 +170,7 @@ export default function CollectionForm() {
                       placeholder="Enter product description"
                       className="min-h-32 xl:text-base"
                       {...field}
-                      disabled={loading}
+                      disabled={form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -201,7 +190,7 @@ export default function CollectionForm() {
                 maxFileSize={5 * 1000 * 1000} // 5 MB
                 onUploadSuccess={(imageNames) =>
                   setUploadedImageNames(imageNames)
-                } // Capture the uploaded images names
+                }
               />
             </FormItem>
 
@@ -219,7 +208,7 @@ export default function CollectionForm() {
                         step={0.01}
                         placeholder="0.00"
                         {...field}
-                        disabled={loading}
+                        disabled={form.formState.isSubmitting}
                       />
                     </FormControl>
                     <FormMessage />
@@ -240,7 +229,7 @@ export default function CollectionForm() {
                         step={1}
                         placeholder="0"
                         {...field}
-                        disabled={loading}
+                        disabled={form.formState.isSubmitting}
                       />
                     </FormControl>
                     <FormMessage />
@@ -248,6 +237,58 @@ export default function CollectionForm() {
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <select
+                      className="flex h-10 w-full bg-transparent rounded-md border border-neutral-600 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      {...field}
+                      disabled={form.formState.isSubmitting}
+                    >
+                      <option value={0}>Select a category</option>
+                      {categories &&
+                        categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="collection_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Collection</FormLabel>
+                  <FormControl>
+                    <select
+                      className="flex h-10 w-full bg-transparent rounded-md border border-neutral-600 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      {...field}
+                      disabled={form.formState.isSubmitting}
+                    >
+                      <option value={0}>Select a category</option>
+                      {collections &&
+                        collections.map((collection) => (
+                          <option key={collection.id} value={collection.id}>
+                            {collection.name}
+                          </option>
+                        ))}
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -264,32 +305,6 @@ export default function CollectionForm() {
                   <FormDescription>
                     Add key features of the product.
                   </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="category_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <select
-                      className="flex h-10 w-full bg-transparent rounded-md border border-neutral-600 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      {...field}
-                      disabled={loading}
-                    >
-                      <option value={0}>Select a category</option>
-                      {categories &&
-                        categories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
-                          </option>
-                        ))}
-                    </select>
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -314,15 +329,98 @@ export default function CollectionForm() {
                 </FormItem>
               )}
             />
+
+            {/* Trust Badge Section */}
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="text-lg font-semibold">Trust Badges & Policies</h3>
+
+              <FormField
+                control={form.control}
+                name="free_shipping"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={form.formState.isSubmitting}
+                      />
+                    </FormControl>
+                    <FormLabel className="!mt-0">
+                      Free Shipping Available
+                    </FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="warranty_years"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Warranty (years)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          step={1}
+                          placeholder="0"
+                          {...field}
+                          value={field.value ?? 0}
+                          onChange={(e) =>
+                            field.onChange(parseInt(e.target.value) || 0)
+                          }
+                          disabled={form.formState.isSubmitting}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Warranty duration (0 for no warranty)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="return_days"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Return Policy (days)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          step={1}
+                          placeholder="0"
+                          {...field}
+                          value={field.value ?? 0}
+                          onChange={(e) =>
+                            field.onChange(parseInt(e.target.value) || 0)
+                          }
+                          disabled={form.formState.isSubmitting}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Return window (0 for no returns)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
           </CardContent>
 
           <CardFooter className="flex justify-center lg:justify-start px-0">
             <Button
               type="submit"
-              disabled={loading}
+              disabled={form.formState.isSubmitting}
               className="w-full md:w-1/2 text-lg"
             >
-              {loading ? (
+              {form.formState.isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <Icons.spinner className="animate-spin" />
                   Adding

@@ -36,7 +36,7 @@ export default function CollectionCard({
           width={500}
           height={300}
           className={`w-full object-cover ${
-            form === "carousel" ? "h-full" : ""
+            form === "carousel" ? "h-full" : "max-h-44"
           }`}
         />
       </Link>
@@ -48,9 +48,11 @@ export default function CollectionCard({
             : ""
         }`}
       >
-        <CardTitle className="md:text-xl">{item.name}</CardTitle>
+        <CardTitle className="md:text-xl truncate">{item.name}</CardTitle>
 
-        <CardDescription className={`${form === "carousel" ? "max-w-xs" : ""}`}>
+        <CardDescription
+          className={`${form === "carousel" ? "max-w-xs" : ""} truncate`}
+        >
           {item.description ?? "No description provided."}
         </CardDescription>
 

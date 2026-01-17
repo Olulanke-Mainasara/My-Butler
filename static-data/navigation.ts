@@ -24,7 +24,7 @@ export const groupedNavigation = [
     links: [
       {
         id: "1-1",
-        url: "/?splashed=true",
+        url: "/",
         icon: React.createElement(Home),
         title: "Home",
       },
@@ -33,12 +33,6 @@ export const groupedNavigation = [
         url: "/butler",
         icon: React.createElement(Stars),
         title: "Butler A.I",
-      },
-      {
-        id: "1-3",
-        url: "/combine",
-        icon: React.createElement(GiPaintBucket),
-        title: "Outfit Creator",
       },
       {
         id: "1-4",

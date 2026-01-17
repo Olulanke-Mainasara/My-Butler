@@ -9,63 +9,44 @@
 // } from "@/components/Shad-UI/card";
 // import { Overview } from "./overview";
 // import { RecentSales } from "./resent-sales";
-import { useEffect, useState } from "react";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Link } from "next-view-transitions";
 import { Button } from "@/components/Shad-UI/button";
 import {
-  fetchArticles,
-  fetchCollections,
-  fetchEvents,
-  fetchProducts,
-} from "@/lib/DatabaseFetches";
+  getArticlesCount,
+  getCollectionsCount,
+  getEventsCount,
+  getProductsCount,
+} from "@/lib/fetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 export default function DashboardPage() {
   const brandProfile = useBrandProfile();
-  const [productNumbers, setProductNumbers] = useState(0);
-  const [collectionNumbers, setCollectionNumbers] = useState(0);
-  const [articleNumbers, setArticleNumbers] = useState(0);
-  const [eventNumbers, setEventNumbers] = useState(0);
 
-  useEffect(() => {
-    if (!brandProfile) {
-      return;
+  const { count: productNumbers } = useQuery(
+    getProductsCount().eq("brand_id", brandProfile?.id || ""),
+    {
+      enabled: !!brandProfile?.id,
     }
-
-    const fetchPageData = async () => {
-      const [products, collections, articles, events] = await Promise.all([
-        fetchProducts({
-          filters: { brand_id: brandProfile?.id ?? "" },
-          countOnly: true,
-        }),
-        fetchCollections({
-          filters: { brand_id: brandProfile?.id ?? "" },
-          countOnly: true,
-        }),
-        fetchArticles({
-          filters: { brand_id: brandProfile?.id ?? "" },
-          countOnly: true,
-        }),
-        fetchEvents({
-          filters: { brand_id: brandProfile?.id ?? "" },
-          countOnly: true,
-        }),
-      ]);
-
-      setProductNumbers(
-        Array.isArray(products) ? products.length : products ?? 0
-      );
-      setCollectionNumbers(
-        Array.isArray(collections) ? collections.length : collections ?? 0
-      );
-      setArticleNumbers(
-        Array.isArray(articles) ? articles.length : articles ?? 0
-      );
-      setEventNumbers(Array.isArray(events) ? events.length : events ?? 0);
-    };
-
-    fetchPageData();
-  }, [brandProfile]);
+  );
+  const { count: collectionNumbers } = useQuery(
+    getCollectionsCount().eq("brand_id", brandProfile?.id || ""),
+    {
+      enabled: !!brandProfile?.id,
+    }
+  );
+  const { count: articleNumbers } = useQuery(
+    getArticlesCount().eq("brand_id", brandProfile?.id || ""),
+    {
+      enabled: !!brandProfile?.id,
+    }
+  );
+  const { count: eventNumbers } = useQuery(
+    getEventsCount().eq("brand_id", brandProfile?.id || ""),
+    {
+      enabled: !!brandProfile?.id,
+    }
+  );
 
   return (
     <>

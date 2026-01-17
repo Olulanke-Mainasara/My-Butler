@@ -5,30 +5,24 @@ import React, { Suspense } from "react";
 import NormalCarousel from "@/components/Custom-UI/Carousel/NormalCarousel";
 import CarouselWithSubCarousel from "@/components/Custom-UI/Carousel/CarouselWithSubCarousel";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
-import CartDrawerTrigger from "@/components/Custom-UI/Buttons/CartDrawerTrigger";
 import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrigger";
 import CollectionCard from "@/components/Custom-UI/Cards/CollectionCard";
 import { Collection } from "@/types/Collection";
-import { Brand } from "@/types/Brand";
-import { Category } from "@/types/Category";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  fetchCollections,
-  fetchBrands,
-  fetchCategories,
-} from "@/lib/DatabaseFetches";
+import { getCollections, getBrands, getCategories } from "@/lib/fetches";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { Button } from "@/components/Shad-UI/button";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 const Collections = () => {
-  const [collections, setCollections] = React.useState<Collection[]>([]);
-  const [brands, setBrands] = React.useState<Brand[]>([]);
-  const [categories, setCategories] = React.useState<Category[]>([]);
   const [filterResult, setFilterResult] = React.useState<Collection[]>([]);
   const [searchResult, setSearchResult] = React.useState<Collection[]>([]);
   const router = useRouter();
-  const hasRendered = React.useRef(false);
+
+  const { data: collections } = useQuery(getCollections());
+  const { data: brands } = useQuery(getBrands());
+  const { data: categories } = useQuery(getCategories());
 
   const handleFilterResult = (result: unknown[]) => {
     setFilterResult(result as Collection[]);
@@ -37,28 +31,6 @@ const Collections = () => {
   const handleSearchResult = (result: unknown[]) => {
     setSearchResult(result as Collection[]);
   };
-
-  const fetchPageData = async () => {
-    const [Collections, Brands, Categories] = await Promise.all([
-      fetchCollections(),
-      fetchBrands(),
-      fetchCategories(),
-    ]);
-
-    setCollections(Array.isArray(Collections) ? Collections : []);
-    setBrands(Array.isArray(Brands) ? Brands : []);
-    setCategories(Categories || []);
-  };
-
-  React.useEffect(() => {
-    if (hasRendered.current) {
-      return;
-    }
-
-    hasRendered.current = true;
-    fetchPageData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="mt-[76px] md:mt-6 pb-5 space-y-7 xl:space-y-0">
@@ -70,12 +42,11 @@ const Collections = () => {
             handleSearchResult={handleSearchResult}
           />
           <div className="flex items-center gap-4">
-            <CartDrawerTrigger />
             <Suspense>
               {searchResult.length > 0 ? null : (
                 <FilterDrawerTrigger
                   optionCollection={{
-                    category: categories,
+                    category: categories ?? [],
                   }}
                   table="collections"
                   handleFilterResult={handleFilterResult}
@@ -155,13 +126,13 @@ const Collections = () => {
           </section>
 
           <section className="space-y-10 xl:pt-10">
-            <CarouselWithSlideTracker items={collections}>
+            <CarouselWithSlideTracker items={collections ?? []}>
               <CollectionCard />
             </CarouselWithSlideTracker>
 
             <section className="space-y-4 px-4 xl:px-5 pt-5">
               <p className="text-3xl md:text-4xl">New &amp; Hot arrivals</p>
-              <NormalCarousel items={collections}>
+              <NormalCarousel items={collections ?? []}>
                 <CollectionCard />
               </NormalCarousel>
             </section>
@@ -169,8 +140,8 @@ const Collections = () => {
             <section className="space-y-4 px-4 xl:px-5">
               <p className="text-3xl md:text-4xl">Recommended for you</p>
               <CarouselWithSubCarousel
-                items={collections}
-                subItems={categories}
+                items={collections ?? []}
+                subItems={categories ?? []}
               >
                 <CollectionCard />
               </CarouselWithSubCarousel>
@@ -222,7 +193,7 @@ const Collections = () => {
 
             <section className="space-y-4 px-4 xl:px-5">
               <p className="text-3xl md:text-4xl">Trendy &amp; Featured</p>
-              <NormalCarousel items={collections}>
+              <NormalCarousel items={collections ?? []}>
                 <CollectionCard />
               </NormalCarousel>
             </section>
@@ -230,8 +201,8 @@ const Collections = () => {
             <section className="space-y-4 px-4 xl:px-5">
               <p className="text-3xl md:text-4xl">Brands and Collections</p>
               <CarouselWithSubCarousel
-                items={collections}
-                subItems={brands.map(({ name, profile_picture }) => ({
+                items={collections ?? []}
+                subItems={(brands ?? []).map(({ name, profile_picture }) => ({
                   name,
                   profile_picture: profile_picture ?? undefined,
                 }))}

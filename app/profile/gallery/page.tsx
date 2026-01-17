@@ -1,5 +1,4 @@
 "use client";
-
 import { Dialog, DialogContent } from "@/components/Shad-UI/dialog";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { LoginPlaceholder } from "@/components/Custom-UI/Placeholders/LoginPlaceholder";
@@ -7,76 +6,78 @@ import { GalleryPlaceholder } from "@/components/Custom-UI/Placeholders/GalleryP
 import PictureDialogTrigger from "@/components/Custom-UI/Buttons/PictureDialogTrigger";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
-import { Image } from "@/types/Image";
+import { useState } from "react";
 import { Icons } from "@/components/Custom-UI/icons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
+import { getImages } from "@/lib/fetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { deleteImage } from "@/lib/mutations";
 
 const GalleryPage = () => {
-  const [images, setImages] = useState<Image[]>([]);
   const customerProfile = useCustomerProfile();
   const [deleting, setDeleting] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleDelete = async (imagePath: string) => {
-    setDeleting(true);
+  // Fetch images using React Query
+  const {
+    data: images,
+    isPending,
+    isError,
+  } = useQuery(getImages(customerProfile?.id || ""), {
+    enabled: !!customerProfile,
+  });
 
-    const { error } = await supabase.storage
-      .from("camera-pictures")
-      .remove([imagePath]);
+  const { mutate: handleDelete } = useMutation({
+    mutationFn: (imagePath: string) => deleteImage(supabase, imagePath),
 
-    if (error) {
+    onSuccess: () => {
+      toast.success("Image deleted successfully.");
+
+      // Simply invalidate all image queries
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey.includes("camera_pictures"),
+      });
+    },
+
+    onError: () => {
       toast.error("Error deleting image, try again.");
-      return;
-    }
+    },
+  });
 
-    setImages((prev) => prev.filter((image) => image.path !== imagePath));
-    setDeleting(false);
-    toast.success("Image deleted successfully.");
-  };
+  const isLoading = customerProfile && isPending;
 
-  useEffect(() => {
-    // Check if the user is logged in
-    if (!customerProfile) {
-      return;
-    }
-
-    // Fetch the user's images from the database
-    const fetchImages = async () => {
-      const { data, error } = await supabase
-        .from("camera_pictures")
-        .select("*")
-        .eq("user_id", customerProfile?.id);
-
-      if (error) {
-        toast.error("Error fetching images");
-      }
-
-      if (data) {
-        setImages(data);
-      }
-    };
-
-    fetchImages();
-  }, [customerProfile]);
+  const showEmptyState = images && images.length === 0;
 
   return (
     <div className="flex flex-col h-full space-y-2">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col items-center md:items-start gap-1">
         <h1 className="text-4xl">Your Gallery</h1>
         <p className="opacity-70">View and manage your saved photos</p>
       </div>
 
       {!customerProfile ? (
         <LoginPlaceholder info="your saved photos" />
-      ) : images.length === 0 ? (
+      ) : isLoading ? (
+        <LoadingSkeleton />
+      ) : isError ? (
+        <div className="text-center py-20 border rounded-lg">
+          <p className="text-red-500">
+            Error loading images. Please try again.
+          </p>
+        </div>
+      ) : showEmptyState ? (
         <section>
           <GalleryPlaceholder />
         </section>
       ) : (
         <section className="overflow-y-scroll grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-[2px]">
-          {images.map((imageData, index) => (
+          {images?.map((imageData, index) => (
             <PictureDialogTrigger
               image={imageData}
-              key={index}
+              key={imageData.id || index}
               handleDelete={handleDelete}
             />
           ))}

@@ -4,7 +4,8 @@ import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateCustomerProfile } from "@/lib/mutations";
 import { toast } from "sonner";
 import { Button } from "@/components/Shad-UI/button";
 import {
@@ -29,10 +30,38 @@ import { ProfilePictureUpload } from "@/components/Custom-UI/Cards/ProfilePictur
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
-  const [loading, setLoading] = React.useState(false);
   const [profilePicture, setProfilePicture] = React.useState<string>("");
   const router = useTransitionRouter();
   const customerProfile = useCustomerProfile();
+  const queryClient = useQueryClient();
+
+  const { mutate: updateProfile, isPending: loading } = useMutation({
+    mutationFn: (details: {
+      supabase_user_id: string;
+      display_name: string;
+      profile_picture: string;
+      email: string;
+      location: string;
+    }) => updateCustomerProfile(supabase, details),
+
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
+
+      // Invalidate customer profile query to refetch updated data
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey.includes("customers"),
+      });
+
+      router.push("/profile");
+    },
+
+    onError: (error: Error) => {
+      toast.error("Error updating profile", {
+        description: error.message,
+      });
+    },
+  });
 
   const defaultValues: Partial<ProfileFormValues> = {
     username: customerProfile?.display_name,
@@ -74,26 +103,14 @@ export function ProfileForm() {
       return;
     }
 
-    setLoading(true);
-
-    const { error } = await supabase.rpc("update_customer_details", {
-      _display_name: data.username === "N/A" ? "" : data.username ?? "",
-      _profile_picture: profilePicture,
-      _email: data.email === "N/A" ? "" : data.email ?? "",
-      _location: data.location === "N/A" ? "" : data.location ?? "",
-      _supabase_user_id: customerProfile?.supabase_user_id ?? "",
+    // Call the mutation
+    updateProfile({
+      supabase_user_id: customerProfile.supabase_user_id,
+      display_name: data.username === "N/A" ? "" : data.username ?? "",
+      profile_picture: profilePicture,
+      email: data.email === "N/A" ? "" : data.email ?? "",
+      location: data.location === "N/A" ? "" : data.location ?? "",
     });
-
-    if (error) {
-      toast.error("Error updating profile", {
-        description: error.message,
-      });
-    } else {
-      toast.success("Profile updated successfully");
-      router.push("/profile");
-    }
-
-    setLoading(false);
   }
 
   return (

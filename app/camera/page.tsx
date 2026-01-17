@@ -11,6 +11,7 @@ import Image from "next/image";
 import React from "react";
 import { useTransitionRouter } from "next-view-transitions";
 import { Dialog, DialogContent } from "@/components/Shad-UI/dialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Camera = () => {
   const customerProfile = useCustomerProfile();
@@ -19,6 +20,7 @@ const Camera = () => {
   const [deleting, setDeleting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const [capturedImage, setCapturedImage] = React.useState("");
+  const queryClient = useQueryClient();
   const router = useTransitionRouter();
 
   const handleCapture = (imageData: string) => {
@@ -115,6 +117,13 @@ const Camera = () => {
       } else {
         toast.success("Image saved successfully");
         setSaved(true);
+
+        // Simply invalidate all image queries
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            Array.isArray(query.queryKey) &&
+            query.queryKey.includes("camera_pictures"),
+        });
       }
     }
 
