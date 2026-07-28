@@ -14,7 +14,11 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   }[];
 }
 
-export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
+export function ProfileSidebar({
+  className,
+  items,
+  ...props
+}: SidebarNavProps) {
   const pathname = usePathname();
 
   // Get only the base path
@@ -24,7 +28,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
     <nav
       className={cn(
         "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-3 scrollbar-none",
-        className
+        className,
       )}
       {...props}
     >
@@ -35,7 +39,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           className={cn(
             buttonVariants({ variant: "ghost" }),
             basePath === item.href ? "bg-neutral-800 text-white" : "",
-            "justify-start text-base hover:bg-neutral-500 dark:hover:bg-neutral-500 hover:text-white"
+            "justify-start text-base hover:bg-neutral-500 dark:hover:bg-neutral-500 hover:text-white",
           )}
         >
           {item.icon}

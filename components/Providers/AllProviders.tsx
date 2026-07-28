@@ -2,21 +2,19 @@
 
 import React from "react";
 import { ThemeProvider } from "./ThemeProvider";
-import { SidebarProvider, SidebarTrigger } from "@/components/Shad-UI/sidebar";
+import { SidebarProvider } from "@/components/Shad-UI/sidebar";
 import { AppSidebar } from "../Custom-UI/Sidebars/AppSidebar";
-import { Link, ViewTransitions } from "next-view-transitions";
+import { ViewTransitions } from "next-view-transitions";
 import { User } from "@supabase/supabase-js";
 import { usePathname } from "next/navigation";
 import { Toaster } from "../Shad-UI/toaster";
 import { Sonner } from "../Shad-UI/sonner";
-import NotificationsDrawerTrigger from "../Custom-UI/Buttons/NotificationsDrawerTrigger";
-import CartDrawerTrigger from "../Custom-UI/Buttons/CartDrawerTrigger";
 import { Notification } from "@/types/Notification";
 import { CartItem } from "@/types/CartItem";
 import { useUserInfo } from "@/hooks/use-user-info";
 import UserProvider from "./UserProvider";
-import { ThemeToggler } from "../Custom-UI/Buttons/ThemeToggler";
 import { Bookmark } from "@/types/Bookmark";
+import NavBar from "../Custom-UI/NavBar";
 
 const authContext = React.createContext<User | null>(null);
 export const useAuth = () => React.useContext(authContext);
@@ -30,7 +28,7 @@ const cartContext = React.createContext<CartItem[] | null | undefined>(null);
 export const useCart = () => React.useContext(cartContext);
 
 const bookmarksContext = React.createContext<Bookmark[] | null | undefined>(
-  null
+  null,
 );
 export const useBookmarks = () => React.useContext(bookmarksContext);
 
@@ -69,61 +67,8 @@ const AllProviders = ({ children }: React.PropsWithChildren) => {
                     ) : (
                       <></>
                     )}
-
                     <main className="w-full relative">
-                      <div
-                        suppressHydrationWarning
-                        className={`flex justify-between items-center fixed z-40 top-0 right-0 w-full py-3 px-4 md:px-5 ${
-                          pathname !== "/camera" &&
-                          pathname !== "/combine" &&
-                          pathname !== "/combine/personal"
-                            ? "bg-lightBackground dark:bg-darkBackground"
-                            : "text-white"
-                        }`}
-                      >
-                        {!pathname.startsWith("/brand-dashboard") ? (
-                          <SidebarTrigger />
-                        ) : (
-                          <></>
-                        )}
-
-                        <Link
-                          href={
-                            pathname.startsWith("/brand-dashboard")
-                              ? "/brand-dashboard"
-                              : "/"
-                          }
-                          className={`text-2xl ${
-                            pathname === "/camera" ||
-                            pathname === "/combine/personal" ||
-                            pathname === "/"
-                              ? "hidden"
-                              : ""
-                          }`}
-                        >
-                          My{" "}
-                          <span className="text-brandLight dark:text-brandDark ">
-                            Butler
-                          </span>
-                        </Link>
-
-                        <div
-                          className={`flex items-center gap-4 md:gap-5 ${
-                            pathname.startsWith("/butler") ? "pr-11" : ""
-                          }`}
-                        >
-                          {pathname !== "/cart" &&
-                          !pathname.startsWith("/brand-dashboard") ? (
-                            <CartDrawerTrigger />
-                          ) : null}
-
-                          {pathname.startsWith("/brand-dashboard") ? (
-                            <ThemeToggler />
-                          ) : (
-                            <NotificationsDrawerTrigger />
-                          )}
-                        </div>
-                      </div>
+                      <NavBar />
                       {children}
                     </main>
                     <Toaster />

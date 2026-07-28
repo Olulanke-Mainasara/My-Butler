@@ -1,6 +1,6 @@
 "use client";
 
-import { SidebarNav } from "@/components/Custom-UI/Sidebars/SidebarNav";
+import { ProfileSidebar } from "@/components/Custom-UI/Sidebars/ProfileSidebar";
 import { Button } from "@/components/Shad-UI/button";
 import { SunMoon, User } from "lucide-react";
 import { Link } from "next-view-transitions";
@@ -38,7 +38,7 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
       <hr />
       <div className="flex flex-col gap-8 lg:flex-row lg:space-x-12 lg:space-y-0 h-full overflow-scroll">
         <aside className="lg:w-2/12">
-          <SidebarNav items={sidebarNavItems} className="overflow-scroll" />
+          <ProfileSidebar items={sidebarNavItems} className="overflow-scroll" />
         </aside>
         <div className="h-full overflow-y-scroll w-full">{children}</div>
       </div>

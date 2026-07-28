@@ -23,7 +23,7 @@ const CarouselWithSubCarousel = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex flex-col xl:flex-row w-full xl:pr-7 gap-4 xl:gap-0">
+    <section className="flex flex-col xl:flex-row w-full xl:pr-7 gap-4 xl:gap-0">
       {subItems.length === 0 ? (
         <div className="text-center px-10 py-5 xl:py-28 border rounded-lg text-xl flex flex-col gap-4 items-center xl:px-2 xl:w-1/12">
           <Icons.spinner className="animate-spin" />
@@ -93,7 +93,7 @@ const CarouselWithSubCarousel = ({
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

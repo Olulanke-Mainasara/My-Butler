@@ -1,6 +1,6 @@
 "use client";
 
-import { SidebarNav } from "@/components/Custom-UI/Sidebars/SidebarNav";
+import { ProfileSidebar } from "@/components/Custom-UI/Sidebars/ProfileSidebar";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Button } from "@/components/Shad-UI/button";
 import { supabase } from "@/lib/supabase/client";
@@ -19,7 +19,7 @@ import NextLink from "next/link";
 import React from "react";
 import BrandLoadingSkeleton from "@/components/Custom-UI/Skeletons/BrandLoadingSkeleton";
 
-const SidebarNavItems = [
+const ProfileSidebarItems = [
   {
     id: 1,
     href: "/brand-dashboard",
@@ -133,8 +133,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <hr />
       <div className="flex flex-col gap-4 lg:gap-8 lg:flex-row lg:space-y-0 h-full overflow-scroll">
         <aside className="lg:w-2/12">
-          <SidebarNav
-            items={SidebarNavItems}
+          <ProfileSidebar
+            items={ProfileSidebarItems}
             className="overflow-scroll scrollbar-hide"
           />
         </aside>

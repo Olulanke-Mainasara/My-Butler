@@ -1,6 +1,6 @@
 "use client";
 
-import { SidebarNav } from "@/components/Custom-UI/Sidebars/SidebarNav";
+import { ProfileSidebar } from "@/components/Custom-UI/Sidebars/ProfileSidebar";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { Button } from "@/components/Shad-UI/button";
 import {
@@ -17,7 +17,7 @@ import { Link } from "next-view-transitions";
 import Image from "next/image";
 import React from "react";
 
-const SidebarNavItems = [
+const ProfileSidebarItems = [
   {
     id: 1,
     href: "/profile",
@@ -111,8 +111,8 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
       <hr />
       <div className="flex flex-col gap-4 lg:gap-8 lg:flex-row lg:space-y-0 h-full overflow-scroll">
         <aside className="lg:w-2/12">
-          <SidebarNav
-            items={SidebarNavItems}
+          <ProfileSidebar
+            items={ProfileSidebarItems}
             className="overflow-scroll scrollbar-hide"
           />
         </aside>

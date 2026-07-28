@@ -1,10 +1,8 @@
 "use client";
 
 import Logo from "@/components/Custom-UI/logo";
-import { motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect } from "react";
-import { useSessionStorage } from "react-use";
+import { useEffect, useState } from "react";
 import ButlerAIDark from "@/public/Pages/Home/butler-ai-dark.png";
 import ButlerAILight from "@/public/Pages/Home/butler-ai-light.png";
 import CollectionsDark from "@/public/Pages/Home/collections-dark.png";
@@ -15,7 +13,17 @@ import NewsDark from "@/public/Pages/Home/news-dark.png";
 import NewsLight from "@/public/Pages/Home/news-light.png";
 import ShopDark from "@/public/Pages/Home/shop-dark.png";
 import ShopLight from "@/public/Pages/Home/shop-light.png";
-import { Factory, Stars } from "lucide-react";
+import {
+  Armchair,
+  ArrowDown,
+  ArrowRight,
+  Cast,
+  Factory,
+  Lectern,
+  ShoppingBag,
+  Stars,
+  Waypoints,
+} from "lucide-react";
 import {
   GiNewspaper,
   GiPhotoCamera,
@@ -23,65 +31,222 @@ import {
   GiShoppingCart,
   GiTicket,
 } from "react-icons/gi";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/Shad-UI/carousel";
 import { Link } from "next-view-transitions";
 import { useTheme } from "next-themes";
+import { Icons } from "@/components/Custom-UI/icons";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  getArticles,
+  getBrands,
+  getCollections,
+  getEvents,
+  getProducts,
+} from "@/lib/fetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
+import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
+import CollectionCard from "@/components/Custom-UI/Cards/CollectionCard";
+import EventCard from "@/components/Custom-UI/Cards/EventCard";
+import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
+import { motion } from "framer-motion";
+import { Button } from "@/components/Shad-UI/button";
+
+const subItems = [
+  {
+    icon: <ShoppingBag />,
+    category: "Products",
+  },
+  { icon: <GiShirt />, category: "Collections" },
+  {
+    icon: <GiTicket />,
+    category: "Events",
+  },
+  {
+    icon: <GiNewspaper />,
+    category: "News",
+  },
+];
 
 export default function HomePage() {
-  const [splashed, setSplashed] = useSessionStorage("splashed");
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
+
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [card, setCard] = useState(0);
 
   useEffect(() => {
-    const timeOut = setTimeout(() => setSplashed("true"), 2500);
-    window.addEventListener("beforeunload", () => setSplashed(""));
+    if (!api) {
+      return;
+    }
 
-    return () => {
-      clearTimeout(timeOut);
-      window.removeEventListener("beforeunload", () => setSplashed(""));
-    };
-  }, [setSplashed]);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
+  const handleClick = (index: number) => {
+    setCard(index);
+  };
+
+  const { data: products } = useQuery(getProducts());
+  const { data: collections } = useQuery(getCollections());
+  const { data: events } = useQuery(getEvents());
+  const { data: news } = useQuery(getArticles());
+  const { data: brands } = useQuery(getBrands());
+  const [category, setCategory] = useState("Products");
 
   return (
-    <div className="h-screen overflow-scroll">
-      {!splashed && (
-        <motion.div
-          animate={{
-            opacity: 0,
-            display: "none",
-          }}
-          transition={{
-            default: { delay: 1.5, duration: 0.5 },
-            display: { delay: 2 },
-          }}
-          suppressHydrationWarning
-          className="absolute inset-0 bg-lightBackground dark:bg-darkBackground z-50 flex items-center justify-center gap-8 text-9xl"
-        >
-          <Logo mode="inverted" />{" "}
-          <span>
-            My{" "}
-            <span className="text-brandLight dark:text-brandDark">Butler</span>
-          </span>
-        </motion.div>
-      )}
+    <div className="pb-5 space-y-20">
+      <section className="h-screen bg-white px-16 relative">
+        <Carousel opts={{ align: "start" }} setApi={setApi} className="h-full">
+          <CarouselContent className="-ml-5 xl:-ml-8 h-full pr-24 xl:pr-0"></CarouselContent>
+          <CarouselPrevious className="hidden xl:flex" />
+          <CarouselNext className="hidden xl:flex" />
+          <div className="text-center w-full flex gap-1 items-center justify-center h-8 absolute bottom-6">
+            {Array.from({ length: brands?.length || 1 }).map((_, index) => (
+              <motion.div
+                key={index}
+                animate={
+                  current === index + 1
+                    ? { width: 20, backgroundColor: "#65d1fd" }
+                    : { width: 8 }
+                }
+                className="h-2 bg-darkBackground dark:bg-white rounded-full transition"
+              ></motion.div>
+            ))}
+          </div>
+        </Carousel>
+      </section>
 
-      <div
-        suppressHydrationWarning
-        className="flex flex-col gap-4 md:gap-0 md:flex-row justify-between items-center px-5 md:pl-4 xl:pl-3 pt-14 xl:pt-10 mb-5"
-      >
-        <h1
-          suppressHydrationWarning
-          className="text-5xl md:text-7xl lg:text-9xl"
-        >
-          My <span className="text-brandLight dark:text-brandDark">Butler</span>
-        </h1>
+      <section className="flex flex-col xl:flex-row w-full xl:pr-7 gap-4 xl:gap-0 pl-5 pb-8">
+        {subItems.length === 0 ? (
+          <div className="text-center px-10 py-5 xl:py-28 border rounded-lg text-xl flex flex-col gap-4 items-center xl:px-2 xl:w-1/12">
+            <Icons.spinner className="animate-spin" />
+          </div>
+        ) : (
+          <div className="xl:basis-[10.7%] flex items-center">
+            <div className="xl:h-44 w-full">
+              <Carousel
+                opts={{
+                  align: "start",
+                }}
+                orientation={isMobile ? "horizontal" : "vertical"}
+                className="w-full"
+              >
+                <CarouselContent className="-mt-5 h-20 xl:h-[200px] pr-16 xl:pr-0">
+                  {subItems.map((subItem, index) => (
+                    <CarouselItem
+                      key={index}
+                      className="pt-5 basis-1/2 md:basis-1/4 lg:basis-1/5 xl:basis-1/3 cursor-pointer"
+                      onClick={() => setCategory(subItem.category)}
+                    >
+                      <div className="p-1 border h-full flex items-center justify-center gap-1.5 rounded-xl text-xl xl:text-base">
+                        <span className="text-brandLight dark:text-brandDark">
+                          {subItem.icon}
+                        </span>
 
-        <p className="max-w-[400px] text-center md:text-right dark:text-neutral-300">
-          Your personal butler service, reimagined for modern living. Experience
-          luxury assistance tailored to your lifestyle, available whenever you
-          need it.
-        </p>
-      </div>
+                        <span className="">{subItem.category}</span>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden xl:flex" />
+                <CarouselNext className="hidden xl:flex" />
+              </Carousel>
+            </div>
+          </div>
+        )}
 
-      <div className="grid grid-cols-2 md:grid-cols-6 xl:grid-cols-8 xl:grid-rows-9 gap-5 px-5 xl:max-h-screen w-full pb-5">
+        {!products ||
+        products?.length === 0 ||
+        !collections ||
+        collections?.length === 0 ||
+        !events ||
+        events?.length === 0 ||
+        !news ||
+        news?.length === 0 ? (
+          <LoadingSkeleton length={1} className="md:grid-cols-1 ml-5" />
+        ) : (
+          <div className="xl:basis-5/6 xl:w-11/12 flex items-center h-full xl:pl-16 xl:pr-4">
+            <div className="w-full h-full">
+              <Carousel opts={{ align: "start" }} className="h-full">
+                <CarouselContent className="-ml-5 xl:-ml-8 h-full pr-24 xl:pr-0">
+                  {category === "Products" &&
+                    products &&
+                    products.map((item, index) => {
+                      const form = "static"; // Initialize the 'form' variable
+                      return (
+                        <CarouselItem
+                          key={index}
+                          className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-5 xl:pl-8 h-full"
+                        >
+                          <ProductCard form={form} item={item} />
+                        </CarouselItem>
+                      );
+                    })}
+
+                  {category === "Collections" &&
+                    collections &&
+                    collections.map((item, index) => {
+                      const form = "static"; // Initialize the 'form' variable
+                      return (
+                        <CarouselItem
+                          key={index}
+                          className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-5 xl:pl-8 h-full"
+                        >
+                          <CollectionCard form={form} item={item} />
+                        </CarouselItem>
+                      );
+                    })}
+
+                  {category === "Events" &&
+                    events &&
+                    events.map((item, index) => {
+                      const form = "static"; // Initialize the 'form' variable
+                      return (
+                        <CarouselItem
+                          key={index}
+                          className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-5 xl:pl-8 h-full"
+                        >
+                          <EventCard form={form} item={item} />
+                        </CarouselItem>
+                      );
+                    })}
+
+                  {category === "News" &&
+                    news &&
+                    news.map((item, index) => {
+                      const form = "static"; // Initialize the 'form' variable
+                      return (
+                        <CarouselItem
+                          key={index}
+                          className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-5 xl:pl-8 h-full"
+                        >
+                          <ArticleCard form={form} item={item} />
+                        </CarouselItem>
+                      );
+                    })}
+                </CarouselContent>
+                <CarouselPrevious className="hidden xl:flex" />
+                <CarouselNext className="hidden xl:flex" />
+              </Carousel>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="grid grid-cols-2 md:grid-cols-6 xl:grid-cols-8 xl:grid-rows-9 gap-5 px-5 xl:max-h-screen w-full">
         <Link
           href={"/butler"}
           className="col-span-2 md:col-span-4 xl:row-span-3 rounded-md flex border border-neutral-500 relative overflow-hidden hover:border-brandLight dark:hover:border-brandDark duration-150 group md:h-56 lg:h-72 h-48 xl:h-full"
@@ -182,7 +347,7 @@ export default function HomePage() {
             <Logo mode="normal" />
           </div>
           <span className="text-[40px] md:text-5xl lg:text-7xl text-white dark:text-black hidden md:block">
-            Done, next?
+            Discover, rock!
           </span>
         </div>
         <Link
@@ -255,7 +420,268 @@ export default function HomePage() {
             </div>
           </div>
         </Link>
-      </div>
+      </section>
+
+      <section className="space-y-4 px-4 md:px-5 pt-5">
+        <p className="text-3xl md:text-4xl">Diverse Collections</p>
+
+        {!collections || collections?.length === 0 ? (
+          <LoadingSkeleton length={4} height="md:h-[450px]" />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
+            {collections?.map((collection, index) => (
+              <CollectionCard item={collection} key={index} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="min-h-screen flex items-center justify-center">
+        <div className="w-full max-w-(--breakpoint-xl) mx-auto px-4 md:px-5">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-semibold tracking-tighter">
+              Transform Your Business <br />
+              at Texcellence 2025.
+            </h2>
+            <p className="uppercase flex items-center gap-2 font-semibold">
+              what to expect{" "}
+              <ArrowDown className="text-blue-900 dark:text-blue-700" />
+            </p>
+          </div>
+
+          <div className="mt-8 grid sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-3 gap-6 md:gap-20 items-center mb-20">
+            <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
+              {/* Media 1 Mobile */}
+              <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
+                <Image
+                  src={ButlerAIDark}
+                  alt="Keynote"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <span className="text-3xl font-semibold tracking-tight">
+                Keynotes
+              </span>
+
+              <div className="flex items-start gap-3 mt-6">
+                <Lectern className="shrink-0 text-blue-900 dark:text-blue-700" />
+                <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
+                  Gain insights from global tech leaders—explore trends,
+                  strategies, and innovations shaping the future.
+                </p>
+              </div>
+
+              <Link href="/agenda">
+                <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
+                  View the Agenda{" "}
+                  <ArrowRight className="size-6 text-blue-700" />
+                </Button>
+              </Link>
+            </div>
+            {/* Media 1 Desktop */}
+            <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
+              <Image
+                src={ButlerAIDark}
+                alt="Keynote"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Media 2 Desktop */}
+            <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
+              <Image
+                src={ButlerAIDark}
+                alt="Keynote"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
+              {/* Media 2 Mobile */}
+              <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
+                <Image
+                  src={ButlerAIDark}
+                  alt="Keynote"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <span className="text-3xl font-semibold tracking-tight">
+                Panel Sessions
+              </span>
+
+              <div className="flex items-start gap-3 mt-6">
+                <Armchair className="shrink-0 text-blue-900 dark:text-blue-700" />
+                <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
+                  Join engaging conversations with tech and business
+                  experts—unlock ideas, solutions, and fresh perspectives.
+                </p>
+              </div>
+
+              <Link href="/agenda">
+                <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
+                  View the Agenda{" "}
+                  <ArrowRight className="size-6 text-blue-700" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <div className="mt-8 grid sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-3 gap-6 md:gap-20 items-center">
+            <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
+              {/* Media 3 Mobile */}
+              <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
+                <Image
+                  src={ButlerAIDark}
+                  alt="Keynote"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <span className="text-3xl font-semibold tracking-tight">
+                Networking
+              </span>
+
+              <div className="flex items-start gap-3 mt-6">
+                <Waypoints className="shrink-0 text-blue-900 dark:text-blue-700" />
+                <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
+                  Connect with key industry decision-makers—build relationships,
+                  exchange ideas, and open doors to new opportunities.
+                </p>
+              </div>
+
+              <Link href="/agenda">
+                <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
+                  View the Agenda{" "}
+                  <ArrowRight className="size-6 text-blue-700" />
+                </Button>
+              </Link>
+            </div>
+            {/* Media 3 Desktop */}
+            <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
+              <Image
+                src={ButlerAIDark}
+                alt="Keynote"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Media 4 Desktop */}
+            <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
+              <Image
+                src={ButlerAIDark}
+                alt="Keynote"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
+              {/* Media 4 Mobile */}
+              <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
+                <Image
+                  src={ButlerAIDark}
+                  alt="Keynote"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <span className="text-3xl font-semibold tracking-tight">
+                Live Demos
+              </span>
+
+              <div className="flex items-start gap-3 mt-6">
+                <Cast className="shrink-0 text-blue-900 dark:text-blue-700" />
+                <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
+                  Get hands-on experience with cutting-edge technology—explore
+                  tools, demos, and real-world applications in action.
+                </p>
+              </div>
+
+              <Link href="/agenda">
+                <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
+                  View the Agenda{" "}
+                  <ArrowRight className="size-6 text-blue-700" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="flex h-[600px] flex-col gap-8 px-6 dark:text-white md:h-[700px] lg:h-[800px] xl:h-[700px] xl:p-8">
+        <h2 className="text-center text-3xl md:text-4xl">Anticipated Events</h2>
+
+        <div className="flex w-full grow gap-8 overflow-y-hidden overflow-x-scroll text-white">
+          {events?.map((event, index) => {
+            return (
+              <div
+                onClick={() => handleClick(index)}
+                className={`relative min-w-[60vw] overflow-hidden rounded-xl duration-500 ease-out xl:min-w-[200px] ${
+                  card == index ? "grow" : "grow-0 hover:cursor-pointer"
+                }`}
+                key={index}
+              >
+                <div className="relative h-full w-full">
+                  <Image
+                    className="object-cover"
+                    src={ButlerAIDark}
+                    fill
+                    sizes="(max-width: 767px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    quality={90}
+                    placeholder="blur"
+                    alt={event.title}
+                  />
+                </div>
+
+                <div
+                  className={`${
+                    card !== index
+                      ? "backdrop-brightness-[80%] xl:backdrop-brightness-50"
+                      : "backdrop-brightness-[80%]"
+                  } absolute inset-0 pl-5 pt-5 duration-500`}
+                >
+                  <p
+                    className={`${
+                      card == index
+                        ? "text-3xl md:text-5xl"
+                        : "text-3xl md:text-5xl xl:text-xl"
+                    } flex flex-col gap-2 duration-300`}
+                  >
+                    {event.title}
+                    <span
+                      className={`${
+                        card == index ? "opacity-100" : "xl:opacity-0"
+                      } text-base duration-300`}
+                    >
+                      <Button>
+                        View more <ArrowRight />
+                      </Button>
+                    </span>
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="space-y-4 px-4 md:px-5 pt-5">
+        <h2 className="text-3xl md:text-4xl">Top Stories</h2>
+
+        {!news || news?.length === 0 ? (
+          <LoadingSkeleton
+            length={5}
+            height="md:h-96"
+            className="md:grid-cols-3 xl:grid-cols-5"
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
+            {news?.map((newsItem, index) => (
+              <ArticleCard item={newsItem} key={index} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
