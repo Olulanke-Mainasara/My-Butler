@@ -45,7 +45,11 @@ diff policy changes in code review.
 
 **Next step:** connect Supabase MCP (or share read access) in a follow-up
 session so the two blocked items above can actually be verified/fixed, not
-just documented.
+just documented. **Update:** the Supabase MCP server is connected to this
+session, but every call (`list_projects`, etc.) returns
+`MCP error -32003: MCP tool call requires approval` — this looks like a
+pending tool-approval prompt on the client side that isn't going through,
+not a missing connection. Still blocked as of this pass.
 
 ---
 
@@ -166,12 +170,45 @@ brand catalogs grow.
   feature and currently under-built, but it's additive rather than a
   blocker, so it's queued after the above.
 
-- **7. (New finding) Brand-dashboard "edit" pages don't edit anything.**
-  `app/brand-dashboard/products/[slugAndId]/page.tsx` (and the equivalent
-  collections/events routes) render the same read-only detail view used on
-  the public storefront — it even ships an "Add to Cart" button inside the
-  brand's own dashboard. There is no `update`/`delete` call anywhere in
-  `app/brand-dashboard`; only the four `new` pages `insert`. Brands currently
-  have no way to edit or remove a product/collection/event/article once
-  published. This is a real gap for onboarding, separate from the caching
-  work in #3.
+- **7. Brand-dashboard "edit" pages don't edit anything — FIXED.**
+  `app/brand-dashboard/{products,collections,events,articles}/[slugAndId]/page.tsx`
+  used to render the same read-only detail view as the public storefront
+  (products even shipped an "Add to Cart" button inside the brand's own
+  dashboard). Rebuilt all four:
+  - [x] Extracted each entity's `new/page.tsx` form into a shared
+        `<entity>-form.tsx` component taking an optional `initialData` prop,
+        used by both the `new` page (create) and the `[slugAndId]` page
+        (edit) — `product-form.tsx`, `collection-form.tsx`, `event-form.tsx`,
+        `article-form.tsx`.
+  - [x] `[slugAndId]` pages now fetch the record, check
+        `record.brand_id === brandProfile.id` before rendering (client-side
+        guard only — see caveat below), render the form pre-filled, and add
+        a "Danger Zone" delete section with an `AlertDialog` confirmation.
+  - [x] Fixed `getCategories().eq("brand_id", ...)` in the product/collection
+        forms — `categories` has no `brand_id` column at all, so this filter
+        was always returning zero rows and the category dropdown was
+        permanently empty in both create and (now) edit mode.
+  - [x] Added `getProductForEdit` / `getCollectionForEdit` to
+        `lib/fetches.ts` — `getProduct`/`getCollection` embed the category
+        relation (`category_id (name)`) for display, which isn't the numeric
+        value an edit form's `<select>` needs.
+  - [x] **Separate bug found and fixed while wiring this up:** every card
+        component (`ProductCard`, `CollectionCard`, `EventCard`,
+        `ArticleCard`) linked to the wrong place from inside the brand
+        dashboard — `ProductCard`/`ArticleCard` pointed at nonexistent
+        top-level routes (`/products/...`, `/articles/...`), and
+        `CollectionCard`/`EventCard` didn't branch on `/brand-dashboard` at
+        all, always linking to the public page. Brands could not have
+        reached the new edit pages by clicking their own items without this
+        fix.
+  - [!] **Caveat:** the `brand_id` ownership check on each edit page is
+        client-side only (`if (record.brand_id !== brandProfile.id) redirect`).
+        It stops accidental cross-brand edits in the UI but a crafted direct
+        API call would bypass it entirely. The real guarantee has to come
+        from an RLS `UPDATE`/`DELETE` policy on each table scoped to
+        `brand_id = auth.uid()` — this is the same DB verification blocked
+        under item 1, not newly introduced by this change.
+  - [ ] Not done: storage cleanup on delete (deleting a product/collection/
+        event/article leaves its uploaded images in the Supabase Storage
+        bucket) — left out to keep this pass scoped to the missing CRUD
+        itself.

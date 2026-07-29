@@ -1,34 +1,40 @@
 "use client";
 
-import Image from "next/image";
-import { Calendar } from "lucide-react";
-import { Badge } from "@/components/Shad-UI/badge";
-import { toast } from "sonner";
-import { useTransitionRouter } from "next-view-transitions";
-import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
-import { getCollection, getProducts } from "@/lib/fetches";
-import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
-import { getItemId } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
+import { toast } from "sonner";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { getCollectionForEdit } from "@/lib/fetches";
+import { getItemId, invalidateTable } from "@/lib/utils";
+import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Icons } from "@/components/Custom-UI/icons";
+import { supabase } from "@/lib/supabase/client";
+import { CollectionForm } from "../collection-form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/Shad-UI/alert-dialog";
+import { Button } from "@/components/Shad-UI/button";
+import { Trash2 } from "lucide-react";
 
-export default function CollectionPage() {
+export default function EditCollectionPage() {
   const pathname = usePathname();
   const collectionId = getItemId(pathname.split("/").pop() || "");
   const router = useTransitionRouter();
+  const queryClient = useQueryClient();
+  const brandProfile = useBrandProfile();
 
-  const { data: collection, isError: collectionError } = useQuery(
-    getCollection(collectionId || ""),
-    {
-      enabled: !!collectionId,
-    }
-  );
-
-  const { data: products, isError: productsError } = useQuery(
-    getProducts().eq("collection_id", collectionId || ""),
-    {
-      enabled: !!collectionId,
-    }
+  const { data: collection, isError } = useQuery(
+    getCollectionForEdit(collectionId || ""),
+    { enabled: !!collectionId }
   );
 
   if (!collectionId) {
@@ -37,7 +43,7 @@ export default function CollectionPage() {
     return;
   }
 
-  if (!collection || !products) {
+  if (!collection) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Icons.spinner className="w-6 h-6 animate-spin" /> Loading
@@ -45,62 +51,68 @@ export default function CollectionPage() {
     );
   }
 
-  if (collectionError || productsError) {
+  if (isError) {
     toast.error("Failed to load collection");
-    router.push("/collections");
+    router.push("/brand-dashboard/collections");
     return;
   }
 
+  if (brandProfile && collection.brand_id !== brandProfile.id) {
+    toast.error("You don't have access to this collection.");
+    router.push("/brand-dashboard/collections");
+    return;
+  }
+
+  const handleDelete = async () => {
+    const { error } = await supabase
+      .from("collections")
+      .delete()
+      .eq("id", collection.id);
+
+    if (error) {
+      toast.error("Failed to delete collection. Please try again.");
+      return;
+    }
+
+    invalidateTable(queryClient, "collections");
+    toast.success("Collection deleted.");
+    router.push("/brand-dashboard/collections");
+  };
+
   return (
-    <div className="xl:h-screen pt-14 flex flex-col xl:flex-row">
-      {/* Hero Section */}
-      <div className="relative h-[30vh] xl:h-full overflow-hidden w-full xl:w-1/2">
-        <Image
-          src={collection.display_image || "/placeholder.svg"}
-          alt={collection.name}
-          fill
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="px-4 md:px-5">
-            <div className={`text-white`}>
-              <Badge className="mb-2 bg-white/20 text-white border-white/30">
-                {collection.category_id}
-              </Badge>
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                {collection.name}
-              </h1>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-8">
+      <CollectionForm initialData={collection} />
 
-      <div className="p-4 md:p-5 w-full xl:w-1/2 overflow-scroll">
-        {/* Collection Info */}
-        <div className={`space-y-2`}>
-          <div className="flex items-center gap-2 text-sm opacity-70">
-            <Calendar className="w-4 h-4" />
-            Collection created{" "}
-            {new Date(collection.created_at || "").toLocaleDateString()}
-          </div>
-          <h3 className="text-2xl">About This Collection</h3>
-          <p className="opacity-70">{collection.description}</p>
-        </div>
-
-        {/* Collection Details */}
-        <div className="py-4 md:py-5">
-          <div className="space-y-2">
-            <h2 className={`text-3xl md:text-4xl`}>Products</h2>
-
-            {/* Products Grid */}
-            <div className="grid md:grid-cols-2 gap-4 md:gap-5">
-              {products?.map((product) => (
-                <ProductCard item={product} key={product.id} />
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="xl:max-w-screen-sm space-y-2 pt-6 border-t border-destructive/30">
+        <h3 className="text-lg font-semibold text-destructive">Danger Zone</h3>
+        <p className="text-sm opacity-70">
+          Deleting a collection removes it permanently and cannot be undone.
+          Products already assigned to it won&apos;t be deleted, but their
+          collection reference will point to nothing until you reassign them.
+        </p>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">
+              <Trash2 className="w-4 h-4" />
+              Delete Collection
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this collection?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete &quot;{collection.name}&quot;.
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

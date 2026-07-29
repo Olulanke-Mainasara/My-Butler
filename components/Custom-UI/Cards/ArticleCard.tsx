@@ -20,7 +20,7 @@ export default function ArticleCard({
   }
 
   const relevantLink = pathname.startsWith("/brand-dashboard")
-    ? `/articles/${buildItemSlugId(item.slug, item.id)}`
+    ? `/brand-dashboard/articles/${buildItemSlugId(item.slug, item.id)}`
     : `/news/${buildItemSlugId(item.slug, item.id)}`;
 
   return (

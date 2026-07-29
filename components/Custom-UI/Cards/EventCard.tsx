@@ -7,6 +7,7 @@ import {
   convertRawDateToReadableDate,
   convertRawDateToReadableTime,
 } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export default function EventCard({
   item,
@@ -15,9 +16,15 @@ export default function EventCard({
   item?: Event;
   form?: "static" | "carousel";
 }) {
+  const pathname = usePathname();
+
   if (!item) {
     return;
   }
+
+  const relevantLink = pathname.startsWith("/brand-dashboard")
+    ? `/brand-dashboard/events/${buildItemSlugId(item.slug, item.id)}`
+    : `/events/${buildItemSlugId(item.slug, item.id)}`;
 
   return (
     <Card
@@ -26,7 +33,7 @@ export default function EventCard({
       }`}
     >
       <Link
-        href={`/events/${buildItemSlugId(item.slug, item.id)}`}
+        href={relevantLink}
         prefetch={false}
         className={`rounded-xl overflow-hidden h-44 ${
           form === "carousel" ? "md:h-full" : ""
@@ -53,10 +60,7 @@ export default function EventCard({
           {convertRawDateToReadableDate(item.start_date)}
         </p>
 
-        <Link
-          href={`/events/${buildItemSlugId(item.slug, item.id)}`}
-          prefetch={false}
-        >
+        <Link href={relevantLink} prefetch={false}>
           <CardTitle className="text-xl">{item.title}</CardTitle>
         </Link>
 

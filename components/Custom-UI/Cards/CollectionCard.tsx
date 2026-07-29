@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { Collection } from "@/types/Collection";
 import { buildItemSlugId } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export default function CollectionCard({
   item,
@@ -17,19 +18,21 @@ export default function CollectionCard({
   item?: Collection;
   form?: "static" | "carousel";
 }) {
+  const pathname = usePathname();
+
   if (!item) {
     return;
   }
+
+  const relevantLink = pathname.startsWith("/brand-dashboard")
+    ? `/brand-dashboard/collections/${buildItemSlugId(item.slug, item.id)}`
+    : `/collections/${buildItemSlugId(item.slug, item.id)}`;
 
   return (
     <Card
       className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
     >
-      <Link
-        href={`/collections/${buildItemSlugId(item.slug, item.id)}`}
-        prefetch={false}
-        className="basis-1/2"
-      >
+      <Link href={relevantLink} prefetch={false} className="basis-1/2">
         <Image
           src={item.display_image ?? "/placeholder.svg"}
           alt={item.name}
@@ -65,10 +68,7 @@ export default function CollectionCard({
             } `}
             asChild
           >
-            <Link
-              href={`/collections/${buildItemSlugId(item.slug, item.id)}`}
-              prefetch={false}
-            >
+            <Link href={relevantLink} prefetch={false}>
               View Collection
             </Link>
           </Button>

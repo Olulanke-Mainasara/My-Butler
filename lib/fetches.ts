@@ -151,6 +151,13 @@ export const getCollection = (collectionId: string) => {
     .single();
 };
 
+// getCollection() embeds category_id as a joined { name } object for
+// display, which isn't usable as the numeric value an edit form needs to
+// prefill its category <select>. This returns the plain row instead.
+export const getCollectionForEdit = (collectionId: string) => {
+  return supabase.from("collections").select("*").eq("id", collectionId).single();
+};
+
 // Products
 export const getProducts = (params: PageParams = {}) => {
   return paginate(supabase.from("products").select("*"), params);
@@ -168,6 +175,12 @@ export const getProduct = (productId: string) => {
     .select("*, category_id (name)")
     .eq("id", productId)
     .single();
+};
+
+// See getCollectionForEdit — same problem, getProduct()'s embedded
+// category_id isn't a number an edit form's <select> can use.
+export const getProductForEdit = (productId: string) => {
+  return supabase.from("products").select("*").eq("id", productId).single();
 };
 
 // Articles

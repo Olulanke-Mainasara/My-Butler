@@ -21,7 +21,7 @@ export default function ProductCard({
     return;
   }
   const relevantLink = pathname.startsWith("/brand-dashboard")
-    ? `/products/${buildItemSlugId(item.slug, item.id)}`
+    ? `/brand-dashboard/products/${buildItemSlugId(item.slug, item.id)}`
     : `/shop/${buildItemSlugId(item.slug, item.id)}`;
 
   return (
