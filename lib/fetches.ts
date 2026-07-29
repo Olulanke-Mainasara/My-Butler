@@ -18,7 +18,7 @@ export const getBrandProfile = (userId: string) => {
   return supabase
     .from("brands")
     .select(
-      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, created_at, updated_at"
+      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, created_at, updated_at"
     )
     .eq("id", userId)
     .single();
@@ -30,6 +30,10 @@ export const getCartItems = (userId: string) => {
     .from("cart")
     .select("id, user_id, item_id, item_type, quantity, added_at, updated_at")
     .eq("user_id", userId);
+};
+
+export const getProductsByIds = (productIds: string[]) => {
+  return supabase.from("products").select("*").in("id", productIds);
 };
 
 // Notifications
@@ -209,4 +213,43 @@ export const getEventsCount = () => {
 
 export const getEvent = (eventId: string) => {
   return supabase.from("events").select("*").eq("id", eventId).single();
+};
+
+// Orders
+export const getOrder = (orderId: string) => {
+  return supabase
+    .from("orders")
+    .select("*, order_items(*)")
+    .eq("id", orderId)
+    .single();
+};
+
+export const getCustomerOrders = (customerId: string) => {
+  return supabase
+    .from("orders")
+    .select("*, order_items(*)")
+    .eq("customer_id", customerId)
+    .order("created_at", { ascending: false });
+};
+
+// Order line items belonging to a brand, across all customers' orders.
+export const getBrandOrderItems = (brandId: string) => {
+  return supabase
+    .from("order_items")
+    .select("*, orders(id, status, created_at)")
+    .eq("brand_id", brandId)
+    .order("created_at", { ascending: false });
+};
+
+// Admin
+export const getIsAdmin = (userId: string) => {
+  return supabase.from("admins").select("id").eq("id", userId).maybeSingle();
+};
+
+export const getPendingBrands = () => {
+  return supabase
+    .from("brands")
+    .select("*")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
 };

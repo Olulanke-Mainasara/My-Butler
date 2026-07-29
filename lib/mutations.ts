@@ -121,3 +121,18 @@ export const deleteImage = async (
 ) => {
   return client.storage.from("camera-pictures").remove([imagePath]);
 };
+
+export async function updateBrandStatus(
+  client: SupabaseClient,
+  brandId: string,
+  status: "pending" | "approved" | "rejected"
+) {
+  const { error } = await client.rpc("update_brand_status", {
+    _brand_id: brandId,
+    _status: status,
+  });
+
+  if (error) {
+    throw error;
+  }
+}

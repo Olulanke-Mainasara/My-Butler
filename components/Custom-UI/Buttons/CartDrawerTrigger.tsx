@@ -23,6 +23,8 @@ import { CartPlaceholder } from "../Placeholders/CartPlaceholder";
 import CartItemCard from "../Cards/CartItemCard";
 import { LoginPlaceholder } from "../Placeholders/LoginPlaceholder";
 import { usePathname } from "next/navigation";
+import { getProductsByIds } from "@/lib/fetches";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 export default function CartDrawerTrigger() {
   const [open, setOpen] = React.useState(false);
@@ -30,6 +32,16 @@ export default function CartDrawerTrigger() {
   const customerProfile = useCustomerProfile();
   const pathname = usePathname();
   const cart = useCart();
+
+  const productIds = (cart ?? [])
+    .filter((item) => item.item_type === "product" && item.item_id)
+    .map((item) => item.item_id as string);
+
+  const { data: products } = useQuery(getProductsByIds(productIds), {
+    enabled: productIds.length > 0,
+  });
+
+  const productsById = new Map((products ?? []).map((p) => [p.id, p]));
 
   return (
     <>
@@ -55,7 +67,17 @@ export default function CartDrawerTrigger() {
                 {!cart || cart.length === 0 ? (
                   <CartPlaceholder />
                 ) : (
-                  cart.map((_, index) => <CartItemCard key={index} />)
+                  cart.map((item) => {
+                    const product = productsById.get(item.item_id ?? "");
+                    if (!product) return null;
+                    return (
+                      <CartItemCard
+                        key={item.id}
+                        cartItem={item}
+                        product={product}
+                      />
+                    );
+                  })
                 )}
               </section>
             )}
@@ -88,7 +110,17 @@ export default function CartDrawerTrigger() {
                 {!cart || cart.length === 0 ? (
                   <CartPlaceholder />
                 ) : (
-                  cart.map((_, index) => <CartItemCard key={index} />)
+                  cart.map((item) => {
+                    const product = productsById.get(item.item_id ?? "");
+                    if (!product) return null;
+                    return (
+                      <CartItemCard
+                        key={item.id}
+                        cartItem={item}
+                        product={product}
+                      />
+                    );
+                  })
                 )}
               </section>
             )}
