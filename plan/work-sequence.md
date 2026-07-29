@@ -206,11 +206,21 @@ brand catalogs grow.
       via `CarouselWithSlideTracker`/`NormalCarousel`/`CarouselWithSubCarousel`),
       so its Load more control lives in its own section after the existing
       carousels rather than inside a `.map()` grid like the other three.
-- [ ] **Still not done — the homepage** (`app/page.tsx`) still fetches all
-      five catalog tables in full with no pagination. Not extended yet
-      because it feeds several different sections (carousels + grids) off
-      the same query per table, similar to `/collections`'s multi-consumer
-      shape, and warrants its own look rather than a copy-paste.
+- [x] Extended to the homepage (`app/page.tsx`) too, one `visibleCount` per
+      resource rather than one shared state, since each feeds a different
+      section: `collections` → category-switcher carousel + "Diverse
+      Collections" grid (Load more on the grid); `events` → switcher +
+      "Anticipated Events" horizontal scroller, which has a fixed-height
+      layout, so its Load more sits just below the section instead of
+      inside the fixed-height flex column; `news` → switcher + "Top
+      Stories" grid (Load more on the grid). `products` only feeds the
+      switcher carousel with no dedicated listing section on this page, so
+      it's capped at `DEFAULT_PAGE_SIZE` with no Load more control —
+      `/shop` already owns the full paginated product experience. `brands`
+      stays unpaginated; it's only used for the hero carousel's dot count,
+      never rendered as a list.
+- [x] **All five catalog-consuming pages now use the pattern** — `/shop`,
+      `/collections`, `/events`, `/news`, and the homepage.
 - [ ] Server-rendering the initial catalog fetch (currently everything is
       still `"use client"`) is unstarted — larger structural change than fit
       in this pass, and would need to preserve the framer-motion/embla
