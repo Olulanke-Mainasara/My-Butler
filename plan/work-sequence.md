@@ -200,9 +200,17 @@ brand catalogs grow.
       `visibleCount` state seeded at `DEFAULT_PAGE_SIZE` (24), a "Load more"
       button that grows it, `hasMoreProducts` heuristic based on whether the
       last page came back full.
-- [ ] **Not done — same pattern still needs applying to** `/collections`,
-      `/events`, `/news`, and the homepage carousels, which all still fetch
-      full tables. `/shop` is meant as the copy-able template for those.
+- [x] Extended the same pattern to `/collections`, `/events`, `/news` — same
+      `visibleCount` + `pageSize` + "Load more" shape as `/shop`.
+      `/collections` has no plain grid section (its listing is carousel-only
+      via `CarouselWithSlideTracker`/`NormalCarousel`/`CarouselWithSubCarousel`),
+      so its Load more control lives in its own section after the existing
+      carousels rather than inside a `.map()` grid like the other three.
+- [ ] **Still not done — the homepage** (`app/page.tsx`) still fetches all
+      five catalog tables in full with no pagination. Not extended yet
+      because it feeds several different sections (carousels + grids) off
+      the same query per table, similar to `/collections`'s multi-consumer
+      shape, and warrants its own look rather than a copy-paste.
 - [ ] Server-rendering the initial catalog fetch (currently everything is
       still `"use client"`) is unstarted — larger structural change than fit
       in this pass, and would need to preserve the framer-motion/embla
