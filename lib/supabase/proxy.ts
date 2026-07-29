@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { ROLE_CUSTOMER, ROLE_BRAND } from "@/lib/roles";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -39,23 +40,39 @@ export async function updateSession(request: NextRequest) {
   if (!user) {
     if (
       url.pathname.startsWith("/profile") ||
-      url.pathname.startsWith("/brand-dashboard")
+      url.pathname.startsWith("/brand-dashboard") ||
+      url.pathname.startsWith("/admin")
     ) {
       url.pathname = "/auth/login";
       return NextResponse.redirect(url);
     }
   } else {
+    if (url.pathname.startsWith("/admin")) {
+      const { data: adminRow } = await supabase
+        .from("admins")
+        .select("id")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!adminRow) {
+        url.pathname = "/";
+        return NextResponse.redirect(url);
+      }
+
+      return supabaseResponse;
+    }
+
     const role_id = user.user_metadata.role_id;
 
     if (
-      (role_id === 2 && url.pathname.startsWith("/auth")) ||
-      (role_id === 2 && url.pathname.startsWith("/brand-dashboard"))
+      (role_id === ROLE_CUSTOMER && url.pathname.startsWith("/auth")) ||
+      (role_id === ROLE_CUSTOMER && url.pathname.startsWith("/brand-dashboard"))
     ) {
       url.pathname = "/profile";
       return NextResponse.redirect(url);
     }
 
-    if (role_id === 4 && !url.pathname.startsWith("/brand-dashboard")) {
+    if (role_id === ROLE_BRAND && !url.pathname.startsWith("/brand-dashboard")) {
       url.pathname = "/brand-dashboard";
       return NextResponse.redirect(url);
     }

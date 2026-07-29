@@ -10,19 +10,29 @@ import CollectionCard from "@/components/Custom-UI/Cards/CollectionCard";
 import { Collection } from "@/types/Collection";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getCollections, getBrands, getCategories } from "@/lib/fetches";
+import {
+  DEFAULT_PAGE_SIZE,
+  getCollections,
+  getBrands,
+  getCategories,
+} from "@/lib/fetches";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { Button } from "@/components/Shad-UI/button";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { Icons } from "@/components/Custom-UI/icons";
 
 const Collections = () => {
   const [filterResult, setFilterResult] = React.useState<Collection[]>([]);
   const [searchResult, setSearchResult] = React.useState<Collection[]>([]);
+  const [visibleCount, setVisibleCount] = React.useState(DEFAULT_PAGE_SIZE);
   const router = useRouter();
 
-  const { data: collections } = useQuery(getCollections());
+  const { data: collections, isFetching: isFetchingCollections } = useQuery(
+    getCollections({ pageSize: visibleCount })
+  );
   const { data: brands } = useQuery(getBrands());
   const { data: categories } = useQuery(getCategories());
+  const hasMoreCollections = (collections?.length ?? 0) >= visibleCount;
 
   const handleFilterResult = (result: unknown[]) => {
     setFilterResult(result as Collection[]);
@@ -210,6 +220,23 @@ const Collections = () => {
                 <CollectionCard />
               </CarouselWithSubCarousel>
             </section>
+
+            {hasMoreCollections && (
+              <div className="flex justify-center px-4 xl:px-5">
+                <Button
+                  variant="outline"
+                  disabled={isFetchingCollections}
+                  onClick={() =>
+                    setVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+                  }
+                >
+                  {isFetchingCollections && (
+                    <Icons.spinner className="w-4 h-4 animate-spin" />
+                  )}
+                  Load more
+                </Button>
+              </div>
+            )}
           </section>
         </>
       )}

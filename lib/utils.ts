@@ -1,5 +1,20 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { QueryClient } from "@tanstack/react-query";
+
+/**
+ * Invalidates every cached `useQuery` result for a given Supabase table
+ * (matched the same way `hooks/use-user-info.tsx` invalidates
+ * `notifications` on realtime events). Call this after a mutation so brand
+ * dashboard writes show up immediately instead of waiting out the query's
+ * staleTime.
+ */
+export function invalidateTable(queryClient: QueryClient, table: string) {
+  return queryClient.invalidateQueries({
+    predicate: (query) =>
+      Array.isArray(query.queryKey) && query.queryKey.includes(table),
+  });
+}
 
 /**
  * Merges class names using `clsx` and `tailwind-merge`.

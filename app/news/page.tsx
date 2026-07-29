@@ -4,19 +4,24 @@ import React from "react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
 import { Article } from "@/types/Article";
-import { getArticles } from "@/lib/fetches";
+import { DEFAULT_PAGE_SIZE, getArticles } from "@/lib/fetches";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { Icons } from "@/components/Custom-UI/icons";
 
 const News = () => {
   const [searchResult, setSearchResult] = React.useState<Article[]>([]);
+  const [visibleCount, setVisibleCount] = React.useState(DEFAULT_PAGE_SIZE);
   const router = useRouter();
 
-  const { data: articles } = useQuery(getArticles());
+  const { data: articles, isFetching: isFetchingArticles } = useQuery(
+    getArticles({ pageSize: visibleCount })
+  );
+  const hasMoreArticles = (articles?.length ?? 0) >= visibleCount;
 
   const handleSearchResult = (result: unknown[]) => {
     setSearchResult(result as Article[]);
@@ -130,6 +135,23 @@ const News = () => {
                   {articles?.map((article, index) => (
                     <ArticleCard key={index} item={article} />
                   ))}
+                </div>
+              )}
+
+              {hasMoreArticles && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    variant="outline"
+                    disabled={isFetchingArticles}
+                    onClick={() =>
+                      setVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+                    }
+                  >
+                    {isFetchingArticles && (
+                      <Icons.spinner className="w-4 h-4 animate-spin" />
+                    )}
+                    Load more
+                  </Button>
                 </div>
               )}
             </section>

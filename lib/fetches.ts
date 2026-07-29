@@ -18,7 +18,7 @@ export const getBrandProfile = (userId: string) => {
   return supabase
     .from("brands")
     .select(
-      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, created_at, updated_at"
+      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, created_at, updated_at"
     )
     .eq("id", userId)
     .single();
@@ -30,6 +30,10 @@ export const getCartItems = (userId: string) => {
     .from("cart")
     .select("id, user_id, item_id, item_type, quantity, added_at, updated_at")
     .eq("user_id", userId);
+};
+
+export const getProductsByIds = (productIds: string[]) => {
+  return supabase.from("products").select("*").in("id", productIds);
 };
 
 // Notifications
@@ -66,8 +70,24 @@ export const getChats = (userId: string) => {
   return supabase.from("chats").select("id,title").eq("user_id", userId);
 };
 
+export const DEFAULT_PAGE_SIZE = 24;
+
+export type PageParams = { page?: number; pageSize?: number };
+
 // Helper to apply filters
 type QueryBuilder = ReturnType<SupabaseClient<Database>["from"]>["select"];
+
+// Applies `.range()` only when a pageSize is passed, so existing callers of
+// getProducts()/getCollections()/etc. with no arguments keep fetching the
+// full table (unpaginated) exactly as before.
+function paginate<T extends { range: (from: number, to: number) => T }>(
+  query: T,
+  { page = 0, pageSize }: PageParams
+): T {
+  if (!pageSize) return query;
+  const from = page * pageSize;
+  return query.range(from, from + pageSize - 1);
+}
 
 function applyFilters(
   query: QueryBuilder,
@@ -81,8 +101,8 @@ function applyFilters(
 }
 
 // Brands
-export const getBrands = () => {
-  return supabase.from("brands").select("*");
+export const getBrands = (params: PageParams = {}) => {
+  return paginate(supabase.from("brands").select("*"), params);
 };
 
 export const getBrandsCount = (
@@ -117,8 +137,8 @@ export const getCategory = (categoryId: number) => {
 };
 
 // Collections
-export const getCollections = () => {
-  return supabase.from("collections").select("*");
+export const getCollections = (params: PageParams = {}) => {
+  return paginate(supabase.from("collections").select("*"), params);
 };
 
 export const getCollectionsCount = () => {
@@ -135,9 +155,16 @@ export const getCollection = (collectionId: string) => {
     .single();
 };
 
+// getCollection() embeds category_id as a joined { name } object for
+// display, which isn't usable as the numeric value an edit form needs to
+// prefill its category <select>. This returns the plain row instead.
+export const getCollectionForEdit = (collectionId: string) => {
+  return supabase.from("collections").select("*").eq("id", collectionId).single();
+};
+
 // Products
-export const getProducts = () => {
-  return supabase.from("products").select("*");
+export const getProducts = (params: PageParams = {}) => {
+  return paginate(supabase.from("products").select("*"), params);
 };
 
 export const getProductsCount = () => {
@@ -154,9 +181,15 @@ export const getProduct = (productId: string) => {
     .single();
 };
 
+// See getCollectionForEdit — same problem, getProduct()'s embedded
+// category_id isn't a number an edit form's <select> can use.
+export const getProductForEdit = (productId: string) => {
+  return supabase.from("products").select("*").eq("id", productId).single();
+};
+
 // Articles
-export const getArticles = () => {
-  return supabase.from("news").select("*");
+export const getArticles = (params: PageParams = {}) => {
+  return paginate(supabase.from("news").select("*"), params);
 };
 
 export const getArticlesCount = () => {
@@ -168,8 +201,8 @@ export const getArticle = (articleId: string) => {
 };
 
 // Events
-export const getEvents = () => {
-  return supabase.from("events").select("*");
+export const getEvents = (params: PageParams = {}) => {
+  return paginate(supabase.from("events").select("*"), params);
 };
 
 export const getEventsCount = () => {
@@ -180,4 +213,43 @@ export const getEventsCount = () => {
 
 export const getEvent = (eventId: string) => {
   return supabase.from("events").select("*").eq("id", eventId).single();
+};
+
+// Orders
+export const getOrder = (orderId: string) => {
+  return supabase
+    .from("orders")
+    .select("*, order_items(*)")
+    .eq("id", orderId)
+    .single();
+};
+
+export const getCustomerOrders = (customerId: string) => {
+  return supabase
+    .from("orders")
+    .select("*, order_items(*)")
+    .eq("customer_id", customerId)
+    .order("created_at", { ascending: false });
+};
+
+// Order line items belonging to a brand, across all customers' orders.
+export const getBrandOrderItems = (brandId: string) => {
+  return supabase
+    .from("order_items")
+    .select("*, orders(id, status, created_at)")
+    .eq("brand_id", brandId)
+    .order("created_at", { ascending: false });
+};
+
+// Admin
+export const getIsAdmin = (userId: string) => {
+  return supabase.from("admins").select("id").eq("id", userId).maybeSingle();
+};
+
+export const getPendingBrands = () => {
+  return supabase
+    .from("brands")
+    .select("*")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
 };

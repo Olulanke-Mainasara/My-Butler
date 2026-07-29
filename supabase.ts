@@ -81,6 +81,7 @@ export type Database = {
           location: string | null
           name: string
           profile_picture: string | null
+          status: string
           supabase_user_id: string
           updated_at: string | null
           url: string | null
@@ -94,6 +95,7 @@ export type Database = {
           location?: string | null
           name: string
           profile_picture?: string | null
+          status?: string
           supabase_user_id?: string
           updated_at?: string | null
           url?: string | null
@@ -107,11 +109,123 @@ export type Database = {
           location?: string | null
           name?: string
           profile_picture?: string | null
+          status?: string
           supabase_user_id?: string
           updated_at?: string | null
           url?: string | null
         }
         Relationships: []
+      }
+      admins: {
+        Row: {
+          id: string
+          created_at: string
+        }
+        Insert: {
+          id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          id: string
+          customer_id: string
+          status: string
+          total_amount: number
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          customer_id: string
+          status?: string
+          total_amount: number
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          customer_id?: string
+          status?: string
+          total_amount?: number
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          id: string
+          order_id: string
+          product_id: string
+          brand_id: string
+          product_name: string
+          unit_price: number
+          quantity: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          product_id: string
+          brand_id: string
+          product_name: string
+          unit_price: number
+          quantity: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          product_id?: string
+          brand_id?: string
+          product_name?: string
+          unit_price?: number
+          quantity?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       camera_pictures: {
         Row: {
@@ -663,6 +777,13 @@ export type Database = {
           _profile_picture: string
           _supabase_user_id: string
           _url: string
+        }
+        Returns: undefined
+      }
+      update_brand_status: {
+        Args: {
+          _brand_id: string
+          _status: string
         }
         Returns: undefined
       }

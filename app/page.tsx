@@ -14,15 +14,11 @@ import NewsLight from "@/public/Pages/Home/news-light.png";
 import ShopDark from "@/public/Pages/Home/shop-dark.png";
 import ShopLight from "@/public/Pages/Home/shop-light.png";
 import {
-  Armchair,
   ArrowDown,
   ArrowRight,
-  Cast,
   Factory,
-  Lectern,
   ShoppingBag,
   Stars,
-  Waypoints,
 } from "lucide-react";
 import {
   GiNewspaper,
@@ -44,6 +40,7 @@ import { useTheme } from "next-themes";
 import { Icons } from "@/components/Custom-UI/icons";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
+  DEFAULT_PAGE_SIZE,
   getArticles,
   getBrands,
   getCollections,
@@ -99,18 +96,96 @@ export default function HomePage() {
     setCard(index);
   };
 
-  const { data: products } = useQuery(getProducts());
-  const { data: collections } = useQuery(getCollections());
-  const { data: events } = useQuery(getEvents());
-  const { data: news } = useQuery(getArticles());
+  // Products only ever feed the category-switcher carousel above (no
+  // dedicated listing section on this page), so it's capped but has no
+  // "Load more" control here - /shop is where the full paginated listing
+  // lives. Collections/events/news each also back a dedicated section
+  // further down the page, so those get their own visibleCount + trigger.
+  const [productsVisibleCount] = useState(DEFAULT_PAGE_SIZE);
+  const [collectionsVisibleCount, setCollectionsVisibleCount] =
+    useState(DEFAULT_PAGE_SIZE);
+  const [eventsVisibleCount, setEventsVisibleCount] =
+    useState(DEFAULT_PAGE_SIZE);
+  const [newsVisibleCount, setNewsVisibleCount] = useState(DEFAULT_PAGE_SIZE);
+
+  const { data: products } = useQuery(
+    getProducts({ pageSize: productsVisibleCount })
+  );
+  const { data: collections, isFetching: isFetchingCollections } = useQuery(
+    getCollections({ pageSize: collectionsVisibleCount })
+  );
+  const { data: events, isFetching: isFetchingEvents } = useQuery(
+    getEvents({ pageSize: eventsVisibleCount })
+  );
+  const { data: news, isFetching: isFetchingNews } = useQuery(
+    getArticles({ pageSize: newsVisibleCount })
+  );
   const { data: brands } = useQuery(getBrands());
   const [category, setCategory] = useState("Products");
+
+  const hasMoreCollections =
+    (collections?.length ?? 0) >= collectionsVisibleCount;
+  const hasMoreEvents = (events?.length ?? 0) >= eventsVisibleCount;
+  const hasMoreNews = (news?.length ?? 0) >= newsVisibleCount;
 
   return (
     <div className="pb-5 space-y-20">
       <section className="h-screen bg-white px-16 relative">
-        <Carousel opts={{ align: "start" }} setApi={setApi} className="h-full">
-          <CarouselContent className="-ml-5 xl:-ml-8 h-full pr-24 xl:pr-0"></CarouselContent>
+        <Carousel
+          opts={{ align: "start", loop: true }}
+          setApi={setApi}
+          className="h-full"
+        >
+          <CarouselContent className="-ml-5 xl:-ml-8 h-full pr-24 xl:pr-0">
+            {brands && brands.length > 0 ? (
+              brands.map((brand) => (
+                <CarouselItem key={brand.id} className="h-full pl-5 xl:pl-8">
+                  <Link
+                    href={`/brands/${brand.id}`}
+                    className="relative block h-full w-full overflow-hidden rounded-2xl group"
+                  >
+                    <Image
+                      src={brand.profile_picture || "/placeholder.svg"}
+                      alt={brand.name}
+                      fill
+                      sizes="100vw"
+                      priority
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-16 left-8 right-8 md:left-12 md:right-12 text-white">
+                      <p className="uppercase tracking-widest text-sm text-brandDark mb-2">
+                        Featured brand
+                      </p>
+                      <p className="text-4xl md:text-6xl font-semibold">
+                        {brand.name}
+                      </p>
+                      <p className="mt-3 max-w-xl text-neutral-200 line-clamp-2">
+                        {brand.description}
+                      </p>
+                      <Button className="mt-6 bg-white text-black hover:bg-neutral-300">
+                        Visit brand <ArrowRight className="size-4" />
+                      </Button>
+                    </div>
+                  </Link>
+                </CarouselItem>
+              ))
+            ) : (
+              <CarouselItem className="h-full pl-5 xl:pl-8">
+                <div className="h-full w-full rounded-2xl bg-darkBackground dark:bg-lightBackground/50 flex flex-col items-center justify-center gap-6 text-center px-4">
+                  <Logo mode="normal" />
+                  <p className="text-4xl md:text-6xl text-white dark:text-black">
+                    Discover, rock!
+                  </p>
+                  <Link href="/shop">
+                    <Button className="bg-white text-black hover:bg-neutral-300">
+                      Start Shopping <ArrowRight className="size-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </CarouselItem>
+            )}
+          </CarouselContent>
           <CarouselPrevious className="hidden xl:flex" />
           <CarouselNext className="hidden xl:flex" />
           <div className="text-center w-full flex gap-1 items-center justify-center h-8 absolute bottom-6">
@@ -434,94 +509,112 @@ export default function HomePage() {
             ))}
           </div>
         )}
+
+        {hasMoreCollections && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              disabled={isFetchingCollections}
+              onClick={() =>
+                setCollectionsVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+              }
+            >
+              {isFetchingCollections && (
+                <Icons.spinner className="w-4 h-4 animate-spin" />
+              )}
+              Load more
+            </Button>
+          </div>
+        )}
       </section>
 
       <section className="min-h-screen flex items-center justify-center">
         <div className="w-full max-w-(--breakpoint-xl) mx-auto px-4 md:px-5">
           <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-semibold tracking-tighter">
-              Transform Your Business <br />
-              at Texcellence 2025.
+              How Butler A.I <br />
+              works for you.
             </h2>
             <p className="uppercase flex items-center gap-2 font-semibold">
-              what to expect{" "}
+              see how it works{" "}
               <ArrowDown className="text-blue-900 dark:text-blue-700" />
             </p>
           </div>
 
           <div className="mt-8 grid sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-3 gap-6 md:gap-20 items-center mb-20">
             <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
-              {/* Media 1 Mobile */}
+              {/* Get Styled Mobile */}
               <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
                 <Image
-                  src={ButlerAIDark}
-                  alt="Keynote"
+                  src={theme === "light" ? ButlerAILight : ButlerAIDark}
+                  alt="Butler A.I chat"
                   className="w-full h-full object-cover"
                 />
               </div>
 
               <span className="text-3xl font-semibold tracking-tight">
-                Keynotes
+                Get Styled by Butler A.I
               </span>
 
               <div className="flex items-start gap-3 mt-6">
-                <Lectern className="shrink-0 text-blue-900 dark:text-blue-700" />
+                <Stars className="shrink-0 text-blue-900 dark:text-blue-700" />
                 <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
-                  Gain insights from global tech leaders—explore trends,
-                  strategies, and innovations shaping the future.
+                  Chat with your personal AI stylist for product
+                  recommendations, sizing help, and anything else on the
+                  platform.
                 </p>
               </div>
 
-              <Link href="/agenda">
+              <Link href="/butler">
                 <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
-                  View the Agenda{" "}
+                  Chat with Butler{" "}
                   <ArrowRight className="size-6 text-blue-700" />
                 </Button>
               </Link>
             </div>
-            {/* Media 1 Desktop */}
+            {/* Get Styled Desktop */}
             <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
               <Image
-                src={ButlerAIDark}
-                alt="Keynote"
+                src={theme === "light" ? ButlerAILight : ButlerAIDark}
+                alt="Butler A.I chat"
                 className="w-full h-full object-cover"
               />
             </div>
 
-            {/* Media 2 Desktop */}
+            {/* Shop Desktop */}
             <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
               <Image
-                src={ButlerAIDark}
-                alt="Keynote"
+                src={theme === "light" ? ShopLight : ShopDark}
+                alt="Shop"
                 className="w-full h-full object-cover"
               />
             </div>
 
             <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
-              {/* Media 2 Mobile */}
+              {/* Shop Mobile */}
               <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
                 <Image
-                  src={ButlerAIDark}
-                  alt="Keynote"
+                  src={theme === "light" ? ShopLight : ShopDark}
+                  alt="Shop"
                   className="w-full h-full object-cover"
                 />
               </div>
 
               <span className="text-3xl font-semibold tracking-tight">
-                Panel Sessions
+                Shop Curated Products
               </span>
 
               <div className="flex items-start gap-3 mt-6">
-                <Armchair className="shrink-0 text-blue-900 dark:text-blue-700" />
+                <GiShoppingCart className="shrink-0 text-blue-900 dark:text-blue-700 size-5" />
                 <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
-                  Join engaging conversations with tech and business
-                  experts—unlock ideas, solutions, and fresh perspectives.
+                  Browse products from independent brands, searchable and
+                  filterable to find exactly what you want.
                 </p>
               </div>
 
-              <Link href="/agenda">
+              <Link href="/shop">
                 <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
-                  View the Agenda{" "}
+                  Start Shopping{" "}
                   <ArrowRight className="size-6 text-blue-700" />
                 </Button>
               </Link>
@@ -529,78 +622,77 @@ export default function HomePage() {
           </div>
           <div className="mt-8 grid sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-3 gap-6 md:gap-20 items-center">
             <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
-              {/* Media 3 Mobile */}
+              {/* Collections Mobile */}
               <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
                 <Image
-                  src={ButlerAIDark}
-                  alt="Keynote"
+                  src={theme === "light" ? CollectionsLight : CollectionsDark}
+                  alt="Collections"
                   className="w-full h-full object-cover"
                 />
               </div>
 
               <span className="text-3xl font-semibold tracking-tight">
-                Networking
+                Explore Collections
               </span>
 
               <div className="flex items-start gap-3 mt-6">
-                <Waypoints className="shrink-0 text-blue-900 dark:text-blue-700" />
+                <GiShirt className="shrink-0 text-blue-900 dark:text-blue-700 size-5" />
                 <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
-                  Connect with key industry decision-makers—build relationships,
-                  exchange ideas, and open doors to new opportunities.
+                  Discover collections curated by brands and organized by
+                  theme and season.
                 </p>
               </div>
 
-              <Link href="/agenda">
+              <Link href="/collections">
                 <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
-                  View the Agenda{" "}
+                  Browse Collections{" "}
                   <ArrowRight className="size-6 text-blue-700" />
                 </Button>
               </Link>
             </div>
-            {/* Media 3 Desktop */}
+            {/* Collections Desktop */}
             <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
               <Image
-                src={ButlerAIDark}
-                alt="Keynote"
+                src={theme === "light" ? CollectionsLight : CollectionsDark}
+                alt="Collections"
                 className="w-full h-full object-cover"
               />
             </div>
 
-            {/* Media 4 Desktop */}
+            {/* Events Desktop */}
             <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
               <Image
-                src={ButlerAIDark}
-                alt="Keynote"
+                src={theme === "light" ? EventsLight : EventsDark}
+                alt="Events"
                 className="w-full h-full object-cover"
               />
             </div>
 
             <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
-              {/* Media 4 Mobile */}
+              {/* Events Mobile */}
               <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
                 <Image
-                  src={ButlerAIDark}
-                  alt="Keynote"
+                  src={theme === "light" ? EventsLight : EventsDark}
+                  alt="Events"
                   className="w-full h-full object-cover"
                 />
               </div>
 
               <span className="text-3xl font-semibold tracking-tight">
-                Live Demos
+                Discover Events
               </span>
 
               <div className="flex items-start gap-3 mt-6">
-                <Cast className="shrink-0 text-blue-900 dark:text-blue-700" />
+                <GiTicket className="shrink-0 text-blue-900 dark:text-blue-700 size-5" />
                 <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
-                  Get hands-on experience with cutting-edge technology—explore
-                  tools, demos, and real-world applications in action.
+                  Find trunk shows, launches, and fashion events from the
+                  brands you love, virtual and in-person.
                 </p>
               </div>
 
-              <Link href="/agenda">
+              <Link href="/events">
                 <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
-                  View the Agenda{" "}
-                  <ArrowRight className="size-6 text-blue-700" />
+                  See Events <ArrowRight className="size-6 text-blue-700" />
                 </Button>
               </Link>
             </div>
@@ -665,6 +757,23 @@ export default function HomePage() {
         </div>
       </section>
 
+      {hasMoreEvents && (
+        <div className="flex justify-center px-6 xl:px-8">
+          <Button
+            variant="outline"
+            disabled={isFetchingEvents}
+            onClick={() =>
+              setEventsVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+            }
+          >
+            {isFetchingEvents && (
+              <Icons.spinner className="w-4 h-4 animate-spin" />
+            )}
+            Load more
+          </Button>
+        </div>
+      )}
+
       <section className="space-y-4 px-4 md:px-5 pt-5">
         <h2 className="text-3xl md:text-4xl">Top Stories</h2>
 
@@ -679,6 +788,23 @@ export default function HomePage() {
             {news?.map((newsItem, index) => (
               <ArticleCard item={newsItem} key={index} />
             ))}
+          </div>
+        )}
+
+        {hasMoreNews && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              disabled={isFetchingNews}
+              onClick={() =>
+                setNewsVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+              }
+            >
+              {isFetchingNews && (
+                <Icons.spinner className="w-4 h-4 animate-spin" />
+              )}
+              Load more
+            </Button>
           </div>
         )}
       </section>

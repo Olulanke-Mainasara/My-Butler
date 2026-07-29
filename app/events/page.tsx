@@ -4,19 +4,24 @@ import React from "react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
 import { Event } from "@/types/Event";
-import { getEvents } from "@/lib/fetches";
+import { DEFAULT_PAGE_SIZE, getEvents } from "@/lib/fetches";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { Icons } from "@/components/Custom-UI/icons";
 
 const Events = () => {
   const [searchResult, setSearchResult] = React.useState<Event[]>([]);
+  const [visibleCount, setVisibleCount] = React.useState(DEFAULT_PAGE_SIZE);
   const router = useRouter();
 
-  const { data: events } = useQuery(getEvents());
+  const { data: events, isFetching: isFetchingEvents } = useQuery(
+    getEvents({ pageSize: visibleCount })
+  );
+  const hasMoreEvents = (events?.length ?? 0) >= visibleCount;
 
   const handleSearchResult = (result: unknown[]) => {
     setSearchResult(result as Event[]);
@@ -154,6 +159,23 @@ const Events = () => {
                   {events?.map((event) => (
                     <EventCard key={event.id} item={event} />
                   ))}
+                </div>
+              )}
+
+              {hasMoreEvents && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    variant="outline"
+                    disabled={isFetchingEvents}
+                    onClick={() =>
+                      setVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+                    }
+                  >
+                    {isFetchingEvents && (
+                      <Icons.spinner className="w-4 h-4 animate-spin" />
+                    )}
+                    Load more
+                  </Button>
                 </div>
               )}
             </section>

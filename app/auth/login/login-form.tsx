@@ -17,6 +17,7 @@ import { Provider } from "@supabase/supabase-js";
 import LightLoginImg from "@/public/AuthImgs/login-light.svg";
 import DarkLoginImg from "@/public/AuthImgs/login-dark.svg";
 import { useTheme } from "next-themes";
+import { ROLE_CUSTOMER } from "@/lib/roles";
 
 export function LoginForm({
   className,
@@ -43,7 +44,7 @@ export function LoginForm({
       return;
     }
 
-    if (data.user.user_metadata.role_id === 2) {
+    if (data.user.user_metadata.role_id === ROLE_CUSTOMER) {
       router.replace("/");
     } else {
       router.replace("/brand-dashboard");

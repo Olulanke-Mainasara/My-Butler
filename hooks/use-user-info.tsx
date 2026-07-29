@@ -18,6 +18,8 @@ import { CartItem } from "@/types/CartItem";
 import { Notification } from "@/types/Notification";
 import { Bookmark } from "@/types/Bookmark";
 import { useQueryClient } from "@tanstack/react-query";
+import { ROLE_CUSTOMER, ROLE_BRAND } from "@/lib/roles";
+import { invalidateTable } from "@/lib/utils";
 
 function useUserRealtime(user: User | null) {
   const queryClient = useQueryClient();
@@ -30,13 +32,7 @@ function useUserRealtime(user: User | null) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications" },
-        () => {
-          queryClient.invalidateQueries({
-            predicate: (query) =>
-              Array.isArray(query.queryKey) &&
-              query.queryKey.includes("notifications"),
-          });
-        }
+        () => invalidateTable(queryClient, "notifications")
       )
       .subscribe();
 
@@ -46,9 +42,36 @@ function useUserRealtime(user: User | null) {
   }, [user, queryClient]);
 }
 
+// Catalog data (what brands publish) has no per-user scope, so this
+// subscribes regardless of auth state: a customer browsing signed out
+// should still see a brand's new product without a hard refresh.
+const CATALOG_TABLES = ["products", "collections", "events", "news", "brands"];
+
+function useCatalogRealtime() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const channel = supabase.channel("realtime:catalog");
+
+    CATALOG_TABLES.forEach((table) => {
+      channel.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table },
+        () => invalidateTable(queryClient, table)
+      );
+    });
+
+    channel.subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+}
+
 function useCustomerProfile(user: User | null) {
   const query = useQuery(getCustomerProfile(user?.id || ""), {
-    enabled: !!user && user.user_metadata.role_id === 2,
+    enabled: !!user && user.user_metadata.role_id === ROLE_CUSTOMER,
   });
 
   return {
@@ -61,7 +84,7 @@ function useCustomerProfile(user: User | null) {
 
 function useBrandProfile(user: User | null) {
   const query = useQuery(getBrandProfile(user?.id || ""), {
-    enabled: !!user && user.user_metadata.role_id === 4,
+    enabled: !!user && user.user_metadata.role_id === ROLE_BRAND,
   });
 
   return {
@@ -109,6 +132,7 @@ export function useUserInfo(): UseUserInfoReturn {
   const [userSession, setUserSession] = React.useState<User | null>(null);
 
   useUserRealtime(userSession);
+  useCatalogRealtime();
 
   // Use React Query hooks for all data
   const { data: customerProfile } = useCustomerProfile(userSession);

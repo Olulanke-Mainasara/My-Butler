@@ -16,6 +16,7 @@ import DarkSignupImg from "@/public/AuthImgs/signup-dark.svg";
 import { useTheme } from "next-themes";
 import { Link } from "next-view-transitions";
 import Image from "next/image";
+import { ROLE_CUSTOMER, ROLE_BRAND } from "@/lib/roles";
 
 export function SignupForm({ ...props }: React.ComponentProps<"div">) {
   const [role, setRole] = useState<"customer" | "brand">("customer");
@@ -38,7 +39,7 @@ export function SignupForm({ ...props }: React.ComponentProps<"div">) {
     setError("");
     setLoading(true);
 
-    const role_id = role === "customer" ? 2 : 4;
+    const role_id = role === "customer" ? ROLE_CUSTOMER : ROLE_BRAND;
 
     const { error } = await supabase.auth.signUp({
       email,
@@ -46,9 +47,11 @@ export function SignupForm({ ...props }: React.ComponentProps<"div">) {
       phone: contactNumber,
       options: {
         emailRedirectTo:
-          role_id === 2 ? `${getURL()}auth/email-verified` : `${getURL()}brand`,
+          role_id === ROLE_CUSTOMER
+            ? `${getURL()}auth/email-verified`
+            : `${getURL()}brand`,
         data:
-          role_id === 2
+          role_id === ROLE_CUSTOMER
             ? {
                 role_id,
                 display_name: fname + " " + lname,

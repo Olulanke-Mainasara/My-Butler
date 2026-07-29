@@ -7,9 +7,11 @@ import { supabase } from "@/lib/supabase/client";
 import {
   BookCopy,
   ChartColumnBig,
+  Clock,
   LogOut,
   Newspaper,
   PartyPopper,
+  Receipt,
   Settings,
   ShoppingBag,
   User,
@@ -52,6 +54,12 @@ const ProfileSidebarItems = [
   },
   {
     id: 6,
+    href: "/brand-dashboard/orders",
+    title: "Orders",
+    icon: <Receipt />,
+  },
+  {
+    id: 7,
     href: "/brand-dashboard/settings",
     title: "Settings",
     icon: <Settings />,
@@ -130,6 +138,35 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </Button>
         </div>
       </div>
+
+      {brandProfile && brandProfile.status === "pending" && (
+        <div className="flex items-start gap-3 rounded-lg border border-yellow-500/50 bg-yellow-500/10 p-4">
+          <Clock className="shrink-0 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+          <div>
+            <p className="font-semibold">Your application is under review</p>
+            <p className="text-sm opacity-80">
+              You can set up your products, collections, events, and articles
+              right now - but customers won&apos;t see any of it until your
+              brand is approved. We&apos;ll notify you as soon as a decision
+              is made.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {brandProfile && brandProfile.status === "rejected" && (
+        <div className="flex items-start gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+          <Clock className="shrink-0 text-destructive mt-0.5" />
+          <div>
+            <p className="font-semibold">Your application was not approved</p>
+            <p className="text-sm opacity-80">
+              Your brand and its listings are not visible to customers.
+              Contact support if you have questions about this decision.
+            </p>
+          </div>
+        </div>
+      )}
+
       <hr />
       <div className="flex flex-col gap-4 lg:gap-8 lg:flex-row lg:space-y-0 h-full overflow-scroll">
         <aside className="lg:w-2/12">
