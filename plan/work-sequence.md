@@ -141,16 +141,21 @@ their public-facing listings stay hidden until an admin approves them.
       server-side, not a JWT claim).
 - [x] Pending/rejected banner in the brand-dashboard layout — explains that
       the brand can keep building but customers won't see it yet.
-- [!] **Blocked on the same Supabase MCP approval gate as item 4** — this
-      migration (`add_brand_status_and_admin_review`) is written and
-      retried repeatedly but hasn't gone through yet. All the application
-      code above is written against this schema and will start working the
-      moment it applies; until then, `brandProfile.status` reads will 400
-      against the live DB (the column doesn't exist yet), and `/admin` /
-      the pending banner won't function.
+- [x] **Migration applied live** (`add_brand_status_and_admin_review`,
+      version `20260729191345`) after the Supabase MCP approval gate that
+      blocked it earlier finally cleared. Verified afterward with
+      `get_advisors` (no new warnings beyond expected GraphQL-visibility
+      noise) and a direct `pg_policies` read confirming every policy matches
+      intent exactly. This feature is fully live end to end.
 - [ ] Not done: an "application submitted" distinct step at signup, and a
       sidebar link to `/admin` for discoverability (it's reachable by URL
       but not linked from anywhere in the nav yet).
+- [ ] **The `admins` table is empty** — nobody can use `/admin` yet. Seed
+      the first admin directly in the Supabase SQL editor:
+      ```sql
+      insert into public.admins (id)
+      select id from auth.users where email = 'your-email@example.com';
+      ```
 
 ---
 
@@ -221,21 +226,18 @@ discarding the cart item entirely. This had to be built for real before
       line items belonging to that brand.
 - [x] Full production build (`next build`) verified end to end with dummy
       env vars — every new route compiles and renders.
-- [!] **Two migrations (`add_orders_and_cart_write_policies` for this item,
-      `add_brand_status_and_admin_review` for item 2) are written and
-      correct but stuck behind a persistent Supabase MCP approval gate**
-      (`MCP error -32003: MCP tool call requires approval`) that didn't
-      clear despite many retries across this session. All the application
-      code is written against this schema and is ready to work the moment
-      these two apply — checkout will 500 (orders/order_items don't exist
-      yet) and cart quantity edits/removal will fail until they do.
-      **Needs:** whatever approves pending Supabase MCP tool calls on your
-      end, then re-running these two (they're in
-      `supabase/migrations/`, ready to apply as-is).
-- [ ] Needs before this works in a real deployment, beyond the two
-      migrations above: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` (from a
-      webhook endpoint registered in the Stripe dashboard pointing at
-      `/api/stripe/webhook`), and `SUPABASE_SERVICE_ROLE_KEY` as env vars.
+- [x] **Migration applied live** (`add_orders_and_cart_write_policies`,
+      version `20260729191405`) — the Supabase MCP approval gate that
+      blocked both this and item 2's migration earlier cleared on retry.
+      Verified with `get_advisors` and a direct `pg_policies` read: `cart`
+      UPDATE/DELETE and `orders`/`order_items` policies all match intent
+      exactly. Checkout, cart quantity editing, and removal are all live end
+      to end now, database-side.
+- [ ] Needs before this works in a real deployment: `STRIPE_SECRET_KEY`,
+      `STRIPE_WEBHOOK_SECRET` (from a webhook endpoint registered in the
+      Stripe dashboard pointing at `/api/stripe/webhook`), and
+      `SUPABASE_SERVICE_ROLE_KEY` as env vars — none of these are set yet
+      anywhere I have visibility into.
 - [ ] Not done: refunds/cancellations, shipping address collection,
       multi-currency, tax calculation — this is a working baseline, not a
       complete commerce feature set.
