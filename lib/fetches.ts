@@ -66,8 +66,24 @@ export const getChats = (userId: string) => {
   return supabase.from("chats").select("id,title").eq("user_id", userId);
 };
 
+export const DEFAULT_PAGE_SIZE = 24;
+
+export type PageParams = { page?: number; pageSize?: number };
+
 // Helper to apply filters
 type QueryBuilder = ReturnType<SupabaseClient<Database>["from"]>["select"];
+
+// Applies `.range()` only when a pageSize is passed, so existing callers of
+// getProducts()/getCollections()/etc. with no arguments keep fetching the
+// full table (unpaginated) exactly as before.
+function paginate<T extends { range: (from: number, to: number) => T }>(
+  query: T,
+  { page = 0, pageSize }: PageParams
+): T {
+  if (!pageSize) return query;
+  const from = page * pageSize;
+  return query.range(from, from + pageSize - 1);
+}
 
 function applyFilters(
   query: QueryBuilder,
@@ -81,8 +97,8 @@ function applyFilters(
 }
 
 // Brands
-export const getBrands = () => {
-  return supabase.from("brands").select("*");
+export const getBrands = (params: PageParams = {}) => {
+  return paginate(supabase.from("brands").select("*"), params);
 };
 
 export const getBrandsCount = (
@@ -117,8 +133,8 @@ export const getCategory = (categoryId: number) => {
 };
 
 // Collections
-export const getCollections = () => {
-  return supabase.from("collections").select("*");
+export const getCollections = (params: PageParams = {}) => {
+  return paginate(supabase.from("collections").select("*"), params);
 };
 
 export const getCollectionsCount = () => {
@@ -136,8 +152,8 @@ export const getCollection = (collectionId: string) => {
 };
 
 // Products
-export const getProducts = () => {
-  return supabase.from("products").select("*");
+export const getProducts = (params: PageParams = {}) => {
+  return paginate(supabase.from("products").select("*"), params);
 };
 
 export const getProductsCount = () => {
@@ -155,8 +171,8 @@ export const getProduct = (productId: string) => {
 };
 
 // Articles
-export const getArticles = () => {
-  return supabase.from("news").select("*");
+export const getArticles = (params: PageParams = {}) => {
+  return paginate(supabase.from("news").select("*"), params);
 };
 
 export const getArticlesCount = () => {
@@ -168,8 +184,8 @@ export const getArticle = (articleId: string) => {
 };
 
 // Events
-export const getEvents = () => {
-  return supabase.from("events").select("*");
+export const getEvents = (params: PageParams = {}) => {
+  return paginate(supabase.from("events").select("*"), params);
 };
 
 export const getEventsCount = () => {

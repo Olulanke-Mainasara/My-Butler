@@ -31,15 +31,17 @@ import { Icons } from "@/components/Custom-UI/icons";
 import { ImageUpload } from "@/components/Custom-UI/Cards/ImageUpload";
 import { supabase } from "@/lib/supabase/client";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug, invalidateTable } from "@/lib/utils";
 import { collectionFormSchema } from "@/lib/schemas";
 import { getCategories } from "@/lib/fetches";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 type CollectionFormValues = z.infer<typeof collectionFormSchema>;
 
 export default function CollectionForm() {
   const router = useTransitionRouter();
+  const queryClient = useQueryClient();
   const brandProfile = useBrandProfile();
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
     null
@@ -101,6 +103,7 @@ export default function CollectionForm() {
         return;
       }
 
+      invalidateTable(queryClient, "collections");
       toast.success("Collection created successfully!");
       router.push(
         `/brand-dashboard/products/new?collectionID=${

@@ -31,18 +31,20 @@ import { ImageUpload } from "@/components/Custom-UI/Cards/ImageUpload";
 import { Checkbox } from "@/components/Shad-UI/checkbox";
 import { supabase } from "@/lib/supabase/client";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug, invalidateTable } from "@/lib/utils";
 import { FeaturesInput } from "./features-input";
 import { SpecificationsInput } from "./specifications-input";
 import { Icons } from "@/components/Custom-UI/icons";
 import { productFormSchema } from "@/lib/schemas";
 import { getCategories, getCollections } from "@/lib/fetches";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 type CollectionFormValues = z.infer<typeof productFormSchema>;
 
 export default function ProductForm() {
   const router = useTransitionRouter();
+  const queryClient = useQueryClient();
   const brandProfile = useBrandProfile();
   const [uploadedImageNames, setUploadedImageNames] = useState<string[] | null>(
     null
@@ -122,6 +124,7 @@ export default function ProductForm() {
         return;
       }
 
+      invalidateTable(queryClient, "products");
       toast.success("Product added successfully!");
       router.push(`/brand-dashboard/products`);
     } catch {

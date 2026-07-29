@@ -14,8 +14,13 @@ export const ReactQueryClientProvider = ({
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: Infinity,
-            gcTime: Infinity,
+            // Catalog and profile data can change from other sessions (a
+            // brand adding a product, another tab editing a profile), so an
+            // infinite staleTime meant nothing ever refetched in a live
+            // session. Queries that genuinely never change can still opt
+            // into a longer staleTime per-call.
+            staleTime: 2 * 60 * 1000,
+            gcTime: 10 * 60 * 1000,
             refetchOnWindowFocus: false,
           },
         },

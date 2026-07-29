@@ -2,6 +2,7 @@ import { BrandProfile } from "@/types/BrandProfile";
 import { CustomerProfile } from "@/types/CustomerProfile";
 import { User } from "@supabase/supabase-js";
 import React from "react";
+import { ROLE_CUSTOMER } from "@/lib/roles";
 
 const customerProfileContext = React.createContext<
   CustomerProfile | null | undefined
@@ -25,7 +26,7 @@ const UserProvider = ({
   customerProfile: CustomerProfile | null | undefined;
   brandProfile: BrandProfile | null | undefined;
 }) => {
-  return userSession?.user_metadata.role_id === 2 ? (
+  return userSession?.user_metadata.role_id === ROLE_CUSTOMER ? (
     <customerProfileContext.Provider value={customerProfile}>
       {children}
     </customerProfileContext.Provider>

@@ -6,20 +6,25 @@ import FilterDrawerTrigger from "@/components/Custom-UI/Buttons/FilterDrawerTrig
 import { Product } from "@/types/Product";
 import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
-import { getCategories, getProducts } from "@/lib/fetches";
+import { DEFAULT_PAGE_SIZE, getCategories, getProducts } from "@/lib/fetches";
 import { Button } from "@/components/Shad-UI/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { Icons } from "@/components/Custom-UI/icons";
 
 const Shop = () => {
   const [filterResult, setFilterResult] = React.useState<Product[]>([]);
   const [searchResult, setSearchResult] = React.useState<Product[]>([]);
+  const [visibleCount, setVisibleCount] = React.useState(DEFAULT_PAGE_SIZE);
   const router = useRouter();
 
-  const { data: products } = useQuery(getProducts());
+  const { data: products, isFetching: isFetchingProducts } = useQuery(
+    getProducts({ pageSize: visibleCount })
+  );
   const { data: categories } = useQuery(getCategories());
+  const hasMoreProducts = (products?.length ?? 0) >= visibleCount;
 
   const handleFilterResult = (result: unknown[]) => {
     setFilterResult(result as Product[]);
@@ -183,6 +188,23 @@ const Shop = () => {
                   {products?.map((product, index) => (
                     <ProductCard item={product} key={index} />
                   ))}
+                </div>
+              )}
+
+              {hasMoreProducts && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    variant="outline"
+                    disabled={isFetchingProducts}
+                    onClick={() =>
+                      setVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+                    }
+                  >
+                    {isFetchingProducts && (
+                      <Icons.spinner className="w-4 h-4 animate-spin" />
+                    )}
+                    Load more
+                  </Button>
                 </div>
               )}
             </section>

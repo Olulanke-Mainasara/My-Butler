@@ -33,14 +33,16 @@ import { ImageUpload } from "@/components/Custom-UI/Cards/ImageUpload";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { useState } from "react";
 import { useTransitionRouter } from "next-view-transitions";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug, invalidateTable } from "@/lib/utils";
 import { Badge } from "@/components/Shad-UI/badge";
 import { X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type FormValues = z.infer<typeof articleSchema>;
 
 export default function NewsForm() {
   const router = useTransitionRouter();
+  const queryClient = useQueryClient();
   const brandProfile = useBrandProfile();
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
     null
@@ -116,6 +118,7 @@ export default function NewsForm() {
         return;
       }
 
+      invalidateTable(queryClient, "news");
       toast.success("Article published successfully!");
       router.push("/brand-dashboard/articles");
     } catch {

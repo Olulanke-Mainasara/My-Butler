@@ -34,14 +34,16 @@ import { ImageUpload } from "@/components/Custom-UI/Cards/ImageUpload";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { useState } from "react";
 import { useTransitionRouter } from "next-view-transitions";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug, invalidateTable } from "@/lib/utils";
 import { Badge } from "@/components/Shad-UI/badge";
 import { X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type FormValues = z.infer<typeof eventSchema>;
 
 export default function EventForm() {
   const router = useTransitionRouter();
+  const queryClient = useQueryClient();
   const brandProfile = useBrandProfile();
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
     null
@@ -133,6 +135,7 @@ export default function EventForm() {
         return;
       }
 
+      invalidateTable(queryClient, "events");
       toast.success("Event posted successfully!");
       router.push("/brand-dashboard/events");
     } catch {
