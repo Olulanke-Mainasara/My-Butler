@@ -44,6 +44,7 @@ import { useTheme } from "next-themes";
 import { Icons } from "@/components/Custom-UI/icons";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
+  DEFAULT_PAGE_SIZE,
   getArticles,
   getBrands,
   getCollections,
@@ -99,12 +100,37 @@ export default function HomePage() {
     setCard(index);
   };
 
-  const { data: products } = useQuery(getProducts());
-  const { data: collections } = useQuery(getCollections());
-  const { data: events } = useQuery(getEvents());
-  const { data: news } = useQuery(getArticles());
+  // Products only ever feed the category-switcher carousel above (no
+  // dedicated listing section on this page), so it's capped but has no
+  // "Load more" control here - /shop is where the full paginated listing
+  // lives. Collections/events/news each also back a dedicated section
+  // further down the page, so those get their own visibleCount + trigger.
+  const [productsVisibleCount] = useState(DEFAULT_PAGE_SIZE);
+  const [collectionsVisibleCount, setCollectionsVisibleCount] =
+    useState(DEFAULT_PAGE_SIZE);
+  const [eventsVisibleCount, setEventsVisibleCount] =
+    useState(DEFAULT_PAGE_SIZE);
+  const [newsVisibleCount, setNewsVisibleCount] = useState(DEFAULT_PAGE_SIZE);
+
+  const { data: products } = useQuery(
+    getProducts({ pageSize: productsVisibleCount })
+  );
+  const { data: collections, isFetching: isFetchingCollections } = useQuery(
+    getCollections({ pageSize: collectionsVisibleCount })
+  );
+  const { data: events, isFetching: isFetchingEvents } = useQuery(
+    getEvents({ pageSize: eventsVisibleCount })
+  );
+  const { data: news, isFetching: isFetchingNews } = useQuery(
+    getArticles({ pageSize: newsVisibleCount })
+  );
   const { data: brands } = useQuery(getBrands());
   const [category, setCategory] = useState("Products");
+
+  const hasMoreCollections =
+    (collections?.length ?? 0) >= collectionsVisibleCount;
+  const hasMoreEvents = (events?.length ?? 0) >= eventsVisibleCount;
+  const hasMoreNews = (news?.length ?? 0) >= newsVisibleCount;
 
   return (
     <div className="pb-5 space-y-20">
@@ -434,6 +460,23 @@ export default function HomePage() {
             ))}
           </div>
         )}
+
+        {hasMoreCollections && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              disabled={isFetchingCollections}
+              onClick={() =>
+                setCollectionsVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+              }
+            >
+              {isFetchingCollections && (
+                <Icons.spinner className="w-4 h-4 animate-spin" />
+              )}
+              Load more
+            </Button>
+          </div>
+        )}
       </section>
 
       <section className="min-h-screen flex items-center justify-center">
@@ -665,6 +708,23 @@ export default function HomePage() {
         </div>
       </section>
 
+      {hasMoreEvents && (
+        <div className="flex justify-center px-6 xl:px-8">
+          <Button
+            variant="outline"
+            disabled={isFetchingEvents}
+            onClick={() =>
+              setEventsVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+            }
+          >
+            {isFetchingEvents && (
+              <Icons.spinner className="w-4 h-4 animate-spin" />
+            )}
+            Load more
+          </Button>
+        </div>
+      )}
+
       <section className="space-y-4 px-4 md:px-5 pt-5">
         <h2 className="text-3xl md:text-4xl">Top Stories</h2>
 
@@ -679,6 +739,23 @@ export default function HomePage() {
             {news?.map((newsItem, index) => (
               <ArticleCard item={newsItem} key={index} />
             ))}
+          </div>
+        )}
+
+        {hasMoreNews && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              disabled={isFetchingNews}
+              onClick={() =>
+                setNewsVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
+              }
+            >
+              {isFetchingNews && (
+                <Icons.spinner className="w-4 h-4 animate-spin" />
+              )}
+              Load more
+            </Button>
           </div>
         )}
       </section>
