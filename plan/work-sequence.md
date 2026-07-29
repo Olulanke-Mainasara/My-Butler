@@ -84,11 +84,15 @@ diff policy changes in code review.
         only exist on `bookmarks` — every bookmark attempt threw `column
         target_id does not exist`. Bookmarking did not work at all. Fixed to
         target `bookmarks`.
-- [ ] Pull the DB schema + policies into version control (`supabase/migrations`)
-      so this class of question is answerable by reading the repo, not just
-      by querying the live project. Not done this pass — everything above
-      was applied directly via `apply_migration`, which Supabase tracks on
-      its own, but nothing was pulled back into this repo.
+- [x] Pulled the DB schema + policy history into `supabase/migrations/`: a
+      best-effort baseline reconstruction of the full schema as it stood
+      before this session's fixes, plus the six fix migrations reproduced
+      verbatim with their real Supabase-assigned versions/names. Not a
+      perfect `pg_dump` (indexes beyond PK/UNIQUE weren't captured, and one
+      trigger's table attachment is inferred, not re-verified — both noted
+      in the file's header comment) but the schema and its history are now
+      reviewable by reading the repo instead of only by querying the live
+      project.
 - [!] **Not SQL-fixable, needs manual action in the Supabase dashboard:**
       Postgres 15.8.1.121 has outstanding security patches
       (Database → Settings → Infrastructure → upgrade); leaked-password
@@ -112,20 +116,41 @@ launch, and it changes the signup flow and data model (a `status` field on
 immediate, live access to `/brand-dashboard` — no review step, no admin
 concept anywhere in the codebase (`role_id` only has 2 and 4 defined).
 
-**Decision needed:** open marketplace vs. curated/approved brands vs. hybrid
-(self-serve signup, but listings stay unpublished until reviewed). **Not yet
-answered** — not implemented, since building a `status` column and admin
-gating against a guessed answer would mean throwing away work either way,
-and the `brands` table would need a live migration I can't apply without DB
-access regardless.
+**Decision: hybrid.** Brands keep immediate self-serve dashboard access;
+their public-facing listings stay hidden until an admin approves them.
 
-**Tasks (depend on decision):**
-- [ ] Add `status` to `brands` (e.g. `pending` / `approved` / `rejected`) if
-      approval is required.
-- [ ] Add an admin role (`role_id = ?`) and a minimal review surface.
-- [ ] Gate `/brand-dashboard` and/or listing visibility on `status`.
-- [ ] Add a brand-side "application submitted" state distinct from "verify
-      your email."
+**Tasks:**
+- [x] `brands.status` (`pending`/`approved`/`rejected`, default `pending`).
+- [x] Admin status via a dedicated `admins` table with **no INSERT policy
+      for any client role** — deliberately not a self-assignable `role_id`,
+      since that would reopen the exact class of hole just closed on
+      `role_id` 2/4 (client-writable `user_metadata` at signup). Admin
+      status can only be granted with direct database access. A short SQL
+      snippet to seed the first admin is in the summary below — the
+      `admins` table is currently empty.
+- [x] `update_brand_status(_brand_id, _status)` RPC checks the caller
+      against `admins` before changing anything, and notifies the brand of
+      the decision via the existing `notifications` table.
+- [x] Public SELECT on `brands`/`products`/`collections`/`events`/`news`
+      rewritten to `status = 'approved' OR auth.uid() = brand_id` — a
+      pending brand still sees and can manage its own catalog; nobody else
+      sees it until approved.
+- [x] `/admin` — lists pending brands with approve/reject, gated both
+      client-side (checks `admins` membership, shows "Not authorized"
+      otherwise) and in `proxy.ts` middleware (queries `admins` directly
+      server-side, not a JWT claim).
+- [x] Pending/rejected banner in the brand-dashboard layout — explains that
+      the brand can keep building but customers won't see it yet.
+- [!] **Blocked on the same Supabase MCP approval gate as item 4** — this
+      migration (`add_brand_status_and_admin_review`) is written and
+      retried repeatedly but hasn't gone through yet. All the application
+      code above is written against this schema and will start working the
+      moment it applies; until then, `brandProfile.status` reads will 400
+      against the live DB (the column doesn't exist yet), and `/admin` /
+      the pending banner won't function.
+- [ ] Not done: an "application submitted" distinct step at signup, and a
+      sidebar link to `/admin` for discoverability (it's reachable by URL
+      but not linked from anywhere in the nav yet).
 
 ---
 
@@ -165,19 +190,55 @@ checkout flow was found anywhere in `app/`. Without this, brands have no way
 to actually sell and customers have no way to actually buy — this is the gap
 between "demo" and "marketplace."
 
-**Decision needed:** payment provider and scope for this pass. **Not yet
-answered, not started** — a Stripe MCP is available in this environment, but
-wiring a real provider means touching a real account (creating
-products/prices, webhooks) and I'm not doing that without the user picking
-the provider and scope first.
+**Decision: Stripe, full flow** — cart review through order records, not
+just a payment button.
 
-**Tasks (scope depends on decision):**
-- [ ] Cart review / shipping details step (`/cart` already exists as a route —
-      confirm current content).
-- [ ] Order creation (new `orders` / `order_items` tables).
-- [ ] Payment provider integration (Stripe Checkout/Payment Intents if
-      selected).
-- [ ] Order confirmation + brand-side order visibility in `/brand-dashboard`.
+**Finding along the way:** `/cart`'s `CartItemCard` was a complete stub — a
+bare `<div>` with a `console.log`, and both call sites (the `/cart` page and
+the nav's `CartDrawerTrigger` drawer/dialog) called it with no props at all,
+discarding the cart item entirely. This had to be built for real before
+"checkout" meant anything.
+
+**Tasks:**
+- [x] `CartItemCard` rebuilt — product image/name/price, quantity +/-, and
+      remove, wired to real mutations. Both call sites fixed to hydrate cart
+      rows against `products` and pass real data.
+- [x] `cart` had no UPDATE/DELETE policy (only INSERT/SELECT) — added both,
+      owner-scoped, since quantity edits and removal need them.
+- [x] `orders` / `order_items` tables. The checkout API route
+      (`app/api/checkout/route.ts`) creates a `pending` order under the
+      customer's own session — prices and stock come from the DB
+      server-side, never trusted from the client — then creates a Stripe
+      Checkout Session with the order id in `metadata` and returns the
+      redirect URL.
+- [x] Stripe webhook (`app/api/stripe/webhook/route.ts`) — verifies the
+      signature, flips the order to `paid` on `checkout.session.completed`,
+      clears the customer's cart, sends a notification;
+      `checkout.session.expired` cancels the pending order. Runs on a new
+      service-role Supabase client (`lib/supabase/service.ts`) since a
+      webhook has no user session to authenticate as.
+- [x] `/orders/[id]` confirmation page; `/brand-dashboard/orders` lists paid
+      line items belonging to that brand.
+- [x] Full production build (`next build`) verified end to end with dummy
+      env vars — every new route compiles and renders.
+- [!] **Two migrations (`add_orders_and_cart_write_policies` for this item,
+      `add_brand_status_and_admin_review` for item 2) are written and
+      correct but stuck behind a persistent Supabase MCP approval gate**
+      (`MCP error -32003: MCP tool call requires approval`) that didn't
+      clear despite many retries across this session. All the application
+      code is written against this schema and is ready to work the moment
+      these two apply — checkout will 500 (orders/order_items don't exist
+      yet) and cart quantity edits/removal will fail until they do.
+      **Needs:** whatever approves pending Supabase MCP tool calls on your
+      end, then re-running these two (they're in
+      `supabase/migrations/`, ready to apply as-is).
+- [ ] Needs before this works in a real deployment, beyond the two
+      migrations above: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` (from a
+      webhook endpoint registered in the Stripe dashboard pointing at
+      `/api/stripe/webhook`), and `SUPABASE_SERVICE_ROLE_KEY` as env vars.
+- [ ] Not done: refunds/cancellations, shipping address collection,
+      multi-currency, tax calculation — this is a working baseline, not a
+      complete commerce feature set.
 
 ---
 
@@ -228,13 +289,19 @@ brand catalogs grow.
 
 ---
 
-## Backlog (not in this pass)
+## Backlog
 
-- **6. AI Butler tool-calling** — `app/api/chat/route.ts` system prompt is a
-  generic `"You are a helpful assistant."` with no access to product/brand/
-  event data via the `ai` SDK's tool-calling. This is the product's namesake
-  feature and currently under-built, but it's additive rather than a
-  blocker, so it's queued after the above.
+- **6. AI Butler tool-calling — DONE.** `app/api/chat/route.ts` system
+  prompt was a generic `"You are a helpful assistant."` with no access to
+  product/brand/event data. Added four AI SDK tools
+  (`app/api/chat/tools.ts`: search products/collections/events/brands, each
+  a bounded name-filtered query against the live tables — no DB dependency,
+  works today), wired into `streamText` with `stopWhen: stepCountIs(5)`, and
+  a system prompt that identifies the assistant, instructs it to use the
+  tools rather than invent results, and specifies the exact markdown link
+  format so recommendations render as clickable links in the existing chat
+  UI (which already renders markdown links and silently skips non-text
+  message parts — no UI changes needed).
 
 - **7. Brand-dashboard "edit" pages don't edit anything — FIXED.**
   `app/brand-dashboard/{products,collections,events,articles}/[slugAndId]/page.tsx`
@@ -281,3 +348,35 @@ brand catalogs grow.
         event/article leaves its uploaded images in the Supabase Storage
         bucket) — left out to keep this pass scoped to the missing CRUD
         itself.
+
+- **8. Homepage content refurbish — DONE.** Two sections weren't placeholder
+  text so much as actually broken/unrelated content:
+  - [x] The hero carousel had zero slides — an empty `<CarouselContent>`
+        with dot indicators sized to `brands.length` pointing at nothing.
+        Replaced with a real brand-spotlight carousel using the `brands`
+        data already fetched on the page (image, name, description, link to
+        `/brands/{id}`), with a logo/tagline fallback slide for when there
+        are no brands yet.
+  - [x] "Transform Your Business at Texcellence 2025" was wholesale
+        unrelated conference-landing-page content — Keynotes/Panel
+        Sessions/Networking/Live Demos, generic B2B copy, the same
+        `ButlerAIDark` image repeated 8 times, and four "View the Agenda"
+        buttons linking to `/agenda`, a route confirmed not to exist
+        anywhere in the app (dead link). Replaced with "How Butler A.I
+        works for you" using the identical grid structure (content-only
+        swap, responsive layout untouched) showing the app's real four
+        pillars — Butler A.I, Shop, Collections, Events — each linking to
+        its real route, using the theme-aware images already imported for
+        the tile grid above rather than new assets.
+
+- **9. Server-rendering the catalog pages — deliberately deferred.**
+  Explicitly the item flagged as riskiest to do well: `/shop`, `/collections`,
+  `/events`, `/news`, and the homepage are all `"use client"` and built
+  around `useTheme`, `useIsMobile`, embla carousel refs, and framer-motion
+  state that assume a client render. Converting the initial data fetch to
+  the server while preserving that interactivity is a real architectural
+  change, not a content or query tweak, and doing it carelessly on top of
+  everything else in this pass risked breaking the app's most-visited pages
+  with no way to catch it before a real browser test. Not attempted this
+  session — worth its own focused pass with browser verification, not a
+  tack-on to a session already touching this much surface area.
