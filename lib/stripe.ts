@@ -18,3 +18,9 @@ export function getStripe(): Stripe {
   stripeClient = new Stripe(secretKey);
   return stripeClient;
 }
+
+// The platform's cut of every sale, taken out of the transfer to the
+// selling brand's connected account (see the webhook's "separate charges
+// and transfers" handling). Not a Stripe concept itself - just how much of
+// each brand's total we keep before transferring the rest.
+export const PLATFORM_FEE_PERCENT = 10;

@@ -18,7 +18,7 @@ export const getBrandProfile = (userId: string) => {
   return supabase
     .from("brands")
     .select(
-      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, created_at, updated_at"
+      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled, created_at, updated_at"
     )
     .eq("id", userId)
     .single();

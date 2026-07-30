@@ -1,7 +1,96 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, PLATFORM_FEE_PERCENT } from "@/lib/stripe";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "@/supabase";
+
+// "Separate charges and transfers": the whole cart is charged to the
+// platform's own Stripe balance (see app/api/checkout/route.ts - one
+// Checkout Session regardless of how many brands are in the cart), then
+// each brand's share is moved out with its own Transfer once payment
+// succeeds. Brands that haven't connected Stripe yet (or aren't approved
+// for charges) are simply skipped - their order_items keep transfer_id
+// null so they can be paid out later once connected.
+async function transferOrderProceedsToBrands(
+  supabase: SupabaseClient<Database>,
+  stripe: Stripe,
+  orderId: string,
+  paymentIntentId: string | undefined
+) {
+  const { data: items, error } = await supabase
+    .from("order_items")
+    .select(
+      "id, brand_id, unit_price, quantity, brands(stripe_account_id, stripe_charges_enabled)"
+    )
+    .eq("order_id", orderId)
+    .is("transfer_id", null);
+
+  if (error || !items || items.length === 0) {
+    if (error) console.error("Failed to load order items for transfer:", error);
+    return;
+  }
+
+  let sourceChargeId: string | undefined;
+  if (paymentIntentId) {
+    try {
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      sourceChargeId =
+        typeof paymentIntent.latest_charge === "string"
+          ? paymentIntent.latest_charge
+          : paymentIntent.latest_charge?.id;
+    } catch (error) {
+      console.error("Failed to retrieve payment intent for transfer source:", error);
+    }
+  }
+
+  const groups = new Map<
+    string,
+    { itemIds: string[]; totalCents: number; stripeAccountId: string }
+  >();
+
+  for (const item of items) {
+    const brand = item.brands;
+    if (!brand?.stripe_account_id || !brand.stripe_charges_enabled) continue;
+
+    const existing = groups.get(item.brand_id);
+    const itemCents = Math.round(item.unit_price * 100) * item.quantity;
+
+    if (existing) {
+      existing.itemIds.push(item.id);
+      existing.totalCents += itemCents;
+    } else {
+      groups.set(item.brand_id, {
+        itemIds: [item.id],
+        totalCents: itemCents,
+        stripeAccountId: brand.stripe_account_id,
+      });
+    }
+  }
+
+  for (const [brandId, group] of groups) {
+    const transferCents =
+      group.totalCents - Math.round((group.totalCents * PLATFORM_FEE_PERCENT) / 100);
+    if (transferCents <= 0) continue;
+
+    try {
+      const transfer = await stripe.transfers.create({
+        amount: transferCents,
+        currency: "usd",
+        destination: group.stripeAccountId,
+        transfer_group: orderId,
+        source_transaction: sourceChargeId,
+      });
+
+      await supabase
+        .from("order_items")
+        .update({ transfer_id: transfer.id, transferred_at: new Date().toISOString() })
+        .in("id", group.itemIds);
+    } catch (error) {
+      console.error(`Failed to transfer proceeds to brand ${brandId}:`, error);
+    }
+  }
+}
 
 // Runs with no user session - Stripe calls this server-to-server - so it
 // uses the service role client to update orders regardless of who owns
@@ -66,6 +155,36 @@ export async function POST(req: Request) {
           title: "Order confirmed!",
           message: "Your payment went through and your order is confirmed.",
         });
+
+        await transferOrderProceedsToBrands(
+          supabase,
+          stripe,
+          orderId,
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : session.payment_intent?.id
+        );
+
+        break;
+      }
+
+      case "account.updated": {
+        const account = event.data.object as Stripe.Account;
+
+        const { error: accountUpdateError } = await supabase
+          .from("brands")
+          .update({
+            stripe_charges_enabled: account.charges_enabled ?? false,
+            stripe_payouts_enabled: account.payouts_enabled ?? false,
+          })
+          .eq("stripe_account_id", account.id);
+
+        if (accountUpdateError) {
+          console.error(
+            "Failed to sync Stripe Connect account status:",
+            accountUpdateError
+          );
+        }
 
         break;
       }

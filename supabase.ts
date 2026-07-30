@@ -82,6 +82,9 @@ export type Database = {
           name: string
           profile_picture: string | null
           status: string
+          stripe_account_id: string | null
+          stripe_charges_enabled: boolean
+          stripe_payouts_enabled: boolean
           supabase_user_id: string
           updated_at: string | null
           url: string | null
@@ -96,6 +99,9 @@ export type Database = {
           name: string
           profile_picture?: string | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_payouts_enabled?: boolean
           supabase_user_id?: string
           updated_at?: string | null
           url?: string | null
@@ -110,6 +116,9 @@ export type Database = {
           name?: string
           profile_picture?: string | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_payouts_enabled?: boolean
           supabase_user_id?: string
           updated_at?: string | null
           url?: string | null
@@ -181,6 +190,8 @@ export type Database = {
           product_name: string
           unit_price: number
           quantity: number
+          transfer_id: string | null
+          transferred_at: string | null
           created_at: string
         }
         Insert: {
@@ -191,6 +202,8 @@ export type Database = {
           product_name: string
           unit_price: number
           quantity: number
+          transfer_id?: string | null
+          transferred_at?: string | null
           created_at?: string
         }
         Update: {
@@ -201,6 +214,8 @@ export type Database = {
           product_name?: string
           unit_price?: number
           quantity?: number
+          transfer_id?: string | null
+          transferred_at?: string | null
           created_at?: string
         }
         Relationships: [
