@@ -92,6 +92,46 @@ async function transferOrderProceedsToBrands(
   }
 }
 
+// Order items accumulate with transfer_id null whenever they were paid
+// before the selling brand had a connected (and charges-enabled) Stripe
+// account - see transferOrderProceedsToBrands, which only transfers to
+// brands that are already connected at the moment a checkout completes.
+// This sweeps a brand's backlog once account.updated reports them as
+// newly able to receive charges, grouped back out per paid order so each
+// transfer can still use that order's own charge as its source.
+async function backfillPendingTransfersForBrand(
+  supabase: SupabaseClient<Database>,
+  stripe: Stripe,
+  brandId: string
+) {
+  const { data: pendingItems, error } = await supabase
+    .from("order_items")
+    .select("order_id, orders(status, stripe_payment_intent_id)")
+    .eq("brand_id", brandId)
+    .is("transfer_id", null);
+
+  if (error) {
+    console.error("Failed to load pending order items for backfill:", error);
+    return;
+  }
+
+  const paidOrders = new Map<string, string | null | undefined>();
+  for (const item of pendingItems ?? []) {
+    if (item.orders?.status === "paid") {
+      paidOrders.set(item.order_id, item.orders.stripe_payment_intent_id);
+    }
+  }
+
+  for (const [orderId, paymentIntentId] of paidOrders) {
+    await transferOrderProceedsToBrands(
+      supabase,
+      stripe,
+      orderId,
+      paymentIntentId ?? undefined
+    );
+  }
+}
+
 // Runs with no user session - Stripe calls this server-to-server - so it
 // uses the service role client to update orders regardless of who owns
 // them. Signature verification is what proves a request actually came from
@@ -170,20 +210,32 @@ export async function POST(req: Request) {
 
       case "account.updated": {
         const account = event.data.object as Stripe.Account;
+        const chargesEnabled = account.charges_enabled ?? false;
 
-        const { error: accountUpdateError } = await supabase
+        const { data: brand, error: accountUpdateError } = await supabase
           .from("brands")
           .update({
-            stripe_charges_enabled: account.charges_enabled ?? false,
+            stripe_charges_enabled: chargesEnabled,
             stripe_payouts_enabled: account.payouts_enabled ?? false,
           })
-          .eq("stripe_account_id", account.id);
+          .eq("stripe_account_id", account.id)
+          .select("id")
+          .single();
 
         if (accountUpdateError) {
           console.error(
             "Failed to sync Stripe Connect account status:",
             accountUpdateError
           );
+          break;
+        }
+
+        // Cheap either way (a no-op query when nothing's pending) and
+        // catches every case that actually matters: first time this brand
+        // becomes chargeable, or Stripe re-sends account.updated after a
+        // temporary restriction clears.
+        if (chargesEnabled && brand) {
+          await backfillPendingTransfersForBrand(supabase, stripe, brand.id);
         }
 
         break;

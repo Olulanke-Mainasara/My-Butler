@@ -290,12 +290,26 @@ multi-brand cart as one order:
       list now shows a second "Paid out" / "Payout pending" badge per line
       item, driven by `transfer_id`.
 - [x] Verified with `get_advisors` — no new warnings.
-- [ ] Not done: backfilling transfers for `order_items` that were paid
-      while a brand was still unconnected (once they connect, older
-      un-transferred rows just sit there — no retry/reconciliation job
-      exists yet to sweep them). Also not done: an Express dashboard login
-      link for already-connected brands to check their own Stripe payout
-      history from inside My Butler instead of stripe.com directly.
+- [x] **Follow-up, done: backfill for transfers that were pending when a
+      brand wasn't connected yet.** `order_items.transfer_id` stays null
+      whenever `transferOrderProceedsToBrands` runs and the selling brand
+      isn't connected/enabled at that moment - previously nothing ever
+      revisited those rows once the brand did connect. The `account.updated`
+      handler now calls `backfillPendingTransfersForBrand` whenever
+      `charges_enabled` flips true: it finds every paid order with
+      untransferred items for that brand and re-runs
+      `transferOrderProceedsToBrands` per order (still against that order's
+      own charge as the transfer source). Idempotent by construction — both
+      functions only ever touch rows with `transfer_id IS NULL`, so a
+      redundant `account.updated` (Stripe can resend it) just finds nothing
+      left to do.
+- [x] **Follow-up, done: Express dashboard login link.** New
+      `app/api/stripe/connect/dashboard-link/route.ts` calls
+      `stripe.accounts.createLoginLink` for the calling brand's connected
+      account; the settings Payments card now shows a "View Stripe
+      Dashboard" button (opens in a new tab) once a brand is fully
+      connected, so they can check payout history without ever needing a
+      separate stripe.com login.
 - [ ] Same real-deployment prerequisite as checkout above, plus the Stripe
       Dashboard webhook endpoint needs "Connect" events (`account.updated`)
       enabled alongside the regular checkout events, or `account.updated`

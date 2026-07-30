@@ -15,6 +15,7 @@ export function StripeConnectCard() {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isOpeningDashboard, setIsOpeningDashboard] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("stripe") === "return") {
@@ -42,6 +43,27 @@ export function StripeConnectCard() {
     } catch {
       toast.error("Failed to start Stripe onboarding");
       setIsRedirecting(false);
+    }
+  };
+
+  const handleOpenDashboard = async () => {
+    setIsOpeningDashboard(true);
+    try {
+      const res = await fetch("/api/stripe/connect/dashboard-link", {
+        method: "POST",
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.url) {
+        toast.error(data.error || "Failed to open the Stripe dashboard");
+        return;
+      }
+
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    } catch {
+      toast.error("Failed to open the Stripe dashboard");
+    } finally {
+      setIsOpeningDashboard(false);
     }
   };
 
@@ -82,7 +104,15 @@ export function StripeConnectCard() {
             : "Connect a Stripe account so you can actually get paid for sales. Until this is set up, proceeds from your sales stay on the platform's balance and can't be paid out."}
       </p>
 
-      {!isFullyConnected && (
+      {isFullyConnected ? (
+        <Button
+          variant="outline"
+          onClick={handleOpenDashboard}
+          disabled={isOpeningDashboard}
+        >
+          {isOpeningDashboard ? "Opening..." : "View Stripe Dashboard"}
+        </Button>
+      ) : (
         <Button onClick={handleConnect} disabled={isRedirecting}>
           {isRedirecting
             ? "Redirecting..."
