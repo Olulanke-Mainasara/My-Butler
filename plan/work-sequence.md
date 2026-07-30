@@ -147,15 +147,23 @@ their public-facing listings stay hidden until an admin approves them.
       `get_advisors` (no new warnings beyond expected GraphQL-visibility
       noise) and a direct `pg_policies` read confirming every policy matches
       intent exactly. This feature is fully live end to end.
-- [ ] Not done: an "application submitted" distinct step at signup, and a
-      sidebar link to `/admin` for discoverability (it's reachable by URL
-      but not linked from anywhere in the nav yet).
-- [ ] **The `admins` table is empty** — nobody can use `/admin` yet. Seed
-      the first admin directly in the Supabase SQL editor:
-      ```sql
-      insert into public.admins (id)
-      select id from auth.users where email = 'your-email@example.com';
-      ```
+- [x] **Polish, done.** Admin sidebar link: `AppSidebar` now checks
+      `getIsAdmin` for the signed-in user and, if they're in the `admins`
+      table, shows an "Admin" group with a link to `/admin` — regardless of
+      whether that account is otherwise using the customer or brand
+      context, since admin status is independent of `role_id`.
+- [x] **Polish, done.** "Application submitted" step: `/auth/verify-email`
+      (shown right after signup, before email confirmation) now branches on
+      `role_id` — brands see "Application submitted" copy explaining the
+      verify-then-review flow instead of the generic customer "check your
+      email" message. Also fixed a real bug found while doing this: the
+      brand signup's `emailRedirectTo` pointed at `/brand`, a route that
+      doesn't exist (404) — corrected to `/brand-dashboard`, which already
+      has the pending/rejected status banner for exactly this moment.
+- [x] **The `admins` table was empty — now seeded.** Done earlier this
+      session (see the AI tool-calling / admin verification summary): the
+      current user was inserted into `admins` directly and `/admin` access
+      was confirmed to work end to end.
 
 ---
 
@@ -242,6 +250,57 @@ discarding the cart item entirely. This had to be built for real before
       multi-currency, tax calculation — this is a working baseline, not a
       complete commerce feature set.
 
+**Stripe Connect (brand payouts) — DONE.** Before this, checkout worked but
+brands had no way to actually get paid — every dollar landed in the
+platform's own Stripe balance with no mechanism to move a brand's share
+out. Built on the "separate charges and transfers" pattern rather than
+per-brand Checkout Sessions, since the cart/checkout flow already treats a
+multi-brand cart as one order:
+- [x] Migration `add_stripe_connect_fields`: `brands.stripe_account_id`,
+      `stripe_charges_enabled`, `stripe_payouts_enabled` (mirror Stripe's
+      own account flags); `order_items.transfer_id`/`transferred_at` (has
+      this line item's share of the sale actually been paid out yet).
+      Brands have no client-facing UPDATE policy at all (writes go through
+      `update_brand_details` or, for these fields, a server route using the
+      service role client after verifying the caller) — consistent with
+      how the table already worked, no RLS changes needed.
+- [x] `app/api/stripe/connect/onboard/route.ts` — creates an Express
+      connected account for the calling brand (or reuses the existing one)
+      and returns a fresh Account Link URL for Stripe-hosted onboarding.
+      `app/api/stripe/connect/refresh/route.ts` — where Stripe redirects
+      the brand's browser if a link expires; generates a new one and sends
+      them straight back in instead of a dead end.
+- [x] Webhook gains two responsibilities: `account.updated` syncs
+      `stripe_charges_enabled`/`stripe_payouts_enabled` onto the brand's
+      row whenever Stripe's own verification status changes (requires the
+      Stripe Dashboard webhook endpoint to also be subscribed to Connect
+      account events, not just checkout events). On
+      `checkout.session.completed`, after marking the order paid, it now
+      groups the order's line items by brand, and for every brand that's
+      connected and enabled, transfers that brand's total minus the
+      platform's cut (`PLATFORM_FEE_PERCENT` in `lib/stripe.ts`, currently
+      10%) to their connected account — using `source_transaction` (the
+      charge behind the payment) so the transfer draws against funds that
+      are actually available. Brands that haven't connected yet are simply
+      skipped; their `order_items.transfer_id` stays null so what's owed
+      to them is visible (see below) rather than silently lost.
+- [x] Brand-dashboard settings page gained a Payments section
+      (`stripe-connect-card.tsx`) — connection status plus a "Connect with
+      Stripe" / "Continue onboarding" button. The brand-dashboard orders
+      list now shows a second "Paid out" / "Payout pending" badge per line
+      item, driven by `transfer_id`.
+- [x] Verified with `get_advisors` — no new warnings.
+- [ ] Not done: backfilling transfers for `order_items` that were paid
+      while a brand was still unconnected (once they connect, older
+      un-transferred rows just sit there — no retry/reconciliation job
+      exists yet to sweep them). Also not done: an Express dashboard login
+      link for already-connected brands to check their own Stripe payout
+      history from inside My Butler instead of stripe.com directly.
+- [ ] Same real-deployment prerequisite as checkout above, plus the Stripe
+      Dashboard webhook endpoint needs "Connect" events (`account.updated`)
+      enabled alongside the regular checkout events, or `account.updated`
+      never arrives.
+
 ---
 
 ## 5. Catalog pages: pagination + server rendering
@@ -304,6 +363,18 @@ brand catalogs grow.
   format so recommendations render as clickable links in the existing chat
   UI (which already renders markdown links and silently skips non-text
   message parts — no UI changes needed).
+  - [x] **Follow-up, done: rendered result cards instead of plain links.**
+        The four search tools now also select each item's image column
+        (`product_images`, `display_image`, `profile_picture`). New
+        `app/butler/[chat]/tool-result-cards.tsx` renders a horizontally
+        scrollable row of compact image cards (photo, name, price/date/
+        location) linking straight to the item. `chat-component.tsx` now
+        also handles `tool-*` message parts (previously only `text` parts
+        were rendered — tool call/result parts were silently dropped) and
+        renders the matching card row once a tool call's `state` is
+        `output-available`. Updated the system prompt to stop asking the
+        model for markdown links on searched items, since the cards are
+        now the clickable element and duplicating both looked redundant.
 
 - **7. Brand-dashboard "edit" pages don't edit anything — FIXED.**
   `app/brand-dashboard/{products,collections,events,articles}/[slugAndId]/page.tsx`
