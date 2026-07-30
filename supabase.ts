@@ -724,22 +724,28 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
+          product_id: string
           rating: number | null
           review_text: string | null
+          reviewer_name: string
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: number
+          product_id: string
           rating?: number | null
           review_text?: string | null
+          reviewer_name: string
           user_id?: string
         }
         Update: {
           created_at?: string | null
           id?: number
+          product_id?: string
           rating?: number | null
           review_text?: string | null
+          reviewer_name?: string
           user_id?: string
         }
         Relationships: [
@@ -748,6 +754,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]

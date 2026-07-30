@@ -346,10 +346,15 @@ brand catalogs grow.
         tables' UPDATE/DELETE entirely, which means the Save/Delete buttons
         built in this pass would have silently no-opped against the live
         database until the item 1 migrations were applied.
-  - [ ] Not done: storage cleanup on delete (deleting a product/collection/
-        event/article leaves its uploaded images in the Supabase Storage
-        bucket) — left out to keep this pass scoped to the missing CRUD
-        itself.
+  - [x] **Storage cleanup on delete — DONE.** Added
+        `getStoragePathFromPublicUrl(url, bucket)` to `lib/utils.ts`
+        (strips a public Storage URL down to the object path Storage's
+        `.remove()` expects). All four `handleDelete` handlers now delete
+        the DB row first (must succeed), then best-effort remove the
+        associated file(s) from Storage — products loop over
+        `product_images`, the other three remove a single `display_image`.
+        Storage failures are logged, not surfaced as a user-facing error,
+        since the DB delete already succeeded and is the part that matters.
 
 - **8. Homepage content refurbish — DONE.** Two sections weren't placeholder
   text so much as actually broken/unrelated content:
@@ -382,3 +387,39 @@ brand catalogs grow.
   with no way to catch it before a real browser test. Not attempted this
   session — worth its own focused pass with browser verification, not a
   tack-on to a session already touching this much surface area.
+
+- **10. Reviews — DONE.** `reviews` had no `product_id` column at all —
+  just `user_id`/`rating`/`review_text`/`created_at` — so the product page's
+  "Customer Reviews" tab had nothing to query against and was hard-commented
+  out with a static "No reviews yet" placeholder.
+  - [x] Migration `add_review_product_reference_and_rating_sync`: added
+        `product_id uuid NOT NULL REFERENCES products(id) ON DELETE CASCADE`,
+        a `UNIQUE (product_id, user_id)` constraint (one review per customer
+        per product — resubmitting is an update, not a second row), UPDATE/
+        DELETE RLS policies scoped to `auth.uid() = user_id` (INSERT/SELECT
+        already existed), and a `SECURITY DEFINER` trigger
+        (`update_product_rating_stats` / `reviews_update_product_rating`)
+        that recomputes `products.rating`/`reviews_count` on every
+        insert/update/delete so those denormalized display fields stay
+        accurate automatically.
+  - [x] Migration `add_review_reviewer_name_snapshot`: added
+        `reviewer_name text NOT NULL`. A live join from `reviews` to
+        `customers` for the reviewer's display name would silently return
+        null for every review except the viewer's own, because `customers`
+        SELECT is correctly locked to `auth.uid() = id` — the same reason
+        `order_items` snapshots `product_name`/`unit_price` instead of
+        joining. `reviewer_name` is captured from the customer's
+        `display_name` at submission time instead.
+  - [x] `lib/fetches.ts`: `getProductReviews(productId)` (public, all
+        reviews for a product) and `getMyReviewForProduct(productId, userId)`
+        (the logged-in customer's own review, if any).
+  - [x] `lib/mutations.ts`: `submitReview()` — upserts on the
+        `(product_id, user_id)` conflict, so a second submission edits the
+        existing row instead of violating the unique constraint.
+  - [x] `app/shop/[slugAndId]/product-reviews.tsx` (new): renders the
+        review list (star rating, `reviewer_name`, date, text) and, for
+        logged-in customers, a star-picker + textarea submission form that
+        shows their existing review with an "Edit" action instead of a
+        second form once they've already reviewed. Wired into
+        `app/shop/[slugAndId]/page.tsx`'s Reviews tab, replacing the
+        commented-out block.
