@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { getCollectionForEdit } from "@/lib/fetches";
-import { getItemId, invalidateTable } from "@/lib/utils";
+import {
+  getItemId,
+  getStoragePathFromPublicUrl,
+  invalidateTable,
+} from "@/lib/utils";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase/client";
@@ -72,6 +76,18 @@ export default function EditCollectionPage() {
     if (error) {
       toast.error("Failed to delete collection. Please try again.");
       return;
+    }
+
+    const imagePath = collection.display_image
+      ? getStoragePathFromPublicUrl(collection.display_image, "collections")
+      : null;
+    if (imagePath) {
+      const { error: storageError } = await supabase.storage
+        .from("collections")
+        .remove([imagePath]);
+      if (storageError) {
+        console.error("Failed to clean up collection image:", storageError);
+      }
     }
 
     invalidateTable(queryClient, "collections");

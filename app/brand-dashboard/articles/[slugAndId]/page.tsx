@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { getArticle } from "@/lib/fetches";
-import { getItemId, invalidateTable } from "@/lib/utils";
+import {
+  getItemId,
+  getStoragePathFromPublicUrl,
+  invalidateTable,
+} from "@/lib/utils";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase/client";
@@ -71,6 +75,18 @@ export default function EditArticlePage() {
     if (error) {
       toast.error("Failed to delete article. Please try again.");
       return;
+    }
+
+    const imagePath = article.display_image
+      ? getStoragePathFromPublicUrl(article.display_image, "news")
+      : null;
+    if (imagePath) {
+      const { error: storageError } = await supabase.storage
+        .from("news")
+        .remove([imagePath]);
+      if (storageError) {
+        console.error("Failed to clean up article image:", storageError);
+      }
     }
 
     invalidateTable(queryClient, "news");
