@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { getEvent } from "@/lib/fetches";
-import { getItemId, invalidateTable } from "@/lib/utils";
+import {
+  getItemId,
+  getStoragePathFromPublicUrl,
+  invalidateTable,
+} from "@/lib/utils";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase/client";
@@ -71,6 +75,18 @@ export default function EditEventPage() {
     if (error) {
       toast.error("Failed to delete event. Please try again.");
       return;
+    }
+
+    const imagePath = event.display_image
+      ? getStoragePathFromPublicUrl(event.display_image, "events")
+      : null;
+    if (imagePath) {
+      const { error: storageError } = await supabase.storage
+        .from("events")
+        .remove([imagePath]);
+      if (storageError) {
+        console.error("Failed to clean up event image:", storageError);
+      }
     }
 
     invalidateTable(queryClient, "events");

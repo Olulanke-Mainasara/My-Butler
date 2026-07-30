@@ -29,19 +29,32 @@ import Image from "next/image";
 import logoDark from "@/public/Logo/logoDark.png";
 import logoLight from "@/public/Logo/logoLight.png";
 import { groupedNavigation } from "@/static-data/navigation";
-import { ChevronUp, LogIn, LogOut, User } from "lucide-react";
+import { ChevronUp, LogIn, LogOut, ShieldCheck, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
+import { useAuth } from "@/components/Providers/AllProviders";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { getIsAdmin } from "@/lib/fetches";
 
 export function AppSidebar() {
   const customerProfile = useCustomerProfile();
+  const user = useAuth();
   const router = useTransitionRouter();
   const pathname = usePathname();
   const { theme } = useTheme();
   const { toggleSidebar } = useSidebar();
   const queryClient = useQueryClient();
+
+  // Admin status has nothing to do with role_id (customer vs brand) - it's
+  // a separate `admins` table membership check, so this link only shows up
+  // for accounts actually in that table, regardless of which profile
+  // context they're otherwise using.
+  const { data: adminRow } = useQuery(getIsAdmin(user?.id || ""), {
+    enabled: !!user?.id,
+  });
+  const isAdmin = !!adminRow;
 
   const handleSignout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -111,6 +124,36 @@ export function AppSidebar() {
             )}
           </SidebarGroup>
         ))}
+
+        {isAdmin && (
+          <SidebarGroup className="pt-0 px-2">
+            <SidebarGroupLabel className="tracking-normal text-base text-neutral-500">
+              Admin
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/admin"}
+                    size={"default"}
+                    onClick={() => {
+                      toggleSidebar();
+                      router.push("/admin");
+                    }}
+                  >
+                    <Link href="/admin">
+                      <span className="text-brandLight dark:text-brandDark text-sm">
+                        <ShieldCheck size={20} />
+                      </span>
+                      <span>Brand Review</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarSeparator className="bg-darkBackground dark:bg-lightBackground w-full ml-0" />
       <SidebarFooter className="pb-4">

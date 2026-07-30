@@ -51,6 +51,15 @@ export default function BrandOrdersPage() {
                 <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
                   Paid
                 </Badge>
+                <Badge
+                  className={
+                    item.transfer_id
+                      ? "bg-green-100 text-green-800 hover:bg-green-200"
+                      : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                  }
+                >
+                  {item.transfer_id ? "Paid out" : "Payout pending"}
+                </Badge>
               </div>
             </div>
           ))}

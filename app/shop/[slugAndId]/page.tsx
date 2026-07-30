@@ -26,6 +26,7 @@ import AddToCart from "@/components/Custom-UI/Buttons/AddToCart";
 import { getProduct } from "@/lib/fetches";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { Icons } from "@/components/Custom-UI/icons";
+import { ProductReviews } from "./product-reviews";
 
 export default function ProductPage() {
   const pathname = usePathname();
@@ -279,36 +280,7 @@ export default function ProductPage() {
               <div className="rounded-2xl p-8 shadow-sm border hover:shadow-md transition-shadow duration-300">
                 <h3 className="text-2xl font-bold">Customer Reviews</h3>
                 <hr className="mt-5 mb-4" />
-                {/* {product.reviews && product.reviews.length > 0 ? (
-                  <div className="space-y-4">
-                    {product.reviews.map((review, index) => (
-                      <div
-                        key={index}
-                        className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-4 h-4 ${
-                                i < review.rating
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          ))}
-                          <span className="text-sm text-gray-500">
-                            {review.author}
-                          </span>
-                        </div>
-                        <p>{review.comment}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p>No reviews yet. Be the first to review!</p>
-                )} */}
-                <p>No reviews yet. Be the first to review!</p>
+                <ProductReviews productId={product.id} />
               </div>
             </TabsContent>
           </Tabs>

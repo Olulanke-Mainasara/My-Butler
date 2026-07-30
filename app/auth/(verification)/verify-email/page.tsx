@@ -3,11 +3,13 @@
 import React from "react";
 import { Button } from "@/components/Shad-UI/button";
 import { Link } from "next-view-transitions";
-import { MailCheck, MailPlus } from "lucide-react";
+import { MailCheck, MailPlus, ClipboardCheck } from "lucide-react";
 import { useAuth } from "@/components/Providers/AllProviders";
+import { ROLE_BRAND } from "@/lib/roles";
 
 const VerifyEmail = () => {
   const userSession = useAuth();
+  const isBrandSignup = userSession?.user_metadata?.role_id === ROLE_BRAND;
 
   return (
     <div className="h-screen flex items-center justify-center px-4">
@@ -32,6 +34,33 @@ const VerifyEmail = () => {
             <p className="max-w-md">
               You can return to your previous tab and close this one or go back
               to the home page
+            </p>
+          </div>
+
+          <Button size={"lg"} asChild>
+            <Link href={"/"}>Home</Link>
+          </Button>
+        </div>
+      ) : isBrandSignup ? (
+        <div className="space-y-4 border border-darkBackground dark:border-lightBackground p-4 rounded-lg dark:text-white text-center">
+          <div className="flex flex-col items-center gap-3">
+            <ClipboardCheck
+              size={70}
+              className="text-brandLight dark:text-brandDark"
+            />
+            <h1 className="text-4xl">Application submitted</h1>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <p className="max-w-md">
+              Thanks for applying to sell on My Butler. First, verify your
+              email - check your inbox and click the link we sent.
+            </p>
+            <p className="max-w-md">
+              Once verified, you can start setting up your products,
+              collections, events, and articles right away. Your brand won&apos;t
+              be visible to customers until an admin reviews and approves it -
+              we&apos;ll notify you as soon as a decision is made.
             </p>
           </div>
 

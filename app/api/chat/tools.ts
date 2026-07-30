@@ -21,7 +21,7 @@ export const searchProducts = tool({
   execute: async ({ query, minPrice, maxPrice, limit }) => {
     let request = supabase
       .from("products")
-      .select("id, slug, name, description, price, stock_quantity")
+      .select("id, slug, name, description, price, stock_quantity, product_images")
       .limit(limit);
 
     if (query) request = request.ilike("name", `%${query}%`);
@@ -44,7 +44,7 @@ export const searchCollections = tool({
   execute: async ({ query, limit }) => {
     let request = supabase
       .from("collections")
-      .select("id, slug, name, description")
+      .select("id, slug, name, description, display_image")
       .limit(limit);
 
     if (query) request = request.ilike("name", `%${query}%`);
@@ -65,7 +65,9 @@ export const searchEvents = tool({
   execute: async ({ query, limit }) => {
     let request = supabase
       .from("events")
-      .select("id, slug, title, description, start_date, location, is_virtual, admission_price")
+      .select(
+        "id, slug, title, description, start_date, location, is_virtual, admission_price, display_image"
+      )
       .gte("start_date", new Date().toISOString())
       .order("start_date", { ascending: true })
       .limit(limit);
@@ -88,7 +90,7 @@ export const searchBrands = tool({
   execute: async ({ query, limit }) => {
     let request = supabase
       .from("brands")
-      .select("id, name, description, location")
+      .select("id, name, description, location, profile_picture")
       .limit(limit);
 
     if (query) request = request.ilike("name", `%${query}%`);

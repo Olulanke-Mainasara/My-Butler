@@ -18,7 +18,7 @@ export const getBrandProfile = (userId: string) => {
   return supabase
     .from("brands")
     .select(
-      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, created_at, updated_at"
+      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled, created_at, updated_at"
     )
     .eq("id", userId)
     .single();
@@ -239,6 +239,24 @@ export const getBrandOrderItems = (brandId: string) => {
     .select("*, orders(id, status, created_at)")
     .eq("brand_id", brandId)
     .order("created_at", { ascending: false });
+};
+
+// Reviews
+export const getProductReviews = (productId: string) => {
+  return supabase
+    .from("reviews")
+    .select("id, product_id, user_id, rating, review_text, reviewer_name, created_at")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false });
+};
+
+export const getMyReviewForProduct = (productId: string, userId: string) => {
+  return supabase
+    .from("reviews")
+    .select("id, product_id, user_id, rating, review_text, reviewer_name, created_at")
+    .eq("product_id", productId)
+    .eq("user_id", userId)
+    .maybeSingle();
 };
 
 // Admin

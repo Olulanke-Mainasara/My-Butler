@@ -82,6 +82,9 @@ export type Database = {
           name: string
           profile_picture: string | null
           status: string
+          stripe_account_id: string | null
+          stripe_charges_enabled: boolean
+          stripe_payouts_enabled: boolean
           supabase_user_id: string
           updated_at: string | null
           url: string | null
@@ -96,6 +99,9 @@ export type Database = {
           name: string
           profile_picture?: string | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_payouts_enabled?: boolean
           supabase_user_id?: string
           updated_at?: string | null
           url?: string | null
@@ -110,6 +116,9 @@ export type Database = {
           name?: string
           profile_picture?: string | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_payouts_enabled?: boolean
           supabase_user_id?: string
           updated_at?: string | null
           url?: string | null
@@ -181,6 +190,8 @@ export type Database = {
           product_name: string
           unit_price: number
           quantity: number
+          transfer_id: string | null
+          transferred_at: string | null
           created_at: string
         }
         Insert: {
@@ -191,6 +202,8 @@ export type Database = {
           product_name: string
           unit_price: number
           quantity: number
+          transfer_id?: string | null
+          transferred_at?: string | null
           created_at?: string
         }
         Update: {
@@ -201,6 +214,8 @@ export type Database = {
           product_name?: string
           unit_price?: number
           quantity?: number
+          transfer_id?: string | null
+          transferred_at?: string | null
           created_at?: string
         }
         Relationships: [
@@ -724,22 +739,28 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
+          product_id: string
           rating: number | null
           review_text: string | null
+          reviewer_name: string
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: number
+          product_id: string
           rating?: number | null
           review_text?: string | null
+          reviewer_name: string
           user_id?: string
         }
         Update: {
           created_at?: string | null
           id?: number
+          product_id?: string
           rating?: number | null
           review_text?: string | null
+          reviewer_name?: string
           user_id?: string
         }
         Relationships: [
@@ -748,6 +769,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]

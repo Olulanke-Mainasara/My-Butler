@@ -17,6 +17,24 @@ export function invalidateTable(queryClient: QueryClient, table: string) {
 }
 
 /**
+ * Extracts the storage path from a Supabase Storage public URL, e.g.
+ * "https://xyz.supabase.co/storage/v1/object/public/products/{brandId}/foo.jpg"
+ * -> "{brandId}/foo.jpg" for bucket "products". Needed because
+ * `storage.from(bucket).remove()` takes paths, not the public URLs saved on
+ * the row - returns null if the URL doesn't match the expected shape (e.g.
+ * a placeholder image) so callers can skip it rather than send a bad path.
+ */
+export function getStoragePathFromPublicUrl(
+  url: string,
+  bucket: string
+): string | null {
+  const marker = `/storage/v1/object/public/${bucket}/`;
+  const index = url.indexOf(marker);
+  if (index === -1) return null;
+  return decodeURIComponent(url.slice(index + marker.length));
+}
+
+/**
  * Merges class names using `clsx` and `tailwind-merge`.
  *
  * This function takes multiple class name values, processes them using the

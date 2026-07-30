@@ -122,6 +122,25 @@ export const deleteImage = async (
   return client.storage.from("camera-pictures").remove([imagePath]);
 };
 
+export async function submitReview(
+  client: SupabaseClient,
+  review: {
+    product_id: string;
+    user_id: string;
+    reviewer_name: string;
+    rating: number;
+    review_text: string;
+  }
+) {
+  const { error } = await client
+    .from("reviews")
+    .upsert(review, { onConflict: "product_id,user_id" });
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function updateBrandStatus(
   client: SupabaseClient,
   brandId: string,

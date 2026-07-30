@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { getProductForEdit } from "@/lib/fetches";
-import { getItemId, invalidateTable } from "@/lib/utils";
+import {
+  getItemId,
+  getStoragePathFromPublicUrl,
+  invalidateTable,
+} from "@/lib/utils";
 import { useBrandProfile } from "@/components/Providers/UserProvider";
 import { Icons } from "@/components/Custom-UI/icons";
 import { supabase } from "@/lib/supabase/client";
@@ -76,6 +80,20 @@ export default function EditProductPage() {
     if (error) {
       toast.error("Failed to delete product. Please try again.");
       return;
+    }
+
+    // Best-effort - the row is already gone either way, and a stray file in
+    // storage is a lesser problem than blocking the delete on cleanup.
+    const imagePaths = (product.product_images ?? [])
+      .map((url) => getStoragePathFromPublicUrl(url, "products"))
+      .filter((path): path is string => !!path);
+    if (imagePaths.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from("products")
+        .remove(imagePaths);
+      if (storageError) {
+        console.error("Failed to clean up product images:", storageError);
+      }
     }
 
     invalidateTable(queryClient, "products");

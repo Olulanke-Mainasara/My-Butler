@@ -49,7 +49,7 @@ export function SignupForm({ ...props }: React.ComponentProps<"div">) {
         emailRedirectTo:
           role_id === ROLE_CUSTOMER
             ? `${getURL()}auth/email-verified`
-            : `${getURL()}brand`,
+            : `${getURL()}brand-dashboard`,
         data:
           role_id === ROLE_CUSTOMER
             ? {
