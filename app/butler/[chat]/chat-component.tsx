@@ -4,6 +4,12 @@ import { UIMessage, useChat } from "@ai-sdk/react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowUp, Stars } from "lucide-react";
 import { Markdown } from "./markdown";
+import {
+  ProductResults,
+  CollectionResults,
+  EventResults,
+  BrandResults,
+} from "./tool-result-cards";
 import { useLocalStorage } from "react-use";
 import { useTransitionRouter } from "next-view-transitions";
 import { usePathname } from "next/navigation";
@@ -203,13 +209,43 @@ export default function ChatComponent() {
               }`}
             >
               {message.parts.map((part, i) => {
+                const key = `${message.id}-${i}`;
+
                 if (part.type === "text") {
                   return (
-                    <div key={`${message.id}-${i}`}>
+                    <div key={key}>
                       <Markdown>{part.text}</Markdown>
                     </div>
                   );
                 }
+
+                if (part.type.startsWith("tool-") && "state" in part) {
+                  if (part.state !== "output-available") return null;
+                  const output = part.output as Record<string, unknown>;
+                  if (!output || "error" in output) return null;
+
+                  return (
+                    <div key={key} className="mt-2 max-w-xs lg:max-w-md">
+                      {part.type === "tool-searchProducts" && (
+                        <ProductResults
+                          products={output.products as never}
+                        />
+                      )}
+                      {part.type === "tool-searchCollections" && (
+                        <CollectionResults
+                          collections={output.collections as never}
+                        />
+                      )}
+                      {part.type === "tool-searchEvents" && (
+                        <EventResults events={output.events as never} />
+                      )}
+                      {part.type === "tool-searchBrands" && (
+                        <BrandResults brands={output.brands as never} />
+                      )}
+                    </div>
+                  );
+                }
+
                 return null;
               })}
             </div>

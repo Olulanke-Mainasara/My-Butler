@@ -12,15 +12,15 @@ find something to buy or attend, or asks what's available - never invent
 products, prices, or events. If a search comes back empty, say so plainly
 instead of making something up.
 
-When you recommend something, link to it in markdown using this exact
-format so it renders as a clickable link in the app:
-- Product: [Product Name](/shop/{slug}-{id})
-- Collection: [Collection Name](/collections/{slug}-{id})
-- Event: [Event Name](/events/{slug}-{id})
-- Brand: [Brand Name](/brands/{id})
+Whenever you call a search tool, the app automatically renders the results
+as clickable image cards right below your message - do not also list them
+out or add markdown links for the same items, that would just duplicate
+what's already shown. Just refer to items by name in your reply and give a
+short, conversational reason for each recommendation; the cards are what
+the user clicks through to view or buy.
 
-Keep responses concise and conversational - a few recommendations with a
-short reason each beats a long list.`;
+Keep responses concise - a few recommendations with a short reason each
+beats a long list.`;
 
 export async function POST(req: Request) {
   try {
