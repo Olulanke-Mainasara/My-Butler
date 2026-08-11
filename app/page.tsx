@@ -16,9 +16,7 @@ import ShopLight from "@/public/Pages/Home/shop-light.png";
 import {
   ArrowDown,
   ArrowRight,
-  Clock,
   Factory,
-  MapPin,
   ShoppingBag,
   Stars,
 } from "lucide-react";
@@ -54,10 +52,10 @@ import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import CollectionCard from "@/components/Custom-UI/Cards/CollectionCard";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
+import EventSliderCard from "@/components/Custom-UI/Cards/EventSliderCard";
 import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
 import { motion } from "framer-motion";
 import { Button } from "@/components/Shad-UI/button";
-import { Badge } from "@/components/Shad-UI/badge";
 import {
   Empty,
   EmptyDescription,
@@ -65,11 +63,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/Shad-UI/empty";
-import {
-  buildItemSlugId,
-  convertRawDateToReadableDate,
-  convertRawDateToReadableTime,
-} from "@/lib/utils";
 import Footer from "@/components/Custom-UI/Footer";
 
 const subItems = [
@@ -94,7 +87,6 @@ export default function HomePage() {
 
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const [card, setCard] = useState(0);
 
   useEffect(() => {
     if (!api) {
@@ -108,10 +100,6 @@ export default function HomePage() {
     });
   }, [api]);
 
-  const handleClick = (index: number) => {
-    setCard(index);
-  };
-
   // Products only ever feed the category-switcher carousel above (no
   // dedicated listing section on this page), so it's capped but has no
   // "Load more" control here - /shop is where the full paginated listing
@@ -119,8 +107,6 @@ export default function HomePage() {
   // further down the page, so those get their own visibleCount + trigger.
   const [productsVisibleCount] = useState(DEFAULT_PAGE_SIZE);
   const [collectionsVisibleCount, setCollectionsVisibleCount] =
-    useState(DEFAULT_PAGE_SIZE);
-  const [eventsVisibleCount, setEventsVisibleCount] =
     useState(DEFAULT_PAGE_SIZE);
   const [newsVisibleCount, setNewsVisibleCount] = useState(DEFAULT_PAGE_SIZE);
 
@@ -132,11 +118,9 @@ export default function HomePage() {
     isFetching: isFetchingCollections,
     isLoading: isLoadingCollections,
   } = useQuery(getCollections({ pageSize: collectionsVisibleCount }));
-  const {
-    data: events,
-    isFetching: isFetchingEvents,
-    isLoading: isLoadingEvents,
-  } = useQuery(getEvents({ pageSize: eventsVisibleCount }));
+  const { data: events, isLoading: isLoadingEvents } = useQuery(
+    getEvents({ pageSize: 8 })
+  );
   const {
     data: news,
     isFetching: isFetchingNews,
@@ -147,7 +131,6 @@ export default function HomePage() {
 
   const hasMoreCollections =
     (collections?.length ?? 0) >= collectionsVisibleCount;
-  const hasMoreEvents = (events?.length ?? 0) >= eventsVisibleCount;
   const hasMoreNews = (news?.length ?? 0) >= newsVisibleCount;
 
   return (
@@ -734,7 +717,14 @@ export default function HomePage() {
       </section>
 
       <section className="flex flex-col gap-8 px-6 dark:text-white xl:p-8">
-        <h2 className="text-center text-3xl md:text-4xl">Anticipated Events</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl md:text-4xl">Anticipated Events</h2>
+          <Link href="/events">
+            <Button variant="outline">
+              See all events <ArrowRight className="size-4" />
+            </Button>
+          </Link>
+        </div>
 
         {isLoadingEvents ? (
           <LoadingSkeleton
@@ -756,101 +746,22 @@ export default function HomePage() {
             </EmptyHeader>
           </Empty>
         ) : (
-          <div className="flex h-[500px] w-full gap-8 overflow-y-hidden overflow-x-scroll text-white md:h-[600px]">
-            {events.map((event, index) => {
-              const eventLink = `/events/${buildItemSlugId(event.slug, event.id)}`;
-              const expanded = card === index;
-
-              return (
-                <div
-                  onClick={() => handleClick(index)}
-                  className={`relative min-w-[60vw] overflow-hidden rounded-xl duration-500 ease-out xl:min-w-[240px] ${
-                    expanded ? "grow" : "grow-0 hover:cursor-pointer"
-                  }`}
-                  key={index}
+          <Carousel opts={{ align: "start" }} className="h-[500px] md:h-[600px]">
+            <CarouselContent className="h-full">
+              {events.map((event) => (
+                <CarouselItem
+                  key={event.id}
+                  className="h-full basis-[85%] md:basis-[70%]"
                 >
-                  <div className="relative h-full w-full">
-                    <Image
-                      className="object-cover"
-                      src={event.display_image || "/placeholder.svg"}
-                      fill
-                      sizes="(max-width: 767px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      quality={90}
-                      alt={event.title}
-                    />
-                  </div>
-
-                  <div
-                    className={`${
-                      !expanded
-                        ? "backdrop-brightness-[80%] xl:backdrop-brightness-50"
-                        : "backdrop-brightness-[80%]"
-                    } absolute inset-0 flex flex-col justify-between p-5 duration-500`}
-                  >
-                    <Badge className="w-fit bg-white/10 text-white backdrop-blur-sm hover:bg-white/10">
-                      {convertRawDateToReadableDate(event.start_date)}
-                    </Badge>
-
-                    <div className="flex flex-col gap-2">
-                      <p
-                        className={`${
-                          expanded
-                            ? "text-3xl md:text-5xl"
-                            : "text-3xl md:text-5xl xl:text-xl"
-                        } duration-300`}
-                      >
-                        {event.title}
-                      </p>
-
-                      <div
-                        className={`flex flex-col gap-3 duration-300 ${
-                          expanded ? "opacity-100" : "xl:opacity-0"
-                        }`}
-                      >
-                        <p className="flex items-center gap-2 text-sm text-neutral-200">
-                          <MapPin className="size-4 shrink-0" />
-                          {event.is_virtual
-                            ? "Online Event"
-                            : event.location ?? "Location TBA"}
-                          <span className="text-neutral-400">·</span>
-                          <Clock className="size-4 shrink-0" />
-                          {convertRawDateToReadableTime(event.start_date)}
-                        </p>
-                        <Link
-                          href={eventLink}
-                          onClick={(e) => e.stopPropagation()}
-                          className="w-fit"
-                        >
-                          <Button>
-                            View more <ArrowRight />
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  <EventSliderCard item={event} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
         )}
       </section>
-
-      {hasMoreEvents && (
-        <div className="flex justify-center px-6 xl:px-8">
-          <Button
-            variant="outline"
-            disabled={isFetchingEvents}
-            onClick={() =>
-              setEventsVisibleCount((count) => count + DEFAULT_PAGE_SIZE)
-            }
-          >
-            {isFetchingEvents && (
-              <Icons.spinner className="w-4 h-4 animate-spin" />
-            )}
-            Load more
-          </Button>
-        </div>
-      )}
 
       <section className="space-y-4 px-4 md:px-5 pt-5">
         <h2 className="text-3xl md:text-4xl">Top Stories</h2>
