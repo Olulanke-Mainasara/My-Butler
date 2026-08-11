@@ -1,11 +1,21 @@
 "use client";
 
 import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/Shad-UI/button";
 import { Card, CardContent } from "@/components/Shad-UI/card";
 import { Input } from "@/components/Shad-UI/input";
-import { Label } from "@/components/Shad-UI/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/Shad-UI/form";
 import Image from "next/image";
 import { useTransitionRouter } from "next-view-transitions";
 import { Link } from "next-view-transitions";
@@ -18,26 +28,28 @@ import LightLoginImg from "@/public/AuthImgs/login-light.svg";
 import DarkLoginImg from "@/public/AuthImgs/login-dark.svg";
 import { useTheme } from "next-themes";
 import { ROLE_CUSTOMER } from "@/lib/roles";
+import { loginSchema } from "@/lib/schemas";
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const router = useTransitionRouter();
   const { theme } = useTheme();
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
+
+  const onSubmit = async (values: LoginFormValues) => {
     setError("");
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await supabase.auth.signInWithPassword(values);
     if (error) {
       setError(error.message);
       setLoading(false);
@@ -68,80 +80,101 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-6 max-w-96 mx-auto">
-              <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-balance text-neutral-500 dark:text-neutral-400">
-                  Login to your My Butler account
-                </p>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="m@example.com"
-                  required
-                  disabled={loading}
-                  className="disabled:cursor-not-allowed disabled:opacity-50"
+          <Form {...form}>
+            <form
+              className="p-6 md:p-8"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <div className="flex flex-col gap-6 max-w-96 mx-auto">
+                <div className="flex flex-col items-center text-center">
+                  <h1 className="text-2xl font-bold">Welcome back</h1>
+                  <p className="text-balance text-neutral-500 dark:text-neutral-400">
+                    Login to your My Butler account
+                  </p>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="m@example.com"
+                          disabled={loading}
+                          className="disabled:cursor-not-allowed disabled:opacity-50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <div className="flex items-center">
+                        <FormLabel>Password</FormLabel>
+                        <Link
+                          href="/auth/forgot-password"
+                          className="ml-auto text-sm underline-offset-2 hover:underline"
+                        >
+                          Forgot your password?
+                        </Link>
+                      </div>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          disabled={loading}
+                          className="disabled:cursor-not-allowed disabled:opacity-50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full text-base flex items-center gap-1 disabled:opacity-50"
+                >
+                  {loading && (
+                    <Icons.spinner className="w-6 h-6 animate-spin" />
+                  )}
+                  Login
+                </Button>
+
+                {error && (
+                  <div className="text-center text-red-600">
+                    <p>{`${error}, please try again`}</p>
+                  </div>
+                )}
+
+                <ThirdPartySignIn
+                  loading={loading}
+                  handleThirdPartyLogin={(provider) =>
+                    handleOAuthLogin(provider)
+                  }
+                  google
+                />
+
+                <div className="text-center text-sm flex gap-1 justify-center">
+                  Don&apos;t have an account?{""}
                   <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                    href="/auth/signup"
+                    className="underline underline-offset-4"
                   >
-                    Forgot your password?
+                    Sign up
                   </Link>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="disabled:cursor-not-allowed disabled:opacity-50"
-                />
               </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full text-base flex items-center gap-1 disabled:opacity-50"
-              >
-                {loading && <Icons.spinner className="w-6 h-6 animate-spin" />}
-                Login
-              </Button>
-
-              {error && (
-                <div className="text-center text-red-600">
-                  <p>{`${error}, please try again`}</p>
-                </div>
-              )}
-
-              <ThirdPartySignIn
-                loading={loading}
-                handleThirdPartyLogin={(provider) => handleOAuthLogin(provider)}
-                google
-              />
-
-              <div className="text-center text-sm flex gap-1 justify-center">
-                Don&apos;t have an account?{""}
-                <Link
-                  href="/auth/signup"
-                  className="underline underline-offset-4"
-                >
-                  Sign up
-                </Link>
-              </div>
-            </div>
-          </form>
+            </form>
+          </Form>
           <div className="relative hidden bg-lightBackground md:block dark:bg-neutral-800">
             <Image
               fill

@@ -1,6 +1,4 @@
 import { supabase } from "./supabase/client";
-import { Database } from "@/supabase";
-import { SupabaseClient } from "@supabase/supabase-js";
 
 // Customer Profile
 export const getCustomerProfile = (userId: string) => {
@@ -11,6 +9,17 @@ export const getCustomerProfile = (userId: string) => {
     )
     .eq("id", userId)
     .single();
+};
+
+// Customers (admin)
+export const getAllCustomers = (params: PageParams = {}) => {
+  return paginate(supabase.from("customers").select("*"), params);
+};
+
+export const getCustomersCount = () => {
+  return supabase
+    .from("customers")
+    .select("*", { count: "estimated", head: true });
 };
 
 // Brand Profile
@@ -74,9 +83,6 @@ export const DEFAULT_PAGE_SIZE = 24;
 
 export type PageParams = { page?: number; pageSize?: number };
 
-// Helper to apply filters
-type QueryBuilder = ReturnType<SupabaseClient<Database>["from"]>["select"];
-
 // Applies `.range()` only when a pageSize is passed, so existing callers of
 // getProducts()/getCollections()/etc. with no arguments keep fetching the
 // full table (unpaginated) exactly as before.
@@ -89,29 +95,13 @@ function paginate<T extends { range: (from: number, to: number) => T }>(
   return query.range(from, from + pageSize - 1);
 }
 
-function applyFilters(
-  query: QueryBuilder,
-  filters: Record<string, string | number | boolean>
-): QueryBuilder {
-  let result = query;
-  Object.entries(filters).forEach(([key, value]) => {
-    result = result.eq(key, value);
-  });
-  return result;
-}
-
 // Brands
 export const getBrands = (params: PageParams = {}) => {
   return paginate(supabase.from("brands").select("*"), params);
 };
 
-export const getBrandsCount = (
-  filters: Record<string, string | number | boolean> = {}
-) => {
-  const query = supabase
-    .from("brands")
-    .select("*", { count: "exact", head: true });
-  return applyFilters(query, filters);
+export const getBrandsCount = () => {
+  return supabase.from("brands").select("*", { count: "estimated", head: true });
 };
 
 export const getBrand = (brandId: string) => {
@@ -121,19 +111,6 @@ export const getBrand = (brandId: string) => {
 // Categories
 export const getCategories = () => {
   return supabase.from("categories").select("*");
-};
-
-export const getCategoriesCount = (
-  filters: Record<string, string | number | boolean> = {}
-) => {
-  const query = supabase
-    .from("categories")
-    .select("*", { count: "exact", head: true });
-  return applyFilters(query, filters);
-};
-
-export const getCategory = (categoryId: number) => {
-  return supabase.from("categories").select("*").eq("id", categoryId).single();
 };
 
 // Collections
@@ -224,12 +201,21 @@ export const getOrder = (orderId: string) => {
     .single();
 };
 
-export const getCustomerOrders = (customerId: string) => {
+// All orders (admin), with the buying customer's name/email attached.
+export const getAllOrders = (params: PageParams = {}) => {
+  return paginate(
+    supabase
+      .from("orders")
+      .select("*, customers(display_name, email)")
+      .order("created_at", { ascending: false }),
+    params
+  );
+};
+
+export const getOrdersCount = () => {
   return supabase
     .from("orders")
-    .select("*, order_items(*)")
-    .eq("customer_id", customerId)
-    .order("created_at", { ascending: false });
+    .select("*", { count: "estimated", head: true });
 };
 
 // Order line items belonging to a brand, across all customers' orders.

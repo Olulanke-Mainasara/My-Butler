@@ -3,7 +3,7 @@ export function ArticleSkeleton() {
     <div className="min-h-screen bg-white">
       {/* Hero Section Skeleton */}
       <div className="relative h-[60vh] bg-gray-200 animate-pulse">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
       </div>
 
       {/* Article Content Skeleton */}
@@ -48,7 +48,7 @@ export function ArticleSkeleton() {
             <div className="my-12 h-px bg-gray-200"></div>
 
             {/* Author Bio Skeleton */}
-            <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl">
+            <div className="flex items-start gap-4 p-6 bg-linear-to-r from-gray-50 to-blue-50 rounded-2xl">
               <div className="w-16 h-16 bg-gray-200 rounded-full animate-pulse"></div>
               <div className="flex-1">
                 <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-2"></div>

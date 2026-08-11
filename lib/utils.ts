@@ -152,36 +152,6 @@ export function generateSlug(name: string): string {
 }
 
 /**
- * Get a value from local storage.
- *
- * Note: This function should only be called on the client side.
- * It will not work on the server side.
- *
- * @param key The key to retrieve the value from.
- * @returns The value stored under the given key,
- *          or null if the key does not exist.
- */
-export function getLocalStorage(key: string) {
-  if (typeof window !== "undefined") {
-    const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : null;
-  }
-  return null;
-}
-
-/**
- * Sanitizes a given string by removing any occurrences of "<has_function_call>".
- *
- * This function is used to sanitize text that may contain function calls,
- * which could potentially be used to inject malicious code.
- *
- * @param text The string to sanitize.
- * @returns The sanitized string.
- */
-export function sanitizeText(text: string) {
-  return text.replace("<has_function_call>", "");
-}
-/**
  * Generates a UUID (Universally Unique Identifier) string in the format of xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx.
  *
  * This function uses the random number generator to generate random numbers, which are then converted to hexadecimal strings.
@@ -300,14 +270,4 @@ export function buildItemSlugId(slug: string, id: string): string {
 export function getItemId(slugAndId: string): string | null {
   const id = slugAndId.slice(-36);
   return uuidRegex.test(id) ? id : null;
-}
-
-/**
- * Extracts the product slug from a slug-id string.
- * Returns null if the UUID part is invalid.
- */
-export function getItemSlug(slugAndId: string): string | null {
-  const id = getItemId(slugAndId);
-  if (!id) return null;
-  return slugAndId.slice(0, -37); // remove "-" + uuid
 }

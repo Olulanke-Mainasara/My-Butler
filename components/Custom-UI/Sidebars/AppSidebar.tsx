@@ -35,8 +35,7 @@ import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { useAuth } from "@/components/Providers/AllProviders";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
-import { getIsAdmin } from "@/lib/fetches";
+import { useIsAdmin } from "@/hooks/use-user-info";
 
 export function AppSidebar() {
   const customerProfile = useCustomerProfile();
@@ -51,10 +50,7 @@ export function AppSidebar() {
   // a separate `admins` table membership check, so this link only shows up
   // for accounts actually in that table, regardless of which profile
   // context they're otherwise using.
-  const { data: adminRow } = useQuery(getIsAdmin(user?.id || ""), {
-    enabled: !!user?.id,
-  });
-  const isAdmin = !!adminRow;
+  const { isAdmin } = useIsAdmin(user?.id);
 
   const handleSignout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -182,7 +178,7 @@ export function AppSidebar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   side="top"
-                  className="w-[--radix-popper-anchor-width]"
+                  className="w-(--radix-popper-anchor-width)"
                 >
                   <DropdownMenuItem
                     onClick={handleSignout}

@@ -77,7 +77,7 @@ export default function ArticlePage() {
           fill
           className="object-cover transition-transform duration-500 hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/70 to-transparent" />
       </div>
 
       {/* Article Content */}
@@ -144,8 +144,8 @@ export default function ArticlePage() {
             <Separator className="my-12" />
 
             {/* Author Bio */}
-            <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl transition-transform duration-300 hover:scale-110">
+            <div className="flex items-start gap-4 p-6 bg-linear-to-r from-gray-50 to-blue-50 rounded-2xl transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
+              <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl transition-transform duration-300 hover:scale-110">
                 {article.author?.charAt(0)}
               </div>
               <div>

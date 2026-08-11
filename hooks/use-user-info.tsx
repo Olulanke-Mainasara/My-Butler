@@ -8,6 +8,7 @@ import {
   getNotifications,
   getBookmarks,
   getChats,
+  getIsAdmin,
 } from "@/lib/fetches";
 import { User } from "@supabase/supabase-js";
 import React, { useEffect } from "react";
@@ -117,6 +118,17 @@ export function useChats(userId?: string) {
   return useQuery(getChats(userId || ""), {
     enabled: !!userId,
   });
+}
+
+// Admin status has nothing to do with role_id (customer vs brand) - it's a
+// separate `admins` table membership check. Shared here since AppSidebar and
+// the admin dashboard layout both need it.
+export function useIsAdmin(userId?: string) {
+  const { data, ...rest } = useQuery(getIsAdmin(userId || ""), {
+    enabled: !!userId,
+  });
+
+  return { isAdmin: !!data, ...rest };
 }
 
 interface UseUserInfoReturn {

@@ -3,7 +3,7 @@ export function CollectionSkeleton() {
     <div className="min-h-screen bg-white">
       {/* Hero Section Skeleton */}
       <div className="relative h-[70vh] bg-gray-200 animate-pulse">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/60 to-black/20" />
         <div className="absolute inset-0 flex items-center">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl">
@@ -17,7 +17,7 @@ export function CollectionSkeleton() {
 
       <div className="p-4">
         {/* Collection Info Skeleton */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 md:p-12">
+        <div className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 md:p-12">
           <div className="h-4 w-48 bg-gray-200 rounded animate-pulse mb-4"></div>
           <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-4"></div>
           <div className="space-y-2">

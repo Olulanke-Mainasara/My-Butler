@@ -1,4 +1,4 @@
-import { convertToModelMessages, stepCountIs, streamText, UIMessage } from "ai";
+import { convertToModelMessages, isStepCount, streamText, UIMessage } from "ai";
 import { google } from "@ai-sdk/google";
 import { butlerTools } from "./tools";
 
@@ -28,10 +28,10 @@ export async function POST(req: Request) {
 
     const result = streamText({
       model: google("gemini-2.5-flash"),
-      system: SYSTEM_PROMPT,
-      messages: convertToModelMessages(messages),
+      instructions: SYSTEM_PROMPT,
+      messages: await convertToModelMessages(messages),
       tools: butlerTools,
-      stopWhen: stepCountIs(5),
+      stopWhen: isStepCount(5),
     });
 
     return result.toUIMessageStreamResponse();

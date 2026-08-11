@@ -6,15 +6,12 @@ import { Link } from "next-view-transitions";
 import { usePathname } from "next/navigation";
 import { useCustomerProfile } from "../Providers/UserProvider";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 import { User } from "lucide-react";
 
 const links = [
   {
-    name: "Products",
-    href: "/products",
+    name: "Shop",
+    href: "/shop",
   },
   {
     name: "Collections",
@@ -25,8 +22,8 @@ const links = [
     href: "/brands",
   },
   {
-    name: "Clothing",
-    href: "/categories/clothing",
+    name: "Events",
+    href: "/events",
   },
   {
     name: "News",
@@ -35,48 +32,14 @@ const links = [
 ];
 
 const NavBar = () => {
-  const [top, setTop] = useState(true);
   const pathname = usePathname();
   const customerProfile = useCustomerProfile();
-  const { theme } = useTheme();
   const isOverlayPage =
     pathname === "/camera" || pathname === "/combine/personal";
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const header = document.querySelector("header");
-      if (header) {
-        if (window.scrollY > 0) {
-          setTop(false);
-        } else {
-          setTop(true);
-        }
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <header className={`fixed z-50 top-0 w-full`}>
-      <motion.nav
-        initial={{ top: 0, width: "100%" }}
-        animate={{
-          top: top ? 0 : 20,
-          width: top ? "100%" : "98%",
-          left: top ? 0 : "1%",
-          backdropFilter: top ? "blur(0px)" : "blur(15px)",
-          borderRadius: top ? 0 : 35,
-          border: top
-            ? "none"
-            : theme === "dark"
-              ? "1px solid rgba(48, 45, 45, 0.5)"
-              : "1px solid rgba(255, 255, 255, 0.5)",
-        }}
-        className="flex items-center justify-between w-full absolute overflow-hidden py-3 px-4 md:px-5"
-      >
+    <header className={`fixed z-50 top-0 w-full h-fit backdrop-blur-2xl`}>
+      <div className="flex items-center justify-between w-full h-fit overflow-hidden py-3 px-4 md:px-5">
         <div
           className={`flex items-center gap-4 md:gap-5 ${
             isOverlayPage ? "text-white" : ""
@@ -131,7 +94,7 @@ const NavBar = () => {
               />
             </Link>
           ) : (
-            <Link href="/login">
+            <Link href="/auth/login">
               <User />
             </Link>
           )}
@@ -146,7 +109,7 @@ const NavBar = () => {
             <NotificationsDrawerTrigger />
           )}
         </div>
-      </motion.nav>
+      </div>
     </header>
   );
 };

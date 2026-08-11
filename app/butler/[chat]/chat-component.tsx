@@ -25,7 +25,7 @@ export default function ChatComponent() {
   const [isLoadingConversation, setIsLoadingConversation] = useState(true);
   const [prompt, , removePrompt] = useLocalStorage<string | undefined>(
     "input",
-    undefined
+    undefined,
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useTransitionRouter();
@@ -39,7 +39,7 @@ export default function ChatComponent() {
       if (message.messages.length === 2) {
         // If it's the first user message and assistant response, create new chat
         const chatTitle = await generateTitleFromUserMessage(
-          message.messages[0]
+          message.messages[0],
         );
 
         const { error } = await supabase.from("chats").insert({
@@ -192,8 +192,8 @@ export default function ChatComponent() {
   }
 
   return (
-    <div className="flex flex-col bg-gradient-to-br h-screen pt-16 overflow-hidden w-full">
-      <div className="flex-1 overflow-y-auto px-4 space-y-4 bg-background scrollbar-none w-full max-w-screen-md mx-auto">
+    <div className="flex flex-col bg-linear-to-br h-screen pt-16 overflow-hidden w-full">
+      <div className="flex-1 overflow-y-auto px-4 space-y-4 bg-background scrollbar-none w-full max-w-(--breakpoint-md) mx-auto">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -227,9 +227,7 @@ export default function ChatComponent() {
                   return (
                     <div key={key} className="mt-2 max-w-xs lg:max-w-md">
                       {part.type === "tool-searchProducts" && (
-                        <ProductResults
-                          products={output.products as never}
-                        />
+                        <ProductResults products={output.products as never} />
                       )}
                       {part.type === "tool-searchCollections" && (
                         <CollectionResults

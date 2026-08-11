@@ -153,7 +153,7 @@ const Camera = () => {
         <div className="absolute w-full bottom-4 flex items-center justify-center gap-20 text-white">
           <a
             href={capturedImage}
-            download={`IMG_${Date.now()}.png`}
+            download={file?.name ?? "IMG.png"}
             className="hidden xl:block"
           >
             <Download size={25} />

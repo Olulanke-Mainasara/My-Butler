@@ -83,6 +83,55 @@ export const articleSchema = z.object({
   title: z.string().min(1, "Title is required"),
 });
 
+export const loginSchema = z.object({
+  email: z.email("Please enter a valid email address."),
+  password: z.string().min(1, "Password is required."),
+});
+
+export const signupSchema = z.discriminatedUnion("role", [
+  z.object({
+    role: z.literal("customer"),
+    fname: z.string().min(1, "First name is required."),
+    lname: z.string().min(1, "Last name is required."),
+    email: z.email("Please enter a valid email address."),
+    password: z.string().min(6, "Password must be at least 6 characters."),
+  }),
+  z.object({
+    role: z.literal("brand"),
+    brandName: z.string().min(1, "Brand name is required."),
+    brandDescription: z.string().min(1, "Brand description is required."),
+    brandURL: z.url("Please enter a valid URL."),
+    contactNumber: z
+      .string()
+      .regex(
+        /^\+?[0-9]{7,15}$/,
+        "Enter a valid phone number (7–15 digits, optional +)."
+      ),
+    brandLocation: z.string().optional(),
+    email: z.email("Please enter a valid email address."),
+    password: z.string().min(6, "Password must be at least 6 characters."),
+  }),
+]);
+
+export const resetPasswordRequestSchema = z.object({
+  email: z.email("Please enter a valid email address."),
+});
+
+export const changePasswordSchema = z
+  .object({
+    password: z.string().min(6, "Password must be at least 6 characters."),
+    confirmPassword: z.string().min(1, "Please confirm your password."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
+export const reviewSchema = z.object({
+  rating: z.number().min(1, "Please select a star rating.").max(5),
+  review_text: z.string().optional(),
+});
+
 export const eventSchema = z.object({
   admission_price: z.number().min(0).default(0),
   capacity: z.number().min(1).default(100),

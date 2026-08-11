@@ -40,7 +40,8 @@ import { X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Article } from "@/types/Article";
 
-type FormValues = z.infer<typeof articleSchema>;
+type FormValues = z.input<typeof articleSchema>;
+type FormOutput = z.output<typeof articleSchema>;
 
 export function ArticleForm({ initialData }: { initialData?: Article }) {
   const isEditMode = !!initialData;
@@ -53,7 +54,7 @@ export function ArticleForm({ initialData }: { initialData?: Article }) {
   const [tags, setTags] = useState<string[]>(initialData?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
 
-  const form = useForm<FormValues>({
+  const form = useForm<FormValues, unknown, FormOutput>({
     resolver: zodResolver(articleSchema),
     defaultValues: initialData
       ? {
@@ -93,7 +94,7 @@ export function ArticleForm({ initialData }: { initialData?: Article }) {
     }
   };
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: FormOutput) => {
     if (!isEditMode && !uploadedImageName) {
       toast.info("Please upload an image for the article.");
       return;

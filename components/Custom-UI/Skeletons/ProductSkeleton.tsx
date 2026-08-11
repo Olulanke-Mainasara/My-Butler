@@ -1,6 +1,6 @@
 export function ProductSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-white">
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
           {/* Product Images Skeleton */}

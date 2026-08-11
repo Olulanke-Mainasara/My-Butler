@@ -61,7 +61,7 @@ export default function CollectionPage() {
           fill
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/20" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/60 to-black/20" />
         <div className="absolute inset-0 flex items-center">
           <div className="px-4 md:px-5">
             <div className={`text-white`}>

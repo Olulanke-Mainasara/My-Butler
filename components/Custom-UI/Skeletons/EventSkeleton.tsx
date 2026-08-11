@@ -1,9 +1,9 @@
 export function EventSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50">
       {/* Hero Section Skeleton */}
       <div className="relative h-[70vh] bg-gray-200 animate-pulse">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/80 to-indigo-900/60" />
+        <div className="absolute inset-0 bg-linear-to-r from-purple-900/80 to-indigo-900/60" />
         <div className="absolute inset-0 flex items-center">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
@@ -69,7 +69,7 @@ export function EventSkeleton() {
 
             {/* Sidebar Skeleton */}
             <div className="space-y-6">
-              <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-6">
+              <div className="bg-linear-to-br from-purple-50 to-indigo-50 rounded-lg p-6">
                 <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-4"></div>
                 <div className="space-y-4">
                   {[...Array(3)].map((_, index) => (

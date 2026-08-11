@@ -62,7 +62,7 @@ const News = () => {
       ) : (
         <>
           <section className="pt-16 md:pt-28 xl:pt-[120px] px-4 md:px-5 flex flex-col gap-4 xl:flex-row xl:gap-8 items-center">
-            <div className="relative w-full max-w-screen-lg xl:max-w-full mx-auto">
+            <div className="relative w-full max-w-[theme(screens.lg)] xl:max-w-full mx-auto">
               <div className="py-5 px-4 rounded-2xl bg-lightBackground dark:bg-darkBackground text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-3/4 md:w-3/5 lg:w-2/4 xl:w-2/5 h-2/4 flex flex-col items-center justify-center">
                 <p className="text-xl md:text-2xl lg:text-3xl">
                   Fashion is a{" "}

@@ -1,4 +1,3 @@
-import { Json } from "@/supabase";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export async function toggleBookmark(
@@ -92,28 +91,6 @@ export async function toggleCart(
 export const deleteChat = async (client: SupabaseClient, chatId: string) => {
   return client.from("chats").delete().eq("id", chatId);
 };
-
-export async function saveChat({
-  client,
-  chatId,
-  title,
-  messages,
-}: {
-  client: SupabaseClient;
-  chatId: string;
-  title?: string;
-  messages: Json[];
-}) {
-  if (title) {
-    return client.from("chats").insert({
-      id: chatId,
-      title,
-      messages,
-    });
-  }
-
-  return client.from("chats").update({ messages }).eq("id", chatId);
-}
 
 export const deleteImage = async (
   client: SupabaseClient,

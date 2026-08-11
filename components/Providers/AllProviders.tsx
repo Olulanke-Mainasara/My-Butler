@@ -32,6 +32,57 @@ const bookmarksContext = React.createContext<Bookmark[] | null | undefined>(
 );
 export const useBookmarks = () => React.useContext(bookmarksContext);
 
+// next-view-transitions (v0.3.5) never attaches a .catch() to the promises
+// returned by document.startViewTransition() - including a "fire and
+// forget" call in its popstate handler that doesn't even keep a reference to
+// them. If a navigation interrupts a transition still settling (rapid
+// clicks, or a proxy.ts redirect landing mid-transition - both routine
+// here), the browser skips the older one and rejects those promises with
+// AbortError "Transition was skipped." The navigation itself still succeeds
+// - only the cross-fade animation is skipped - but with nothing attached to
+// catch it, this reaches Next's dev overlay as a runtime error.
+//
+// A window "unhandledrejection" listener can't fix this: Next registers its
+// own independent listener (next/dist/next-devtools/userspace/app/errors/
+// use-error-handler.js) that reports the error regardless of any other
+// listener calling preventDefault() - listeners don't suppress each other,
+// only the browser's own default action. The only real fix is attaching a
+// handler to the promise before it can go unhandled at all, which means
+// patching the native API itself so every call - including ones next-view-
+// transitions never reads the return value of - gets one.
+if (typeof window !== "undefined" && "startViewTransition" in document) {
+  type ViewTransition = {
+    ready: Promise<void>;
+    finished: Promise<void>;
+    updateCallbackDone: Promise<void>;
+  };
+  type StartViewTransition = (
+    callback: () => void | Promise<void>
+  ) => ViewTransition;
+
+  const nativeStartViewTransition = document.startViewTransition.bind(
+    document
+  ) as StartViewTransition;
+
+  const silenceSkipped = (promise: Promise<void>) =>
+    promise.catch((error) => {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      throw error;
+    });
+
+  (
+    document as unknown as { startViewTransition: StartViewTransition }
+  ).startViewTransition = (callback) => {
+    const transition = nativeStartViewTransition(callback);
+    silenceSkipped(transition.ready);
+    silenceSkipped(transition.finished);
+    silenceSkipped(transition.updateCallbackDone);
+    return transition;
+  };
+}
+
 const AllProviders = ({ children }: React.PropsWithChildren) => {
   const pathname = usePathname();
 

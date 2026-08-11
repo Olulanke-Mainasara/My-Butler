@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { getMyReviewForProduct, getProductReviews } from "@/lib/fetches";
 import { submitReview } from "@/lib/mutations";
 import { supabase } from "@/lib/supabase/client";
+import { reviewSchema } from "@/lib/schemas";
 import { useCustomerProfile } from "@/components/Providers/UserProvider";
 import { Button } from "@/components/Shad-UI/button";
 import { Textarea } from "@/components/Shad-UI/textarea";
@@ -84,8 +85,13 @@ export function ProductReviews({ productId }: { productId: string }) {
       return;
     }
 
-    if (rating < 1) {
-      toast.error("Please select a star rating");
+    const result = reviewSchema.safeParse({
+      rating,
+      review_text: reviewText,
+    });
+
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
       return;
     }
 

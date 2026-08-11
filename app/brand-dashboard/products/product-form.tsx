@@ -42,7 +42,8 @@ import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { Product } from "@/types/Product";
 
-type ProductFormValues = z.infer<typeof productFormSchema>;
+type ProductFormValues = z.input<typeof productFormSchema>;
+type ProductFormOutput = z.output<typeof productFormSchema>;
 
 export function ProductForm({ initialData }: { initialData?: Product }) {
   const isEditMode = !!initialData;
@@ -64,7 +65,7 @@ export function ProductForm({ initialData }: { initialData?: Product }) {
     }
   );
 
-  const form = useForm<ProductFormValues>({
+  const form = useForm<ProductFormValues, unknown, ProductFormOutput>({
     resolver: zodResolver(productFormSchema),
     defaultValues: initialData
       ? {
@@ -96,7 +97,7 @@ export function ProductForm({ initialData }: { initialData?: Product }) {
         },
   });
 
-  async function onSubmit(data: ProductFormValues) {
+  async function onSubmit(data: ProductFormOutput) {
     if (!isEditMode && !uploadedImageNames) {
       toast.error("Please upload an image for the product.");
       return;
@@ -401,7 +402,7 @@ export function ProductForm({ initialData }: { initialData?: Product }) {
                         disabled={form.formState.isSubmitting}
                       />
                     </FormControl>
-                    <FormLabel className="!mt-0">
+                    <FormLabel className="mt-0!">
                       Free Shipping Available
                     </FormLabel>
                     <FormMessage />

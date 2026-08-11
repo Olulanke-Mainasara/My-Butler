@@ -41,7 +41,8 @@ import { X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Event } from "@/types/Event";
 
-type FormValues = z.infer<typeof eventSchema>;
+type FormValues = z.input<typeof eventSchema>;
+type FormOutput = z.output<typeof eventSchema>;
 
 // "2024-01-01T10:00:00+00:00" -> "2024-01-01T10:00", what a
 // datetime-local input needs.
@@ -55,14 +56,14 @@ export function EventForm({ initialData }: { initialData?: Event }) {
   const queryClient = useQueryClient();
   const brandProfile = useBrandProfile();
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
-    null
+    null,
   );
   const [expectations, setExpectations] = useState<string[]>(
-    initialData?.what_to_expect ?? []
+    initialData?.what_to_expect ?? [],
   );
   const [expectationInput, setExpectationInput] = useState("");
 
-  const form = useForm<FormValues>({
+  const form = useForm<FormValues, unknown, FormOutput>({
     resolver: zodResolver(eventSchema),
     defaultValues: initialData
       ? {
@@ -78,8 +79,7 @@ export function EventForm({ initialData }: { initialData?: Event }) {
           location: initialData.location ?? "",
           parking_available: initialData.parking_available ?? false,
           registration_basis:
-            initialData.registration_basis ??
-            "First come, first served basis",
+            initialData.registration_basis ?? "First come, first served basis",
           start_date: toDatetimeLocal(initialData.start_date),
           tickets_url: initialData.tickets_url ?? "",
           title: initialData.title,
@@ -121,7 +121,7 @@ export function EventForm({ initialData }: { initialData?: Event }) {
     }
   };
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: FormOutput) => {
     if (!isEditMode && !uploadedImageName) {
       toast.info("Please upload an image for the event.");
       return;
@@ -132,7 +132,7 @@ export function EventForm({ initialData }: { initialData?: Event }) {
         ? supabase.storage
             .from(`events/${brandProfile?.id}`)
             .getPublicUrl(uploadedImageName).data.publicUrl
-        : initialData?.display_image ?? "";
+        : (initialData?.display_image ?? "");
 
       const payload = {
         admission_price: data.admission_price,
@@ -160,23 +160,23 @@ export function EventForm({ initialData }: { initialData?: Event }) {
 
       if (error) {
         toast.error(
-          isEditMode
-            ? "Failed to update event."
-            : "Failed to post event."
+          isEditMode ? "Failed to update event." : "Failed to post event.",
         );
         return;
       }
 
       invalidateTable(queryClient, "events");
       toast.success(
-        isEditMode ? "Event updated successfully!" : "Event posted successfully!"
+        isEditMode
+          ? "Event updated successfully!"
+          : "Event posted successfully!",
       );
       router.push("/brand-dashboard/events");
     } catch {
       toast.error(
         isEditMode
           ? "Failed to update event. Please try again."
-          : "Failed to post event. Please try again."
+          : "Failed to post event. Please try again.",
       );
     }
   };
@@ -199,17 +199,19 @@ export function EventForm({ initialData }: { initialData?: Event }) {
           <CardContent className="space-y-6 p-0 pb-6">
             <FormItem>
               <FormLabel>Display Image</FormLabel>
-              {isEditMode && !uploadedImageName && initialData.display_image && (
-                <div className="w-full max-w-xs aspect-video rounded-lg overflow-hidden bg-slate-100">
-                  <Image
-                    src={initialData.display_image}
-                    alt={initialData.title}
-                    width={400}
-                    height={225}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              {isEditMode &&
+                !uploadedImageName &&
+                initialData.display_image && (
+                  <div className="w-full max-w-xs aspect-video rounded-lg overflow-hidden bg-slate-100">
+                    <Image
+                      src={initialData.display_image}
+                      alt={initialData.title}
+                      width={400}
+                      height={225}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
               <ImageUpload
                 bucketName="events"
                 path={brandProfile?.id || ""}
@@ -439,7 +441,7 @@ export function EventForm({ initialData }: { initialData?: Event }) {
                       disabled={form.formState.isSubmitting}
                     />
                   </FormControl>
-                  <FormLabel className="!mt-0">Virtual Event</FormLabel>
+                  <FormLabel className="mt-0!">Virtual Event</FormLabel>
                   <FormMessage />
                 </FormItem>
               )}
@@ -457,7 +459,7 @@ export function EventForm({ initialData }: { initialData?: Event }) {
                       disabled={form.formState.isSubmitting}
                     />
                   </FormControl>
-                  <FormLabel className="!mt-0">
+                  <FormLabel className="mt-0!">
                     Parking Available On-Site
                   </FormLabel>
                   <FormMessage />

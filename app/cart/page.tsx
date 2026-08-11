@@ -65,7 +65,7 @@ const Cart = () => {
             {!cart || cart.length === 0 ? (
               <CartPlaceholder />
             ) : (
-              <div className="flex flex-col xl:flex-row gap-8 max-w-screen-lg mx-auto">
+              <div className="flex flex-col xl:flex-row gap-8 max-w-[theme(screens.lg)] mx-auto">
                 <div className="flex-1">
                   {cart.map((item) => {
                     const product = productsById.get(item.item_id ?? "");

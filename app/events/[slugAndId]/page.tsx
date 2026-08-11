@@ -77,7 +77,7 @@ export default function EventPage() {
           fill
           className="object-cover transition-transform duration-500 hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black to-black/70" />
+        <div className="absolute inset-0 bg-linear-to-r from-black to-black/70" />
         <div className="absolute inset-0 flex items-center">
           <div className="mx-auto px-4">
             <div className={`max-w-3xl text-white`}>

@@ -63,7 +63,7 @@ export default function ProductPage() {
     <div className="min-h-screen md:h-screen pt-16 px-4 md:px-5 pb-5 flex flex-col md:flex-row gap-6 md:gap-5">
       {/* Product Images */}
       <div className="space-y-4 md:w-1/2 h-full flex flex-col">
-        <div className="relative h-full md:h-1/2 xl:h-full rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 group">
+        <div className="relative h-full md:h-1/2 xl:h-full rounded-2xl overflow-hidden bg-linear-to-br from-slate-100 to-slate-200 group">
           <Image
             src={product.product_images?.[selectedImage] || "/placeholder.svg"}
             alt={product.name}

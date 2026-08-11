@@ -91,9 +91,9 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
         });
 
       const invalidFiles = fileRejections.map(({ file, errors }) => {
-        (file as FileWithPreview).preview = URL.createObjectURL(file);
-        (file as FileWithPreview).errors = errors;
-        return file as FileWithPreview;
+        (file as unknown as FileWithPreview).preview = URL.createObjectURL(file);
+        (file as unknown as FileWithPreview).errors = errors;
+        return file as unknown as FileWithPreview;
       });
 
       const newFiles = [...files, ...validFiles, ...invalidFiles];
