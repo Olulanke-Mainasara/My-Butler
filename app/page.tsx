@@ -103,8 +103,10 @@ export default function HomePage() {
   // Products only ever feed the category-switcher carousel above (no
   // dedicated listing section on this page), so it's capped but has no
   // "Load more" control here - /shop is where the full paginated listing
-  // lives. Collections/events/news each also back a dedicated section
-  // further down the page, so those get their own visibleCount + trigger.
+  // lives. Collections/news each also back a dedicated section further
+  // down the page, so those get their own visibleCount + trigger. Events
+  // is a fixed-size fetch (shared with the category-switcher carousel
+  // above) capped at render time for the Anticipated Events slider.
   const [productsVisibleCount] = useState(DEFAULT_PAGE_SIZE);
   const [collectionsVisibleCount, setCollectionsVisibleCount] =
     useState(DEFAULT_PAGE_SIZE);
@@ -119,7 +121,7 @@ export default function HomePage() {
     isLoading: isLoadingCollections,
   } = useQuery(getCollections({ pageSize: collectionsVisibleCount }));
   const { data: events, isLoading: isLoadingEvents } = useQuery(
-    getEvents({ pageSize: 8 })
+    getEvents({ pageSize: DEFAULT_PAGE_SIZE })
   );
   const {
     data: news,
@@ -728,9 +730,9 @@ export default function HomePage() {
 
         {isLoadingEvents ? (
           <LoadingSkeleton
-            length={3}
+            length={1}
             height="h-[500px] md:h-[600px]"
-            className="md:grid-cols-3"
+            className="md:grid-cols-1"
           />
         ) : !events || events.length === 0 ? (
           <Empty className="border dark:text-white">
@@ -748,7 +750,7 @@ export default function HomePage() {
         ) : (
           <Carousel opts={{ align: "start" }} className="h-[500px] md:h-[600px]">
             <CarouselContent className="h-full">
-              {events.map((event) => (
+              {events.slice(0, 8).map((event) => (
                 <CarouselItem
                   key={event.id}
                   className="h-full basis-[85%] md:basis-[70%]"
@@ -757,8 +759,8 @@ export default function HomePage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            <CarouselPrevious className="hidden md:flex left-4" />
+            <CarouselNext className="hidden md:flex right-4" />
           </Carousel>
         )}
       </section>

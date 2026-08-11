@@ -2,10 +2,11 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { ArrowRight, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/Shad-UI/badge";
-import { Button } from "@/components/Shad-UI/button";
+import { buttonVariants } from "@/components/Shad-UI/button";
 import { Event } from "@/types/Event";
 import {
   buildItemSlugId,
+  cn,
   convertRawDateToReadableDate,
   convertRawDateToReadableTime,
 } from "@/lib/utils";
@@ -36,9 +37,11 @@ export default function EventSliderCard({ item }: { item: Event }) {
         </Badge>
 
         <div className="flex flex-col gap-2">
-          <p className="text-3xl md:text-5xl">{item.title}</p>
+          <p className="line-clamp-2 text-3xl md:line-clamp-3 md:text-5xl">
+            {item.title}
+          </p>
 
-          <p className="flex items-center gap-2 text-sm text-neutral-200">
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-neutral-200">
             <MapPin className="size-4 shrink-0" />
             {item.is_virtual ? "Online Event" : item.location ?? "Location TBA"}
             <span className="text-neutral-400">·</span>
@@ -46,9 +49,9 @@ export default function EventSliderCard({ item }: { item: Event }) {
             {convertRawDateToReadableTime(item.start_date)}
           </p>
 
-          <Button className="mt-2 w-fit">
+          <span className={cn(buttonVariants(), "mt-2 w-fit")}>
             View more <ArrowRight className="size-4" />
-          </Button>
+          </span>
         </div>
       </div>
     </Link>
