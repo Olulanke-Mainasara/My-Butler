@@ -3,18 +3,14 @@
 import Logo from "@/components/Custom-UI/logo";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import ButlerAIDark from "@/public/Pages/Home/butler-ai-dark.png";
-import ButlerAILight from "@/public/Pages/Home/butler-ai-light.png";
-import CollectionsDark from "@/public/Pages/Home/collections-dark.png";
-import CollectionsLight from "@/public/Pages/Home/collections-light.png";
-import EventsDark from "@/public/Pages/Home/events-dark.png";
-import EventsLight from "@/public/Pages/Home/events-light.png";
-import NewsDark from "@/public/Pages/Home/news-dark.png";
-import NewsLight from "@/public/Pages/Home/news-light.png";
-import ShopDark from "@/public/Pages/Home/shop-dark.png";
-import ShopLight from "@/public/Pages/Home/shop-light.png";
+import ButlerAIImage from "@/public/Pages/Home/butler-ai.jpg";
+import CollectionsImage from "@/public/Pages/Home/collections.jpg";
+import BrandsImage from "@/public/Pages/Home/brands.jpg";
+import NewsImage from "@/public/Pages/Home/news.jpg";
+import ShopImage from "@/public/Pages/Home/shop.jpg";
+import EventsImage from "@/public/Pages/Home/events.jpg";
+import CameraImage from "@/public/Pages/Home/camera.jpg";
 import {
-  ArrowDown,
   ArrowRight,
   Factory,
   ShoppingBag,
@@ -36,7 +32,6 @@ import {
   CarouselPrevious,
 } from "@/components/Shad-UI/carousel";
 import { Link } from "next-view-transitions";
-import { useTheme } from "next-themes";
 import { Icons } from "@/components/Custom-UI/icons";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -64,6 +59,8 @@ import {
   EmptyTitle,
 } from "@/components/Shad-UI/empty";
 import Footer from "@/components/Custom-UI/Footer";
+import BrandStorySection from "@/components/Custom-UI/BrandStorySection";
+import { Brand } from "@/types/Brand";
 
 const subItems = [
   {
@@ -82,7 +79,6 @@ const subItems = [
 ];
 
 export default function HomePage() {
-  const { theme } = useTheme();
   const isMobile = useIsMobile();
 
   const [api, setApi] = useState<CarouselApi>();
@@ -128,7 +124,7 @@ export default function HomePage() {
     isFetching: isFetchingNews,
     isLoading: isLoadingNews,
   } = useQuery(getArticles({ pageSize: newsVisibleCount }));
-  const { data: brands } = useQuery(getBrands());
+  const { data: brands, isLoading: isLoadingBrands } = useQuery(getBrands());
   const [category, setCategory] = useState("Products");
 
   const hasMoreCollections =
@@ -333,7 +329,7 @@ export default function HomePage() {
         >
           <div>
             <Image
-              src={theme === "light" ? ButlerAILight : ButlerAIDark}
+              src={ButlerAIImage}
               alt="Butler A.I"
               className="h-full object-cover scale-150"
             />
@@ -357,7 +353,7 @@ export default function HomePage() {
         >
           <div>
             <Image
-              src={theme === "light" ? CollectionsLight : CollectionsDark}
+              src={CollectionsImage}
               alt="Butler A.I"
               className="h-full object-cover scale-150"
             />
@@ -381,7 +377,7 @@ export default function HomePage() {
         >
           <div>
             <Image
-              src={theme === "light" ? ButlerAILight : ButlerAIDark}
+              src={BrandsImage}
               alt="Butler A.I"
               className="h-full object-cover scale-150"
             />
@@ -405,7 +401,7 @@ export default function HomePage() {
         >
           <div>
             <Image
-              src={theme === "light" ? NewsLight : NewsDark}
+              src={NewsImage}
               alt="Butler A.I"
               className="h-full object-cover scale-150"
             />
@@ -436,7 +432,7 @@ export default function HomePage() {
         >
           <div>
             <Image
-              src={theme === "light" ? ShopLight : ShopDark}
+              src={ShopImage}
               alt="Butler A.I"
               className="h-full object-cover scale-150"
             />
@@ -459,7 +455,7 @@ export default function HomePage() {
         >
           <div>
             <Image
-              src={theme === "light" ? EventsLight : EventsDark}
+              src={EventsImage}
               alt="Butler A.I"
               className="h-full object-cover scale-105 object-left"
             />
@@ -483,7 +479,7 @@ export default function HomePage() {
         >
           <div className="h-full">
             <Image
-              src={theme === "light" ? ButlerAILight : ButlerAIDark}
+              src={CameraImage}
               alt="Butler A.I"
               className="h-full w-full object-cover object-right"
             />
@@ -546,175 +542,148 @@ export default function HomePage() {
         )}
       </section>
 
+      <BrandStorySection />
+
       <section className="min-h-screen flex items-center justify-center">
         <div className="w-full max-w-(--breakpoint-xl) mx-auto px-4 md:px-5">
           <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-semibold tracking-tighter">
-              How Butler A.I <br />
-              works for you.
+              Brands Worth <br />
+              Discovering.
             </h2>
-            <p className="uppercase flex items-center gap-2 font-semibold">
-              see how it works{" "}
-              <ArrowDown className="text-brandLight dark:text-brandDark" />
-            </p>
+            <Link
+              href="/brands"
+              className="uppercase flex items-center gap-2 font-semibold"
+            >
+              see all brands{" "}
+              <ArrowRight className="text-brandLight dark:text-brandDark" />
+            </Link>
           </div>
 
-          <div className="mt-8 grid sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-3 gap-6 md:gap-20 items-center mb-20">
-            <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
-              {/* Get Styled Mobile */}
-              <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
-                <Image
-                  src={theme === "light" ? ButlerAILight : ButlerAIDark}
-                  alt="Butler A.I chat"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <span className="text-3xl font-semibold tracking-tight">
-                Get Styled by Butler A.I
-              </span>
-
-              <div className="flex items-start gap-3 mt-6">
-                <Stars className="shrink-0 text-brandLight dark:text-brandDark" />
-                <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
-                  Chat with your personal AI stylist for product
-                  recommendations, sizing help, and anything else on the
+          {isLoadingBrands ? (
+            <LoadingSkeleton
+              length={1}
+              height="h-[600px] md:h-[750px]"
+              className="md:grid-cols-1 mt-8"
+            />
+          ) : !brands || brands.length === 0 ? (
+            <Empty className="border mt-8">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Factory />
+                </EmptyMedia>
+                <EmptyTitle>No brands yet</EmptyTitle>
+                <EmptyDescription>
+                  Vetted brands will be featured here as they join the
                   platform.
-                </p>
-              </div>
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            (() => {
+              const featured = brands.slice(0, 4);
+              const rows: [Brand, Brand | undefined][] = (
+                [
+                  [featured[0], featured[1]],
+                  [featured[2], featured[3]],
+                ] as [Brand | undefined, Brand | undefined][]
+              ).filter(
+                (row): row is [Brand, Brand | undefined] =>
+                  row[0] !== undefined
+              );
 
-              <Link href="/butler">
-                <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
-                  Chat with Butler{" "}
-                  <ArrowRight className="size-6 text-brandLight dark:text-brandDark" />
-                </Button>
-              </Link>
-            </div>
-            {/* Get Styled Desktop */}
-            <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
-              <Image
-                src={theme === "light" ? ButlerAILight : ButlerAIDark}
-                alt="Butler A.I chat"
-                className="w-full h-full object-cover"
-              />
-            </div>
+              return rows.map(([brandA, brandB], rowIndex) => (
+                <div
+                  key={rowIndex}
+                  className="mt-8 grid sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-3 gap-6 md:gap-20 items-center mb-20 last:mb-0"
+                >
+                  <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
+                    <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl overflow-hidden">
+                      <Image
+                        src={brandA.profile_picture || "/placeholder.svg"}
+                        alt={brandA.name}
+                        width={500}
+                        height={300}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-            {/* Shop Desktop */}
-            <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
-              <Image
-                src={theme === "light" ? ShopLight : ShopDark}
-                alt="Shop"
-                className="w-full h-full object-cover"
-              />
-            </div>
+                    <span className="text-3xl font-semibold tracking-tight">
+                      {brandA.name}
+                    </span>
 
-            <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
-              {/* Shop Mobile */}
-              <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
-                <Image
-                  src={theme === "light" ? ShopLight : ShopDark}
-                  alt="Shop"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+                    <div className="flex items-start gap-3 mt-6">
+                      <Factory className="shrink-0 text-brandLight dark:text-brandDark" />
+                      <p className="-mt-0.5 text-xl md:text-base xl:text-2xl line-clamp-3">
+                        {brandA.description}
+                      </p>
+                    </div>
 
-              <span className="text-3xl font-semibold tracking-tight">
-                Shop Curated Products
-              </span>
+                    <Link href={`/brands/${brandA.id}`}>
+                      <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
+                        Visit brand{" "}
+                        <ArrowRight className="size-6 text-brandLight dark:text-brandDark" />
+                      </Button>
+                    </Link>
+                  </div>
 
-              <div className="flex items-start gap-3 mt-6">
-                <GiShoppingCart className="shrink-0 text-brandLight dark:text-brandDark size-5" />
-                <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
-                  Browse products from independent brands, searchable and
-                  filterable to find exactly what you want.
-                </p>
-              </div>
+                  <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border relative">
+                    <Image
+                      src={brandA.profile_picture || "/placeholder.svg"}
+                      alt={brandA.name}
+                      fill
+                      sizes="33vw"
+                      className="object-cover"
+                    />
+                  </div>
 
-              <Link href="/shop">
-                <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
-                  Start Shopping{" "}
-                  <ArrowRight className="size-6 text-brandLight dark:text-brandDark" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-          <div className="mt-8 grid sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-3 gap-6 md:gap-20 items-center">
-            <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
-              {/* Collections Mobile */}
-              <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
-                <Image
-                  src={theme === "light" ? CollectionsLight : CollectionsDark}
-                  alt="Collections"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+                  {brandB && (
+                    <>
+                      <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border relative">
+                        <Image
+                          src={brandB.profile_picture || "/placeholder.svg"}
+                          alt={brandB.name}
+                          fill
+                          sizes="33vw"
+                          className="object-cover"
+                        />
+                      </div>
 
-              <span className="text-3xl font-semibold tracking-tight">
-                Explore Collections
-              </span>
+                      <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
+                        <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl overflow-hidden">
+                          <Image
+                            src={brandB.profile_picture || "/placeholder.svg"}
+                            alt={brandB.name}
+                            width={500}
+                            height={300}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
 
-              <div className="flex items-start gap-3 mt-6">
-                <GiShirt className="shrink-0 text-brandLight dark:text-brandDark size-5" />
-                <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
-                  Discover collections curated by brands and organized by
-                  theme and season.
-                </p>
-              </div>
+                        <span className="text-3xl font-semibold tracking-tight">
+                          {brandB.name}
+                        </span>
 
-              <Link href="/collections">
-                <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
-                  Browse Collections{" "}
-                  <ArrowRight className="size-6 text-brandLight dark:text-brandDark" />
-                </Button>
-              </Link>
-            </div>
-            {/* Collections Desktop */}
-            <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
-              <Image
-                src={theme === "light" ? CollectionsLight : CollectionsDark}
-                alt="Collections"
-                className="w-full h-full object-cover"
-              />
-            </div>
+                        <div className="flex items-start gap-3 mt-6">
+                          <Factory className="shrink-0 text-brandLight dark:text-brandDark" />
+                          <p className="-mt-0.5 text-xl md:text-base xl:text-2xl line-clamp-3">
+                            {brandB.description}
+                          </p>
+                        </div>
 
-            {/* Events Desktop */}
-            <div className="hidden md:block bg-muted rounded-xl col-span-1 md:col-span-3 lg:col-span-2 overflow-hidden h-[550px] dark:border">
-              <Image
-                src={theme === "light" ? EventsLight : EventsDark}
-                alt="Events"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div className="bg-muted rounded-xl p-4 lg:p-6 col-span-1 md:col-span-2 lg:col-span-1">
-              {/* Events Mobile */}
-              <div className="md:hidden mb-6 aspect-video w-full bg-background rounded-xl">
-                <Image
-                  src={theme === "light" ? EventsLight : EventsDark}
-                  alt="Events"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <span className="text-3xl font-semibold tracking-tight">
-                Discover Events
-              </span>
-
-              <div className="flex items-start gap-3 mt-6">
-                <GiTicket className="shrink-0 text-brandLight dark:text-brandDark size-5" />
-                <p className="-mt-0.5 text-xl md:text-base xl:text-2xl">
-                  Find trunk shows, launches, and fashion events from the
-                  brands you love, virtual and in-person.
-                </p>
-              </div>
-
-              <Link href="/events">
-                <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
-                  See Events <ArrowRight className="size-6 text-brandLight dark:text-brandDark" />
-                </Button>
-              </Link>
-            </div>
-          </div>
+                        <Link href={`/brands/${brandB.id}`}>
+                          <Button className="mt-8 w-full py-6 text-lg cursor-pointer">
+                            Visit brand{" "}
+                            <ArrowRight className="size-6 text-brandLight dark:text-brandDark" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ));
+            })()
+          )}
         </div>
       </section>
 
