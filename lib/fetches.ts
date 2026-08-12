@@ -179,7 +179,10 @@ export const getArticle = (articleId: string) => {
 
 // Events
 export const getEvents = (params: PageParams = {}) => {
-  return paginate(supabase.from("events").select("*"), params);
+  return paginate(
+    supabase.from("events").select("*").order("start_date", { ascending: true }),
+    params
+  );
 };
 
 export const getEventsCount = () => {
