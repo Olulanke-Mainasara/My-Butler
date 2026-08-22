@@ -85,7 +85,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarSeparator className="bg-darkBackground dark:bg-lightBackground w-full ml-0" />
-      <SidebarContent className="sm:justify-center gap-0 px-0">
+      <SidebarContent className="gap-0 px-0">
         {groupedNavigation.map((group) => (
           <SidebarGroup key={group.id} className="pt-0 px-2">
             <SidebarGroupLabel className="tracking-normal text-base text-neutral-500">
@@ -162,7 +162,7 @@ export function AppSidebar() {
                     {customerProfile.profile_picture ? (
                       <Image
                         src={customerProfile.profile_picture}
-                        className="w-8 h-8 rounded-full"
+                        className="w-8 h-8 object-cover rounded-full"
                         alt="logo"
                         width={40}
                         height={40}

@@ -37,7 +37,7 @@ import { collectionFormSchema } from "@/lib/schemas";
 import { getCategories } from "@/lib/fetches";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useQueryClient } from "@tanstack/react-query";
-import { Collection } from "@/types/Collection";
+import { Collection } from "@/types/system-types/Collection";
 
 type CollectionFormValues = z.infer<typeof collectionFormSchema>;
 
@@ -47,7 +47,7 @@ export function CollectionForm({ initialData }: { initialData?: Collection }) {
   const queryClient = useQueryClient();
   const brandProfile = useBrandProfile();
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
-    null
+    null,
   );
 
   // Categories are global (no brand_id column on the table) - unfiltered.
@@ -81,7 +81,7 @@ export function CollectionForm({ initialData }: { initialData?: Collection }) {
         ? supabase.storage
             .from(`collections/${brandProfile?.id}`)
             .getPublicUrl(uploadedImageName).data.publicUrl
-        : initialData?.display_image ?? "";
+        : (initialData?.display_image ?? "");
 
       const payload = {
         name: data.name,
@@ -109,7 +109,7 @@ export function CollectionForm({ initialData }: { initialData?: Collection }) {
         toast.error(
           isEditMode
             ? "Failed to update collection. Please try again."
-            : "Failed to create collection. Please try again."
+            : "Failed to create collection. Please try again.",
         );
         return;
       }
@@ -124,14 +124,14 @@ export function CollectionForm({ initialData }: { initialData?: Collection }) {
         router.push(
           `/brand-dashboard/products/new?collectionID=${
             generateSlug(collectionData.name) + "/" + collectionData.id
-          }`
+          }`,
         );
       }
     } catch {
       toast.error(
         isEditMode
           ? "Failed to update collection. Please try again."
-          : "Failed to create collection. Please try again."
+          : "Failed to create collection. Please try again.",
       );
     }
   }
@@ -235,17 +235,19 @@ export function CollectionForm({ initialData }: { initialData?: Collection }) {
 
             <FormItem>
               <FormLabel>Display Image</FormLabel>
-              {isEditMode && !uploadedImageName && initialData.display_image && (
-                <div className="w-full max-w-xs aspect-video rounded-lg overflow-hidden bg-slate-100">
-                  <Image
-                    src={initialData.display_image}
-                    alt={initialData.name}
-                    width={400}
-                    height={225}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              {isEditMode &&
+                !uploadedImageName &&
+                initialData.display_image && (
+                  <div className="w-full max-w-xs aspect-video rounded-lg overflow-hidden bg-slate-100">
+                    <Image
+                      src={initialData.display_image}
+                      alt={initialData.name}
+                      width={400}
+                      height={225}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
               <ImageUpload
                 bucketName="collections"
                 path={brandProfile?.id || ""}

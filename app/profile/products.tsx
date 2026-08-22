@@ -6,7 +6,7 @@ import ProductCard from "@/components/Custom-UI/Cards/ProductCard";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { getBookmarkedItems } from "@/lib/fetches";
 import { useBookmarks } from "@/components/Providers/AllProviders";
-import { Product } from "@/types/Product";
+import { Product } from "@/types/system-types/Product";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { useMemo } from "react";
 
@@ -38,7 +38,7 @@ export default function Products() {
     if (!bookmarkItems) return [];
     return bookmarkItems.filter(
       (item): item is Product =>
-        typeof item === "object" && item !== null && "price" in item
+        typeof item === "object" && item !== null && "price" in item,
     );
   }, [bookmarkItems]);
 

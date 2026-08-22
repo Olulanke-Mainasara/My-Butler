@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
-import { Brand } from "@/types/Brand";
+import { Brand } from "@/types/system-types/Brand";
 
 const BrandCard = ({
   item,
@@ -19,7 +19,7 @@ const BrandCard = ({
 }) => {
   return (
     <Card
-      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-fit flex flex-col`}
+      className={`relative rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-fit flex flex-col`}
     >
       <Link
         href={`/brands/${item?.id}`}

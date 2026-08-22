@@ -19,7 +19,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/Shad-UI/tabs";
-import { Brand } from "@/types/Brand";
+import { Brand } from "@/types/system-types/Brand";
 
 const STATUS_BADGE_CLASSES: Record<Brand["status"], string> = {
   pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
@@ -36,7 +36,7 @@ function BrandRow({ brand }: { brand: Brand }) {
     onSuccess: (_data, status) => {
       invalidateTable(queryClient, "brands");
       toast.success(
-        status === "approved" ? "Brand approved." : "Brand rejected."
+        status === "approved" ? "Brand approved." : "Brand rejected.",
       );
     },
     onError: () => toast.error("Failed to update brand status."),

@@ -1,5 +1,5 @@
-import { BrandProfile } from "@/types/BrandProfile";
-import { CustomerProfile } from "@/types/CustomerProfile";
+import { BrandProfile } from "@/types/system-types/BrandProfile";
+import { CustomerProfile } from "@/types/system-types/CustomerProfile";
 import { User } from "@supabase/supabase-js";
 import React from "react";
 import { ROLE_CUSTOMER } from "@/lib/roles";

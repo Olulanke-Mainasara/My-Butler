@@ -24,7 +24,7 @@ import { Button } from "@/components/Shad-UI/button";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/client";
 import { Icons } from "../icons";
-import { Table } from "@/types/Table";
+import { Table } from "@/types/system-types/Table";
 
 export default function FilterDrawerTrigger({
   optionCollection,
@@ -46,7 +46,7 @@ export default function FilterDrawerTrigger({
 
   const fetchFilteredData = async (
     activeFilters: Record<string, string[]>,
-    firstFetch?: boolean
+    firstFetch?: boolean,
   ) => {
     setFiltering(true);
     console.log(activeFilters);
@@ -201,7 +201,7 @@ export default function FilterDrawerTrigger({
           <DialogTrigger asChild className="cursor-pointer">
             <SlidersHorizontal />
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[625px] h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
+          <DialogContent className="sm:max-w-156.25 h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
             <DialogHeader className="pb-4">
               <DialogTitle>Filter</DialogTitle>
               <DialogDescription>

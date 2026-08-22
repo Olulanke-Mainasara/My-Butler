@@ -9,11 +9,11 @@ import { User } from "@supabase/supabase-js";
 import { usePathname } from "next/navigation";
 import { Toaster } from "../Shad-UI/toaster";
 import { Sonner } from "../Shad-UI/sonner";
-import { Notification } from "@/types/Notification";
-import { CartItem } from "@/types/CartItem";
+import { Notification } from "@/types/system-types/Notification";
+import { CartItem } from "@/types/system-types/CartItem";
 import { useUserInfo } from "@/hooks/use-user-info";
 import UserProvider from "./UserProvider";
-import { Bookmark } from "@/types/Bookmark";
+import { Bookmark } from "@/types/system-types/Bookmark";
 import NavBar from "../Custom-UI/NavBar";
 
 const authContext = React.createContext<User | null>(null);
@@ -57,11 +57,11 @@ if (typeof window !== "undefined" && "startViewTransition" in document) {
     updateCallbackDone: Promise<void>;
   };
   type StartViewTransition = (
-    callback: () => void | Promise<void>
+    callback: () => void | Promise<void>,
   ) => ViewTransition;
 
   const nativeStartViewTransition = document.startViewTransition.bind(
-    document
+    document,
   ) as StartViewTransition;
 
   const silenceSkipped = (promise: Promise<void>) =>

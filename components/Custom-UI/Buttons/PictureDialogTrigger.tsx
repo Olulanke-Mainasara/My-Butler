@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/Shad-UI/dialog";
 import Image from "next/image";
-import { Image as ImageType } from "@/types/Image";
+import { Image as ImageType } from "@/types/system-types/Image";
 import { Share, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";

@@ -16,7 +16,7 @@ const Notifications = () => {
 
       <hr className="mx-4 xl:mx-3 mt-8" />
 
-      <section className="px-4 xl:px-3 h-full">
+      <section className="h-full">
         {!customerProfile ? (
           <LoginPlaceholder info="your recent notifications" />
         ) : (
@@ -24,7 +24,9 @@ const Notifications = () => {
             {!notifications || notifications.length === 0 ? (
               <NotificationsPlaceholder />
             ) : (
-              notifications.map((_, index) => <NotificationCard key={index} />)
+              notifications.map((item, index) => (
+                <NotificationCard key={index} item={item} />
+              ))
             )}
           </section>
         )}

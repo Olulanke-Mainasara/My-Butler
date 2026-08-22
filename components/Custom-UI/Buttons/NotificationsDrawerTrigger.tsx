@@ -61,8 +61,8 @@ export default function NotificationsDrawerTrigger() {
                 {!notifications || notifications.length === 0 ? (
                   <NotificationsPlaceholder />
                 ) : (
-                  notifications.map((_, index) => (
-                    <NotificationCard key={index} />
+                  notifications.map((item, index) => (
+                    <NotificationCard key={index} item={item} />
                   ))
                 )}
               </section>
@@ -82,7 +82,7 @@ export default function NotificationsDrawerTrigger() {
           <DialogTrigger asChild className="cursor-pointer">
             <BellDot />
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[725px] h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
+          <DialogContent className="sm:max-w-181.25 h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
             <DialogHeader className="pb-0">
               <DialogTitle>Notifications</DialogTitle>
               <DialogDescription>
@@ -95,15 +95,17 @@ export default function NotificationsDrawerTrigger() {
                 close={setOpen}
               />
             ) : (
-              <section className="px-4 pb-4 h-full overflow-y-scroll">
-                {!notifications || notifications.length === 0 ? (
-                  <NotificationsPlaceholder />
-                ) : (
-                  notifications.map((_, index) => (
-                    <NotificationCard key={index} />
-                  ))
-                )}
-              </section>
+              <>
+                <section className="pt-3 pb-4 h-full overflow-y-scroll">
+                  {!notifications || notifications.length === 0 ? (
+                    <NotificationsPlaceholder />
+                  ) : (
+                    notifications.map((item, index) => (
+                      <NotificationCard key={index} item={item} />
+                    ))
+                  )}
+                </section>
+              </>
             )}
           </DialogContent>
         </Dialog>

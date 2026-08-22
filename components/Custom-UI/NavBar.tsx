@@ -34,12 +34,17 @@ const links = [
 const NavBar = () => {
   const pathname = usePathname();
   const customerProfile = useCustomerProfile();
-  const isOverlayPage =
-    pathname === "/camera" || pathname === "/combine/personal";
+  const isOverlayPage = pathname === "/camera";
 
   return (
-    <header className={`fixed z-50 top-0 w-full h-fit backdrop-blur-2xl`}>
-      <div className="flex items-center justify-between w-full h-fit overflow-hidden py-3 px-4 md:px-5">
+    <header
+      className={`fixed z-50 top-0 w-full h-16 ${
+        isOverlayPage
+          ? "backdrop-blur-2xl"
+          : "bg-lightBackground dark:bg-transparent dark:backdrop-blur-2xl"
+      }`}
+    >
+      <div className="flex items-center justify-between w-full h-full overflow-hidden py-3 px-4 md:px-5">
         <div
           className={`flex items-center gap-4 md:gap-5 ${
             isOverlayPage ? "text-white" : ""
@@ -62,25 +67,27 @@ const NavBar = () => {
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6">
-          {links.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className={`${
-                pathname === link.href
-                  ? "text-brandLight dark:text-brandDark font-semibold"
-                  : "text-lightText dark:text-darkText hover:text-brandLight dark:hover:text-brandDark"
-              }`}
-            >
-              {link.name}
-            </Link>
-          ))}
-        </nav>
+        {!pathname.startsWith("/brand-dashboard") ? (
+          <nav className="hidden md:flex items-center gap-6">
+            {links.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`${
+                  pathname === link.href
+                    ? "text-brandLight dark:text-brandDark"
+                    : "text-lightText dark:text-darkText hover:text-brandLight dark:hover:text-brandDark"
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
+        ) : null}
 
         <div
           className={`flex items-center gap-4 md:gap-5 ${
-            pathname.startsWith("/butler") ? "pr-11" : ""
+            pathname.startsWith("/butler") && customerProfile ? "pr-11" : ""
           } ${isOverlayPage ? "text-white" : ""}`}
         >
           {customerProfile ? (
@@ -90,14 +97,14 @@ const NavBar = () => {
                 alt="Profile"
                 width={40}
                 height={40}
-                className="w-8 h-8 rounded-full"
+                className="w-8 h-8 object-cover rounded-full"
               />
             </Link>
-          ) : (
+          ) : !customerProfile && !pathname.startsWith("/brand-dashboard") ? (
             <Link href="/auth/login">
               <User />
             </Link>
-          )}
+          ) : null}
 
           {pathname !== "/cart" && !pathname.startsWith("/brand-dashboard") ? (
             <CartDrawerTrigger />

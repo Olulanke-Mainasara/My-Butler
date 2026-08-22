@@ -4,11 +4,15 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/Shad-UI/button";
-import { CartItem } from "@/types/CartItem";
-import { Product } from "@/types/Product";
+import { CartItem } from "@/types/system-types/CartItem";
+import { Product } from "@/types/system-types/Product";
 import { supabase } from "@/lib/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { buildItemSlugId, invalidateTable } from "@/lib/utils";
+import {
+  buildItemSlugId,
+  convertRawPriceToReadablePrice,
+  invalidateTable,
+} from "@/lib/utils";
 import { toast } from "sonner";
 
 const CartItemCard = ({
@@ -34,7 +38,10 @@ const CartItemCard = ({
 
   const { mutate: removeItem, isPending: isRemoving } = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("cart").delete().eq("id", cartItem.id);
+      const { error } = await supabase
+        .from("cart")
+        .delete()
+        .eq("id", cartItem.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -48,7 +55,7 @@ const CartItemCard = ({
   const itemLink = `/shop/${buildItemSlugId(product.slug, product.id)}`;
 
   return (
-    <div className="flex items-center gap-4 border-b py-6">
+    <div className="flex items-center gap-4 border-b py-6 first:pt-0 last:border-b-0">
       <Link
         href={itemLink}
         className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-slate-100"
@@ -66,7 +73,9 @@ const CartItemCard = ({
         <Link href={itemLink} className="hover:underline">
           <p className="text-lg truncate">{product.name}</p>
         </Link>
-        <p className="opacity-70">${product.price.toFixed(2)}</p>
+        <p className="opacity-70">
+          {convertRawPriceToReadablePrice(product.price)}
+        </p>
       </div>
 
       <div className="flex items-center border rounded-lg">
@@ -90,7 +99,7 @@ const CartItemCard = ({
       </div>
 
       <p className="w-20 text-right shrink-0">
-        ${(product.price * cartItem.quantity).toFixed(2)}
+        {convertRawPriceToReadablePrice(product.price * cartItem.quantity)}
       </p>
 
       <Button

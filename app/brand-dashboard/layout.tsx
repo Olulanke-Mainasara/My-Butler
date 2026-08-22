@@ -90,7 +90,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               {brandProfile?.profile_picture ? (
                 <Image
                   src={brandProfile.profile_picture}
-                  className="w-14 h-14 rounded-full"
+                  className="w-14 h-14 rounded-full object-cover"
                   alt="Profile picture"
                   width={40}
                   height={40}
@@ -147,8 +147,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <p className="text-sm opacity-80">
               You can set up your products, collections, events, and articles
               right now - but customers won&apos;t see any of it until your
-              brand is approved. We&apos;ll notify you as soon as a decision
-              is made.
+              brand is approved. We&apos;ll notify you as soon as a decision is
+              made.
             </p>
           </div>
         </div>
@@ -160,8 +160,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <div>
             <p className="font-semibold">Your application was not approved</p>
             <p className="text-sm opacity-80">
-              Your brand and its listings are not visible to customers.
-              Contact support if you have questions about this decision.
+              Your brand and its listings are not visible to customers. Contact
+              support if you have questions about this decision.
             </p>
           </div>
         </div>

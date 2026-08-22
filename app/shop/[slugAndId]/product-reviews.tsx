@@ -28,12 +28,12 @@ function StarPicker({
           key={i}
           type="button"
           onClick={() => onChange(i + 1)}
-          className="p-0.5"
+          className="p-0.5 cursor-pointer"
         >
           <Star
             className={cn(
               "w-6 h-6 transition-colors",
-              i < value ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+              i < value ? "fill-yellow-400 text-yellow-400" : "text-gray-300",
             )}
           />
         </button>
@@ -49,7 +49,7 @@ export function ProductReviews({ productId }: { productId: string }) {
   const { data: reviews } = useQuery(getProductReviews(productId));
   const { data: myReview } = useQuery(
     getMyReviewForProduct(productId, customerProfile?.id || ""),
-    { enabled: !!customerProfile }
+    { enabled: !!customerProfile },
   );
 
   const [rating, setRating] = useState(myReview?.rating || 0);
@@ -102,65 +102,66 @@ export function ProductReviews({ productId }: { productId: string }) {
 
   return (
     <div className="space-y-6">
-      {customerProfile && (myReview && !isEditing ? (
-        <div className="p-4 border rounded-lg space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 ${
-                    i < (myReview.rating || 0)
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-              <span className="text-sm text-gray-500">Your review</span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setRating(myReview.rating || 0);
-                setReviewText(myReview.review_text || "");
-                setIsEditing(true);
-              }}
-            >
-              Edit
-            </Button>
-          </div>
-          {myReview.review_text && <p>{myReview.review_text}</p>}
-        </div>
-      ) : (
-        <div className="p-4 border rounded-lg space-y-3">
-          <h4 className="font-semibold">
-            {myReview ? "Edit your review" : "Write a review"}
-          </h4>
-          <StarPicker value={rating} onChange={setRating} />
-          <Textarea
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            placeholder="Share your thoughts about this product..."
-          />
-          <div className="flex gap-2">
-            <Button onClick={onSubmit} disabled={isPending}>
-              {isPending ? "Submitting..." : "Submit Review"}
-            </Button>
-            {myReview && (
+      {customerProfile &&
+        (myReview && !isEditing ? (
+          <div className="p-4 border rounded-lg space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-4 h-4 ${
+                      i < (myReview.rating || 0)
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+                <span className="text-sm text-gray-500">Your review</span>
+              </div>
               <Button
                 variant="outline"
-                onClick={() => setIsEditing(false)}
-                disabled={isPending}
+                size="sm"
+                onClick={() => {
+                  setRating(myReview.rating || 0);
+                  setReviewText(myReview.review_text || "");
+                  setIsEditing(true);
+                }}
               >
-                Cancel
+                Edit
               </Button>
-            )}
+            </div>
+            {myReview.review_text && <p>{myReview.review_text}</p>}
           </div>
-        </div>
-      ))}
+        ) : (
+          <div className="p-4 border rounded-lg space-y-3">
+            <h4 className="font-semibold">
+              {myReview ? "Edit your review" : "Write a review"}
+            </h4>
+            <StarPicker value={rating} onChange={setRating} />
+            <Textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              placeholder="Share your thoughts about this product..."
+            />
+            <div className="flex gap-2">
+              <Button onClick={onSubmit} disabled={isPending}>
+                {isPending ? "Submitting..." : "Submit Review"}
+              </Button>
+              {myReview && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                  disabled={isPending}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
 
-      {reviews && reviews.length > 0 ? (
+      {otherReviews && otherReviews.length > 0 ? (
         <div className="space-y-4">
           {otherReviews.map((review) => (
             <div

@@ -40,7 +40,7 @@ import { productFormSchema } from "@/lib/schemas";
 import { getCategories, getCollections } from "@/lib/fetches";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useQueryClient } from "@tanstack/react-query";
-import { Product } from "@/types/Product";
+import { Product } from "@/types/system-types/Product";
 
 type ProductFormValues = z.input<typeof productFormSchema>;
 type ProductFormOutput = z.output<typeof productFormSchema>;
@@ -50,9 +50,9 @@ export function ProductForm({ initialData }: { initialData?: Product }) {
   const router = useTransitionRouter();
   const queryClient = useQueryClient();
   const brandProfile = useBrandProfile();
-  const [uploadedImageNames, setUploadedImageNames] = useState<
-    string[] | null
-  >(null);
+  const [uploadedImageNames, setUploadedImageNames] = useState<string[] | null>(
+    null,
+  );
 
   // Categories are global (no brand_id column on the table), so this must
   // not be filtered by brand - filtering by it previously meant this query
@@ -62,7 +62,7 @@ export function ProductForm({ initialData }: { initialData?: Product }) {
     getCollections().eq("brand_id", brandProfile?.id || ""),
     {
       enabled: !!brandProfile?.id,
-    }
+    },
   );
 
   const form = useForm<ProductFormValues, unknown, ProductFormOutput>({
@@ -113,7 +113,7 @@ export function ProductForm({ initialData }: { initialData?: Product }) {
               .getPublicUrl(imageName);
             return data.publicUrl;
           })
-        : initialData?.product_images ?? [];
+        : (initialData?.product_images ?? []);
 
       const payload = {
         name: data.name,
@@ -132,28 +132,33 @@ export function ProductForm({ initialData }: { initialData?: Product }) {
       };
 
       const { error } = isEditMode
-        ? await supabase.from("products").update(payload).eq("id", initialData.id)
+        ? await supabase
+            .from("products")
+            .update(payload)
+            .eq("id", initialData.id)
         : await supabase.from("products").insert([payload]).select();
 
       if (error) {
         toast.error(
           isEditMode
             ? "Failed to update product. Please try again."
-            : "Failed to add product. Please try again."
+            : "Failed to add product. Please try again.",
         );
         return;
       }
 
       invalidateTable(queryClient, "products");
       toast.success(
-        isEditMode ? "Product updated successfully!" : "Product added successfully!"
+        isEditMode
+          ? "Product updated successfully!"
+          : "Product added successfully!",
       );
       router.push(`/brand-dashboard/products`);
     } catch {
       toast.error(
         isEditMode
           ? "Failed to update product. Please try again."
-          : "Failed to create product. Please try again."
+          : "Failed to create product. Please try again.",
       );
     }
   }
@@ -223,20 +228,22 @@ export function ProductForm({ initialData }: { initialData?: Product }) {
                 initialData.product_images &&
                 initialData.product_images.length > 0 && (
                   <div className="grid grid-cols-4 gap-3 pb-2">
-                    {initialData.product_images.slice(0, 4).map((image, index) => (
-                      <div
-                        key={index}
-                        className="aspect-square rounded-lg overflow-hidden bg-slate-100"
-                      >
-                        <Image
-                          src={image || "/placeholder.svg"}
-                          alt={`${initialData.name} image ${index + 1}`}
-                          width={150}
-                          height={150}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
+                    {initialData.product_images
+                      .slice(0, 4)
+                      .map((image, index) => (
+                        <div
+                          key={index}
+                          className="aspect-square rounded-lg overflow-hidden bg-slate-100"
+                        >
+                          <Image
+                            src={image || "/placeholder.svg"}
+                            alt={`${initialData.name} image ${index + 1}`}
+                            width={150}
+                            height={150}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
                   </div>
                 )}
               <ImageUpload

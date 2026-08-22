@@ -11,6 +11,7 @@ import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { Button } from "@/components/Shad-UI/button";
 import { Icons } from "@/components/Custom-UI/icons";
 import { toast } from "sonner";
+import { convertRawPriceToReadablePrice } from "@/lib/utils";
 
 const Cart = () => {
   const customerProfile = useCustomerProfile();
@@ -52,7 +53,7 @@ const Cart = () => {
   };
 
   return (
-    <div className="pt-16 md:pt-14 flex flex-col h-full">
+    <div className="pt-16 flex flex-col h-full">
       <h1 className="px-3 text-4xl">Your cart</h1>
 
       <hr className="mx-4 xl:mx-3 mt-8" />
@@ -61,11 +62,11 @@ const Cart = () => {
         {!customerProfile ? (
           <LoginPlaceholder info="the items in your cart" />
         ) : (
-          <section className="px-4 pb-4 h-full overflow-y-scroll">
+          <section className="px-4 py-4 h-full overflow-y-scroll">
             {!cart || cart.length === 0 ? (
               <CartPlaceholder />
             ) : (
-              <div className="flex flex-col xl:flex-row gap-8 max-w-[theme(screens.lg)] mx-auto">
+              <div className="flex flex-col xl:flex-row gap-8 max-w-[--breakpoint-lg] mx-auto">
                 <div className="flex-1">
                   {cart.map((item) => {
                     const product = productsById.get(item.item_id ?? "");
@@ -83,7 +84,7 @@ const Cart = () => {
                 <div className="xl:w-80 shrink-0 space-y-4 border rounded-xl p-6 h-fit">
                   <div className="flex justify-between text-lg">
                     <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{convertRawPriceToReadablePrice(subtotal)}</span>
                   </div>
                   <p className="text-sm opacity-70">
                     Shipping and taxes calculated at checkout.

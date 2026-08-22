@@ -39,7 +39,7 @@ import { generateSlug, invalidateTable } from "@/lib/utils";
 import { Badge } from "@/components/Shad-UI/badge";
 import { X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Event } from "@/types/Event";
+import { Event } from "@/types/system-types/Event";
 
 type FormValues = z.input<typeof eventSchema>;
 type FormOutput = z.output<typeof eventSchema>;

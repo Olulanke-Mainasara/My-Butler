@@ -3,7 +3,7 @@ import { Link } from "next-view-transitions";
 import { ArrowRight, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/Shad-UI/badge";
 import { buttonVariants } from "@/components/Shad-UI/button";
-import { Event } from "@/types/Event";
+import { Event } from "@/types/system-types/Event";
 import {
   buildItemSlugId,
   cn,
@@ -37,13 +37,15 @@ export default function EventSliderCard({ item }: { item: Event }) {
         </Badge>
 
         <div className="flex flex-col gap-2">
-          <p className="line-clamp-2 text-3xl md:line-clamp-3 md:text-5xl">
+          <p className="line-clamp-2 text-2xl md:line-clamp-3 md:text-3xl">
             {item.title}
           </p>
 
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-neutral-200">
             <MapPin className="size-4 shrink-0" />
-            {item.is_virtual ? "Online Event" : item.location ?? "Location TBA"}
+            {item.is_virtual
+              ? "Online Event"
+              : (item.location ?? "Location TBA")}
             <span className="text-neutral-400">·</span>
             <Clock className="size-4 shrink-0" />
             {convertRawDateToReadableTime(item.start_date)}

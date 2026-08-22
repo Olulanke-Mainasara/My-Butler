@@ -3,7 +3,7 @@
 import React from "react";
 import CarouselWithSlideTracker from "@/components/Custom-UI/Carousel/CarouselWithSlideTracker";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
-import { Event } from "@/types/Event";
+import { Event } from "@/types/system-types/Event";
 import { DEFAULT_PAGE_SIZE, getEvents } from "@/lib/fetches";
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,7 @@ const Events = () => {
   const router = useRouter();
 
   const { data: events, isFetching: isFetchingEvents } = useQuery(
-    getEvents({ pageSize: visibleCount })
+    getEvents({ pageSize: visibleCount }),
   );
   const hasMoreEvents = (events?.length ?? 0) >= visibleCount;
 
@@ -28,7 +28,7 @@ const Events = () => {
   };
 
   return (
-    <div className="mt-[76px] md:mt-6 pb-5 space-y-7 xl:space-y-0">
+    <div className="mt-19 md:mt-6 pb-5 space-y-7 xl:space-y-0">
       <div className="flex justify-center fixed left-0 top-12 py-3 w-full bg-lightBackground dark:bg-darkBackground z-10">
         <div className="px-4 xl:px-0 w-full md:w-4/6 xl:w-3/6 mx">
           <FullTextSearchInput
@@ -61,7 +61,7 @@ const Events = () => {
         </div>
       ) : (
         <>
-          <section className="pt-14 md:pt-28 xl:pt-[120px] px-4 md:px-5 relative flex flex-col gap-4 xl:flex-row xl:gap-8 items-center">
+          <section className="pt-14 md:pt-28 xl:pt-30 px-4 md:px-5 relative flex flex-col gap-4 xl:flex-row xl:gap-8 items-center">
             <div className="w-full xl:w-1/2 text-center">
               <p className="text-2xl md:text-4xl">Individual scenes, same</p>
               <p className="text-7xl md:text-[120px] text-brandLight dark:text-brandDark">
@@ -69,8 +69,8 @@ const Events = () => {
               </p>
             </div>
 
-            <div className="w-full lg:max-w-screen-md xl:w-1/2 grid grid-cols-2 gap-4 xl:gap-8">
-              <div className="h-44 md:h-60 rounded-2xl relative object-cover object-top overflow-hidden">
+            <div className="w-full lg:max-w-3xl xl:w-1/2 grid grid-cols-2 gap-4 xl:gap-8">
+              <div className="h-44 md:h-60 rounded-xl relative object-cover object-top overflow-hidden">
                 <Image
                   src={"/Pages/Collections/collection.webp"}
                   fill
@@ -81,7 +81,7 @@ const Events = () => {
                 />
               </div>
 
-              <div className="h-44 md:h-60 rounded-2xl relative object-cover object-top overflow-hidden">
+              <div className="h-44 md:h-60 rounded-xl relative object-cover object-top overflow-hidden">
                 <Image
                   src={"/Pages/Collections/collection2.png"}
                   fill
@@ -92,7 +92,7 @@ const Events = () => {
                 />
               </div>
 
-              <div className="h-44 md:h-60 rounded-2xl relative object-cover object-top overflow-hidden">
+              <div className="h-44 md:h-60 rounded-xl relative object-cover object-top overflow-hidden">
                 <Image
                   src={"/Pages/Collections/collection.webp"}
                   fill
@@ -103,7 +103,7 @@ const Events = () => {
                 />
               </div>
 
-              <div className="h-44 md:h-60 rounded-2xl relative object-cover object-top overflow-hidden">
+              <div className="h-44 md:h-60 rounded-xl relative object-cover object-top overflow-hidden">
                 <Image
                   src={"/Pages/Collections/collection2.png"}
                   fill
@@ -140,10 +140,10 @@ const Events = () => {
                 What&apos;s Your Scene?
               </p>
               <div className="grid md:grid-cols-3 gap-4 md:gap-5 mx-auto xl:w-full">
-                <div className="border rounded-3xl col-span-2 xl:col-span-1 xl:row-span-2 h-44 xl:h-auto"></div>
-                <div className="border h-44 md:h-52 xl:h-60 rounded-3xl"></div>
-                <div className="border h-44 md:h-52 xl:h-60 rounded-3xl col-start-2"></div>
-                <div className="hidden md:block border rounded-3xl row-start-1 col-start-3 row-span-2"></div>
+                <div className="border rounded-xl col-span-2 xl:col-span-1 xl:row-span-2 h-44 xl:h-auto"></div>
+                <div className="border h-44 md:h-52 xl:h-60 rounded-xl"></div>
+                <div className="border h-44 md:h-52 xl:h-60 rounded-xl col-start-2"></div>
+                <div className="hidden md:block border rounded-xl row-start-1 col-start-3 row-span-2"></div>
               </div>
             </section>
 

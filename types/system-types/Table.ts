@@ -1,3 +1,3 @@
-import { Database } from "@/supabase";
+import { Database } from "@/types/database.types";
 
 export type Table = keyof Database["public"]["Tables"];

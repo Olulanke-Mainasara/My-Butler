@@ -1,12 +1,13 @@
 import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
 import { Button } from "@/components/Shad-UI/button";
 import { Badge } from "@/components/Shad-UI/badge";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { StarIcon } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
-import { Product } from "@/types/Product";
+import { Product } from "@/types/system-types/Product";
 import { usePathname } from "next/navigation";
-import { buildItemSlugId } from "@/lib/utils";
+import { buildItemSlugId, convertRawPriceToReadablePrice } from "@/lib/utils";
 
 export default function ProductCard({
   item,
@@ -26,7 +27,7 @@ export default function ProductCard({
 
   return (
     <Card
-      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full ${
+      className={`relative rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full ${
         form !== "carousel" && !pathname.startsWith("/brands")
           ? "flex md:flex-col"
           : ""
@@ -38,7 +39,7 @@ export default function ProductCard({
           alt={item.name}
           width={500}
           height={300}
-          className="w-full object-cover h-full"
+          className="w-full object-cover h-60"
         />
       </Link>
 
@@ -49,11 +50,13 @@ export default function ProductCard({
             : ""
         }`}
       >
-        <CardTitle
-          className={`${form === "carousel" ? "text-2xl" : "text-xl"}`}
-        >
-          {item.name}
-        </CardTitle>
+        <Link href={relevantLink} prefetch={false}>
+          <CardTitle
+            className={`${form === "carousel" ? "text-2xl" : "text-xl"}`}
+          >
+            {item.name}
+          </CardTitle>
+        </Link>
 
         <div
           className={`flex items-center  ${
@@ -61,16 +64,16 @@ export default function ProductCard({
           }`}
         >
           <span className="text-xl md:text-2xl lg:text-2xl dark:text-neutral-300">
-            ${item.price.toFixed(2)}
+            {convertRawPriceToReadablePrice(item.price)}
           </span>
 
-          {item.rating !== null && (
+          {/* {item.rating !== null && (
             <div className="items-center flex gap-1 text-yellow-500">
               <StarIcon className="w-4 h-4 fill-yellow-500" />
               {item.rating.toFixed(1)}{" "}
               <span className="hidden lg:block">({item.reviews_count})</span>
             </div>
-          )}
+          )} */}
 
           {item.stock_quantity <= 0 ? (
             <Badge variant="destructive" className="hidden md:block">

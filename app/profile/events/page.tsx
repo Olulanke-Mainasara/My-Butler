@@ -7,7 +7,7 @@ import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { getBookmarkedItems } from "@/lib/fetches";
 import EventCard from "@/components/Custom-UI/Cards/EventCard";
 import { useBookmarks } from "@/components/Providers/AllProviders";
-import { Event } from "@/types/Event";
+import { Event } from "@/types/system-types/Event";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { useMemo } from "react";
 
@@ -39,7 +39,7 @@ export default function Events() {
     if (!bookmarkItems) return [];
     return bookmarkItems.filter(
       (item): item is Event =>
-        typeof item === "object" && item !== null && "location" in item
+        typeof item === "object" && item !== null && "location" in item,
     );
   }, [bookmarkItems]);
 

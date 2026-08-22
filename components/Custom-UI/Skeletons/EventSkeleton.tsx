@@ -27,7 +27,10 @@ export function EventSkeleton() {
           {/* Quick Info Cards Skeleton */}
           <div className="grid md:grid-cols-3 gap-6 mb-16 -mt-24 relative z-10">
             {[...Array(3)].map((_, index) => (
-              <div key={index} className="bg-white/95 backdrop-blur-sm shadow-xl rounded-lg p-6">
+              <div
+                key={index}
+                className="bg-white/95 backdrop-blur-sm shadow-xl rounded-lg p-6"
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
                   <div>
@@ -44,7 +47,7 @@ export function EventSkeleton() {
           {/* Event Description Skeleton */}
           <div className="grid lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border">
+              <div className="bg-white rounded-xl p-8 md:p-12 shadow-sm border">
                 <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-6"></div>
                 <div className="space-y-4">
                   {[...Array(6)].map((_, index) => (
@@ -91,5 +94,5 @@ export function EventSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

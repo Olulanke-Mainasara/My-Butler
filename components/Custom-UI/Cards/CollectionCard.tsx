@@ -1,23 +1,10 @@
-import {
-  Card,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/Shad-UI/card";
-import { Button } from "@/components/Shad-UI/button";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
-import { Collection } from "@/types/Collection";
+import { Collection } from "@/types/system-types/Collection";
 import { buildItemSlugId } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
-export default function CollectionCard({
-  item,
-  form,
-}: {
-  item?: Collection;
-  form?: "static" | "carousel";
-}) {
+export default function CollectionCard({ item }: { item?: Collection }) {
   const pathname = usePathname();
 
   if (!item) {
@@ -29,51 +16,23 @@ export default function CollectionCard({
     : `/collections/${buildItemSlugId(item.slug, item.id)}`;
 
   return (
-    <Card
-      className={`relative rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden h-full`}
-    >
-      <Link href={relevantLink} prefetch={false} className="basis-1/2">
-        <Image
-          src={item.display_image ?? "/placeholder.svg"}
-          alt={item.name}
-          width={500}
-          height={300}
-          className={`w-full object-cover ${
-            form === "carousel" ? "h-full" : "max-h-44"
-          }`}
-        />
-      </Link>
-
-      <CardContent
-        className={`p-3 flex flex-col justify-center gap-2 basis-1/2 ${
-          form === "carousel"
-            ? "absolute inset-0 backdrop-brightness-50 text-white"
-            : ""
-        }`}
-      >
-        <CardTitle className="md:text-xl truncate">{item.name}</CardTitle>
-
-        <CardDescription
-          className={`${form === "carousel" ? "max-w-xs" : ""} truncate`}
-        >
-          {item.description ?? "No description provided."}
-        </CardDescription>
-
-        <div className="flex items-center gap-2">
-          <Button
-            className={`w-full ${
-              form === "carousel"
-                ? "bg-white text-black hover:bg-neutral-300 w-fit"
-                : ""
-            } `}
-            asChild
-          >
-            <Link href={relevantLink} prefetch={false}>
-              View Collection
-            </Link>
-          </Button>
+    <div>
+      <Link href={relevantLink} prefetch={false} className="space-y-5">
+        <div className="relative h-96 w-full rounded-xl overflow-hidden">
+          <Image
+            src={item.display_image ?? "/placeholder.svg"}
+            alt={item.name}
+            fill
+            sizes="(max-width: 767px) 100vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover"
+          />
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="space-y-1">
+          <p className="md:text-xl">{item.name}</p>
+          <p className="text-sm text-muted-foreground">{item.description}</p>
+        </div>
+      </Link>
+    </div>
   );
 }

@@ -5,7 +5,7 @@ export const getCustomerProfile = (userId: string) => {
   return supabase
     .from("customers")
     .select(
-      "id, first_name, last_name, display_name, email, location, phone_no, profile_picture, supabase_user_id, created_at, updated_at"
+      "id, first_name, last_name, display_name, email, location, phone_no, profile_picture, supabase_user_id, created_at, updated_at",
     )
     .eq("id", userId)
     .single();
@@ -27,7 +27,7 @@ export const getBrandProfile = (userId: string) => {
   return supabase
     .from("brands")
     .select(
-      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled, created_at, updated_at"
+      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, paystack_subaccount_code, payout_bank_code, payout_account_number, payout_account_name, payout_verified, commission_rate, created_at, updated_at",
     )
     .eq("id", userId)
     .single();
@@ -37,7 +37,9 @@ export const getBrandProfile = (userId: string) => {
 export const getCartItems = (userId: string) => {
   return supabase
     .from("cart")
-    .select("id, user_id, item_id, item_type, quantity, added_at, updated_at")
+    .select(
+      "id, user_id, item_id, item_type, quantity, added_at, updated_at, variant_id",
+    )
     .eq("user_id", userId);
 };
 
@@ -49,7 +51,7 @@ export const getProductsByIds = (productIds: string[]) => {
 export const getNotifications = (userId: string) => {
   return supabase
     .from("notifications")
-    .select("id, user_id, title, message, type, is_read, created_at")
+    .select("id, user_id, title, message, type, is_read, created_at, brand_id")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 };
@@ -65,7 +67,7 @@ export const getBookmarks = (userId: string) => {
 
 export const getBookmarkedItems = (
   bookmarkIds: string[],
-  targetType: "products" | "collections" | "news" | "events"
+  targetType: "products" | "collections" | "news" | "events",
 ) => {
   return supabase.from(targetType).select("*").in("id", bookmarkIds);
 };
@@ -88,7 +90,7 @@ export type PageParams = { page?: number; pageSize?: number };
 // full table (unpaginated) exactly as before.
 function paginate<T extends { range: (from: number, to: number) => T }>(
   query: T,
-  { page = 0, pageSize }: PageParams
+  { page = 0, pageSize }: PageParams,
 ): T {
   if (!pageSize) return query;
   const from = page * pageSize;
@@ -101,7 +103,9 @@ export const getBrands = (params: PageParams = {}) => {
 };
 
 export const getBrandsCount = () => {
-  return supabase.from("brands").select("*", { count: "estimated", head: true });
+  return supabase
+    .from("brands")
+    .select("*", { count: "estimated", head: true });
 };
 
 export const getBrand = (brandId: string) => {
@@ -136,7 +140,11 @@ export const getCollection = (collectionId: string) => {
 // display, which isn't usable as the numeric value an edit form needs to
 // prefill its category <select>. This returns the plain row instead.
 export const getCollectionForEdit = (collectionId: string) => {
-  return supabase.from("collections").select("*").eq("id", collectionId).single();
+  return supabase
+    .from("collections")
+    .select("*")
+    .eq("id", collectionId)
+    .single();
 };
 
 // Products
@@ -180,8 +188,11 @@ export const getArticle = (articleId: string) => {
 // Events
 export const getEvents = (params: PageParams = {}) => {
   return paginate(
-    supabase.from("events").select("*").order("start_date", { ascending: true }),
-    params
+    supabase
+      .from("events")
+      .select("*")
+      .order("start_date", { ascending: true }),
+    params,
   );
 };
 
@@ -211,7 +222,7 @@ export const getAllOrders = (params: PageParams = {}) => {
       .from("orders")
       .select("*, customers(display_name, email)")
       .order("created_at", { ascending: false }),
-    params
+    params,
   );
 };
 
@@ -234,7 +245,9 @@ export const getBrandOrderItems = (brandId: string) => {
 export const getProductReviews = (productId: string) => {
   return supabase
     .from("reviews")
-    .select("id, product_id, user_id, rating, review_text, reviewer_name, created_at")
+    .select(
+      "id, product_id, user_id, rating, review_text, reviewer_name, created_at",
+    )
     .eq("product_id", productId)
     .order("created_at", { ascending: false });
 };
@@ -242,7 +255,9 @@ export const getProductReviews = (productId: string) => {
 export const getMyReviewForProduct = (productId: string, userId: string) => {
   return supabase
     .from("reviews")
-    .select("id, product_id, user_id, rating, review_text, reviewer_name, created_at")
+    .select(
+      "id, product_id, user_id, rating, review_text, reviewer_name, created_at",
+    )
     .eq("product_id", productId)
     .eq("user_id", userId)
     .maybeSingle();

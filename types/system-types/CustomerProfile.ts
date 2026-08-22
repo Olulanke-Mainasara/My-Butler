@@ -1,4 +1,4 @@
-import { Database } from "@/supabase";
+import { Database } from "@/types/database.types";
 
 export type CustomerProfile =
   Database["public"]["Tables"]["customers"]["Row"] & {

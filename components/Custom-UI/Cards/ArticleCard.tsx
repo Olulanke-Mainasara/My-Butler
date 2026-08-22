@@ -1,5 +1,5 @@
 import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
-import { Article } from "@/types/Article";
+import { Article } from "@/types/system-types/Article";
 import { Calendar, User } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
@@ -25,7 +25,7 @@ export default function ArticleCard({
 
   return (
     <Card
-      className={`relative overflow-hidden h-fit md:h-full bg-transparent dark:bg-transparent border-none p-0 gap-3 ${
+      className={`relative overflow-hidden h-fit md:h-full bg-transparent dark:bg-transparent border-none shadow-none p-0 gap-3 ${
         form !== "carousel" || !pathname.startsWith("/brands")
           ? "flex flex-col"
           : "rounded-xl"
@@ -34,7 +34,7 @@ export default function ArticleCard({
       <Link
         href={relevantLink}
         prefetch={false}
-        className={`rounded-xl overflow-hidden h-44 ${
+        className={`rounded-xl overflow-hidden h-60 ${
           form === "carousel" ? "md:h-full" : ""
         }`}
       >

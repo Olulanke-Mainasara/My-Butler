@@ -6,7 +6,7 @@ import { Link } from "next-view-transitions";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { getBookmarkedItems } from "@/lib/fetches";
 import ArticleCard from "@/components/Custom-UI/Cards/ArticleCard";
-import { Article } from "@/types/Article";
+import { Article } from "@/types/system-types/Article";
 import { useBookmarks } from "@/components/Providers/AllProviders";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { useMemo } from "react";
@@ -39,7 +39,7 @@ export default function Articles() {
     if (!bookmarkItems) return [];
     return bookmarkItems.filter(
       (item): item is Article =>
-        typeof item === "object" && item !== null && "author" in item
+        typeof item === "object" && item !== null && "author" in item,
     );
   }, [bookmarkItems]);
 

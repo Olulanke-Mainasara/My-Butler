@@ -274,7 +274,7 @@ const SidebarTrigger = React.forwardRef<
     <button
       ref={ref}
       data-sidebar="trigger"
-      className={cn("", className)}
+      className={cn("cursor-pointer", className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();

@@ -96,7 +96,7 @@ export default function CartDrawerTrigger() {
           <DialogTrigger asChild className="cursor-pointer">
             <ShoppingCart />
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[725px] h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
+          <DialogContent className="sm:max-w-181.25 h-fit max-h-[55dvh] xl:max-h-[70dvh] gap-0">
             <DialogHeader className="pb-0">
               <DialogTitle>Your cart</DialogTitle>
               <DialogDescription>
@@ -106,7 +106,7 @@ export default function CartDrawerTrigger() {
             {!customerProfile ? (
               <LoginPlaceholder info="the items in your cart" close={setOpen} />
             ) : (
-              <section className="px-4 pb-4 h-full overflow-y-scroll">
+              <section className="mt-3 h-full max-h-110 overflow-scroll">
                 {!cart || cart.length === 0 ? (
                   <CartPlaceholder />
                 ) : (

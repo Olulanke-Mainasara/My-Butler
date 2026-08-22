@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/Shad-UI/button";
 import { cn } from "@/lib/utils";
-import { Article } from "@/types/Article";
-import { Collection } from "@/types/Collection";
-import { Event } from "@/types/Event";
-import { Product } from "@/types/Product";
+import { Article } from "@/types/system-types/Article";
+import { Collection } from "@/types/system-types/Collection";
+import { Event } from "@/types/system-types/Event";
+import { Product } from "@/types/system-types/Product";
 import { ShoppingCart } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
@@ -77,7 +77,7 @@ const AddToCart = ({
         isInTheCart
           ? "bg-brandLight hover:bg-brandLight/70 dark:bg-brandDark text-white dark:text-gray-900"
           : "bg-transparent dark:bg-transparent hover:bg-neutral-600",
-        isPending && "opacity-50 cursor-not-allowed"
+        isPending && "opacity-50 cursor-not-allowed",
       )}
     >
       <ShoppingCart

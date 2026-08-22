@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { MapPin } from "lucide-react";
-import { buildItemSlugId } from "@/lib/utils";
+import { buildItemSlugId, convertRawPriceToReadablePrice } from "@/lib/utils";
 
 type ProductResult = {
   id: string;
@@ -93,7 +93,7 @@ export function ProductResults({ products }: { products: ProductResult[] }) {
           title={product.name}
           subtitle={
             <span className="flex items-center gap-1">
-              ${product.price.toFixed(2)}
+              {convertRawPriceToReadablePrice(product.price)}
               {product.stock_quantity <= 0 && (
                 <span className="text-red-500">· Out of stock</span>
               )}
@@ -138,7 +138,8 @@ export function EventResults({ events }: { events: EventResult[] }) {
           subtitle={
             event.is_virtual
               ? "Virtual"
-              : event.location || new Date(event.start_date).toLocaleDateString()
+              : event.location ||
+                new Date(event.start_date).toLocaleDateString()
           }
         />
       ))}

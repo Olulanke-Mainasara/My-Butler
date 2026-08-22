@@ -38,7 +38,7 @@ import { generateSlug, invalidateTable } from "@/lib/utils";
 import { Badge } from "@/components/Shad-UI/badge";
 import { X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Article } from "@/types/Article";
+import { Article } from "@/types/system-types/Article";
 
 type FormValues = z.input<typeof articleSchema>;
 type FormOutput = z.output<typeof articleSchema>;
@@ -49,7 +49,7 @@ export function ArticleForm({ initialData }: { initialData?: Article }) {
   const queryClient = useQueryClient();
   const brandProfile = useBrandProfile();
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(
-    null
+    null,
   );
   const [tags, setTags] = useState<string[]>(initialData?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
@@ -105,7 +105,7 @@ export function ArticleForm({ initialData }: { initialData?: Article }) {
         ? supabase.storage
             .from(`news/${brandProfile?.id}`)
             .getPublicUrl(uploadedImageName).data.publicUrl
-        : initialData?.display_image ?? "";
+        : (initialData?.display_image ?? "");
 
       const payload = {
         author: data.author,
@@ -125,7 +125,9 @@ export function ArticleForm({ initialData }: { initialData?: Article }) {
 
       if (error) {
         toast.error(
-          isEditMode ? "Failed to update article." : "Failed to publish article."
+          isEditMode
+            ? "Failed to update article."
+            : "Failed to publish article.",
         );
         return;
       }
@@ -134,14 +136,14 @@ export function ArticleForm({ initialData }: { initialData?: Article }) {
       toast.success(
         isEditMode
           ? "Article updated successfully!"
-          : "Article published successfully!"
+          : "Article published successfully!",
       );
       router.push("/brand-dashboard/articles");
     } catch {
       toast.error(
         isEditMode
           ? "Failed to update article. Please try again."
-          : "Failed to publish article. Please try again."
+          : "Failed to publish article. Please try again.",
       );
     }
   };
@@ -164,17 +166,19 @@ export function ArticleForm({ initialData }: { initialData?: Article }) {
           <CardContent className="space-y-6 p-0 pb-6">
             <FormItem>
               <FormLabel>Display Image</FormLabel>
-              {isEditMode && !uploadedImageName && initialData.display_image && (
-                <div className="w-full max-w-xs aspect-video rounded-lg overflow-hidden bg-slate-100">
-                  <Image
-                    src={initialData.display_image}
-                    alt={initialData.title}
-                    width={400}
-                    height={225}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              {isEditMode &&
+                !uploadedImageName &&
+                initialData.display_image && (
+                  <div className="w-full max-w-xs aspect-video rounded-lg overflow-hidden bg-slate-100">
+                    <Image
+                      src={initialData.display_image}
+                      alt={initialData.title}
+                      width={400}
+                      height={225}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
               <ImageUpload
                 bucketName="news"
                 path={brandProfile?.id || ""}

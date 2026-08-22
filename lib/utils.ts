@@ -26,7 +26,7 @@ export function invalidateTable(queryClient: QueryClient, table: string) {
  */
 export function getStoragePathFromPublicUrl(
   url: string,
-  bucket: string
+  bucket: string,
 ): string | null {
   const marker = `/storage/v1/object/public/${bucket}/`;
   const index = url.indexOf(marker);
@@ -91,7 +91,7 @@ export function base64ToFile(base64String: string, filename: string): File {
  */
 export function compareTwoObjects(
   obj1: { [key: string]: string },
-  obj2: { [key: string]: string }
+  obj2: { [key: string]: string },
 ): boolean {
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);
@@ -101,7 +101,7 @@ export function compareTwoObjects(
   }
 
   return keys1.every(
-    (key) => obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+    (key) => obj2.hasOwnProperty(key) && obj1[key] === obj2[key],
   );
 }
 
@@ -270,4 +270,11 @@ export function buildItemSlugId(slug: string, id: string): string {
 export function getItemId(slugAndId: string): string | null {
   const id = slugAndId.slice(-36);
   return uuidRegex.test(id) ? id : null;
+}
+
+export function convertRawPriceToReadablePrice(rawPrice: number): string {
+  return rawPrice.toLocaleString("en-NG", {
+    style: "currency",
+    currency: "NGN",
+  });
 }

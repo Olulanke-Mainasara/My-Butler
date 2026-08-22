@@ -3,7 +3,7 @@
 import FullTextSearchInput from "@/components/Custom-UI/Buttons/Search";
 import BrandCard from "@/components/Custom-UI/Cards/BrandCard";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
-import { Brand } from "@/types/Brand";
+import { Brand } from "@/types/system-types/Brand";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Shad-UI/button";

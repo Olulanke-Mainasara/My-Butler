@@ -3,7 +3,7 @@
 import React from "react";
 import { supabase } from "@/lib/supabase/client";
 import { Search } from "lucide-react";
-import { Table } from "@/types/Table";
+import { Table } from "@/types/system-types/Table";
 import { toast } from "sonner";
 import { Icons } from "../icons";
 import { useRouter } from "next/navigation";
@@ -54,7 +54,7 @@ export default function FullTextSearchInput({
           </p>
         </div>
       )}
-      <div className="w-full items-center border border-black dark:border-white overflow-hidden rounded-3xl flex h-12">
+      <div className="w-full items-center border border-black dark:border-white overflow-hidden rounded-xl flex h-12">
         <div className="flex items-center p-3">
           <button onClick={handleSearch}>
             <Search className="" />

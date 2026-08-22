@@ -19,7 +19,7 @@ import {
 import React, { useState } from "react";
 import AddToBookmarks from "@/components/Custom-UI/Buttons/AddToBookmarks";
 import { usePathname } from "next/navigation";
-import { getItemId } from "@/lib/utils";
+import { convertRawPriceToReadablePrice, getItemId } from "@/lib/utils";
 import { toast } from "sonner";
 import { useTransitionRouter } from "next-view-transitions";
 import AddToCart from "@/components/Custom-UI/Buttons/AddToCart";
@@ -63,7 +63,7 @@ export default function ProductPage() {
     <div className="min-h-screen md:h-screen pt-16 px-4 md:px-5 pb-5 flex flex-col md:flex-row gap-6 md:gap-5">
       {/* Product Images */}
       <div className="space-y-4 md:w-1/2 h-full flex flex-col">
-        <div className="relative h-full md:h-1/2 xl:h-full rounded-2xl overflow-hidden bg-linear-to-br from-slate-100 to-slate-200 group">
+        <div className="relative h-full md:h-1/2 xl:h-full rounded-xl overflow-hidden bg-linear-to-br from-slate-100 to-slate-200 group">
           <Image
             src={product.product_images?.[selectedImage] || "/placeholder.svg"}
             alt={product.name}
@@ -76,7 +76,7 @@ export default function ProductPage() {
           <button
             onClick={() =>
               setSelectedImage((prev) =>
-                prev > 0 ? prev - 1 : product.product_images!.length - 1
+                prev > 0 ? prev - 1 : product.product_images!.length - 1,
               )
             }
             className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center xl:opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-neutral-800"
@@ -86,7 +86,7 @@ export default function ProductPage() {
           <button
             onClick={() =>
               setSelectedImage((prev) =>
-                prev < product.product_images!.length - 1 ? prev + 1 : 0
+                prev < product.product_images!.length - 1 ? prev + 1 : 0,
               )
             }
             className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 backdrop-blur-sm rounded-full flex items-center justify-center xl:opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-neutral-800"
@@ -135,28 +135,12 @@ export default function ProductPage() {
 
       {/* Product Details */}
       <div className="space-y-6 md:w-1/2 lg:overflow-scroll h-full">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">{product.name}</h1>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-5 h-5 transition-all duration-300 hover:scale-110 ${
-                    i < Math.floor(product.rating || 0)
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-              <span className="text-sm ml-2">
-                {product.rating} ({product.reviews_count} reviews)
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 mb-6">
-            <span className="text-4xl xl:text-5xl font-bold">
-              ${product.price.toFixed(2)}
+        <div className="space-y-6">
+          <h1 className="text-4xl font-bold">{product.name}</h1>
+
+          <div className="flex items-center gap-4">
+            <span className="text-4xl xl:text-5xl font-thin">
+              {convertRawPriceToReadablePrice(product.price)}
             </span>
             <Badge
               variant={product.stock_quantity > 0 ? "default" : "destructive"}
@@ -174,6 +158,23 @@ export default function ProductPage() {
         </div>
 
         <p className="max-w-xl">{product.description}</p>
+
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">{product.rating}</span>
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-5 h-5 transition-all duration-300 hover:scale-110 ${
+                  i < Math.floor(product.rating || 0)
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "text-gray-300"
+                }`}
+              />
+            ))}
+            <span className="text-sm">({product.reviews_count})</span>
+          </div>
+        </div>
 
         {/* Features */}
         <div>
@@ -259,12 +260,12 @@ export default function ProductPage() {
               <TabsTrigger value="reviews">Reviews</TabsTrigger>
             </TabsList>
             <TabsContent value="specifications" className="mt-8">
-              <div className="rounded-2xl p-8 border">
+              <div className="rounded-xl p-8 border">
                 <h3 className="text-2xl font-bold">Technical Specifications</h3>
                 <hr className="mt-5 mb-4" />
                 <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
                   {Object.entries(
-                    product.specifications as Record<string, string>
+                    product.specifications as Record<string, string>,
                   ).map(([key, value]) => (
                     <div key={key} className="flex justify-between py-3 px-2">
                       <span className="font-bold first-letter:uppercase">
@@ -277,9 +278,9 @@ export default function ProductPage() {
               </div>
             </TabsContent>
             <TabsContent value="reviews" className="mt-8">
-              <div className="rounded-2xl p-8 shadow-sm border hover:shadow-md transition-shadow duration-300">
+              <div className="rounded-xl p-8 shadow-sm border hover:shadow-md transition-shadow duration-300">
                 <h3 className="text-2xl font-bold">Customer Reviews</h3>
-                <hr className="mt-5 mb-4" />
+                <hr className="mt-4 mb-6" />
                 <ProductReviews productId={product.id} />
               </div>
             </TabsContent>

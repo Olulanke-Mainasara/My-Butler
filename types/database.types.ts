@@ -39,6 +39,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admins: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookmarks: {
         Row: {
           created_at: string | null
@@ -73,6 +97,7 @@ export type Database = {
       }
       brands: {
         Row: {
+          commission_rate: number
           contact: string | null
           created_at: string | null
           description: string
@@ -80,16 +105,19 @@ export type Database = {
           id: string
           location: string | null
           name: string
+          payout_account_name: string | null
+          payout_account_number: string | null
+          payout_bank_code: string | null
+          payout_verified: boolean
+          paystack_subaccount_code: string | null
           profile_picture: string | null
           status: string
-          stripe_account_id: string | null
-          stripe_charges_enabled: boolean
-          stripe_payouts_enabled: boolean
           supabase_user_id: string
           updated_at: string | null
           url: string | null
         }
         Insert: {
+          commission_rate?: number
           contact?: string | null
           created_at?: string | null
           description: string
@@ -97,16 +125,19 @@ export type Database = {
           id?: string
           location?: string | null
           name: string
+          payout_account_name?: string | null
+          payout_account_number?: string | null
+          payout_bank_code?: string | null
+          payout_verified?: boolean
+          paystack_subaccount_code?: string | null
           profile_picture?: string | null
           status?: string
-          stripe_account_id?: string | null
-          stripe_charges_enabled?: boolean
-          stripe_payouts_enabled?: boolean
           supabase_user_id?: string
           updated_at?: string | null
           url?: string | null
         }
         Update: {
+          commission_rate?: number
           contact?: string | null
           created_at?: string | null
           description?: string
@@ -114,133 +145,18 @@ export type Database = {
           id?: string
           location?: string | null
           name?: string
+          payout_account_name?: string | null
+          payout_account_number?: string | null
+          payout_bank_code?: string | null
+          payout_verified?: boolean
+          paystack_subaccount_code?: string | null
           profile_picture?: string | null
           status?: string
-          stripe_account_id?: string | null
-          stripe_charges_enabled?: boolean
-          stripe_payouts_enabled?: boolean
           supabase_user_id?: string
           updated_at?: string | null
           url?: string | null
         }
         Relationships: []
-      }
-      admins: {
-        Row: {
-          id: string
-          created_at: string
-        }
-        Insert: {
-          id: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      orders: {
-        Row: {
-          id: string
-          customer_id: string
-          status: string
-          total_amount: number
-          stripe_checkout_session_id: string | null
-          stripe_payment_intent_id: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          customer_id: string
-          status?: string
-          total_amount: number
-          stripe_checkout_session_id?: string | null
-          stripe_payment_intent_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          customer_id?: string
-          status?: string
-          total_amount?: number
-          stripe_checkout_session_id?: string | null
-          stripe_payment_intent_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "orders_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      order_items: {
-        Row: {
-          id: string
-          order_id: string
-          product_id: string
-          brand_id: string
-          product_name: string
-          unit_price: number
-          quantity: number
-          transfer_id: string | null
-          transferred_at: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          order_id: string
-          product_id: string
-          brand_id: string
-          product_name: string
-          unit_price: number
-          quantity: number
-          transfer_id?: string | null
-          transferred_at?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          order_id?: string
-          product_id?: string
-          brand_id?: string
-          product_name?: string
-          unit_price?: number
-          quantity?: number
-          transfer_id?: string | null
-          transferred_at?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_items_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brands"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       camera_pictures: {
         Row: {
@@ -286,6 +202,7 @@ export type Database = {
           quantity: number
           updated_at: string | null
           user_id: string
+          variant_id: string | null
         }
         Insert: {
           added_at?: string | null
@@ -295,6 +212,7 @@ export type Database = {
           quantity?: number
           updated_at?: string | null
           user_id?: string
+          variant_id?: string | null
         }
         Update: {
           added_at?: string | null
@@ -304,6 +222,7 @@ export type Database = {
           quantity?: number
           updated_at?: string | null
           user_id?: string
+          variant_id?: string | null
         }
         Relationships: [
           {
@@ -311,6 +230,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
@@ -618,6 +544,7 @@ export type Database = {
       }
       notifications: {
         Row: {
+          brand_id: string | null
           created_at: string | null
           id: string
           is_read: boolean | null
@@ -627,6 +554,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          brand_id?: string | null
           created_at?: string | null
           id?: string
           is_read?: boolean | null
@@ -636,6 +564,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          brand_id?: string | null
           created_at?: string | null
           id?: string
           is_read?: boolean | null
@@ -646,10 +575,221 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "notifications_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          brand_id: string
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          status: string
+          unit_price: number
+          variant_id: string | null
+          vendor_amount: number | null
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          status?: string
+          unit_price: number
+          variant_id?: string | null
+          vendor_amount?: number | null
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          status?: string
+          unit_price?: number
+          variant_id?: string | null
+          vendor_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          paystack_reference: string | null
+          shipping_address: Json | null
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          paystack_reference?: string | null
+          shipping_address?: Json | null
+          status?: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          paystack_reference?: string | null
+          shipping_address?: Json | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_splits: {
+        Row: {
+          brand_id: string
+          commission_amount: number
+          created_at: string | null
+          gross_amount: number
+          id: string
+          net_amount: number
+          order_id: string
+          subaccount_code: string
+        }
+        Insert: {
+          brand_id: string
+          commission_amount: number
+          created_at?: string | null
+          gross_amount: number
+          id?: string
+          net_amount: number
+          order_id: string
+          subaccount_code: string
+        }
+        Update: {
+          brand_id?: string
+          commission_amount?: number
+          created_at?: string | null
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          order_id?: string
+          subaccount_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_splits_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_splits_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variants: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          id: string
+          price_override: number | null
+          product_id: string
+          size: string | null
+          sku: string | null
+          stock_quantity: number
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          id?: string
+          price_override?: number | null
+          product_id: string
+          size?: string | null
+          sku?: string | null
+          stock_quantity?: number
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          id?: string
+          price_override?: number | null
+          product_id?: string
+          size?: string | null
+          sku?: string | null
+          stock_quantity?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -765,17 +905,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "reviews_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "reviews_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
         ]
@@ -785,12 +925,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      toggle_bookmark:
-        | {
-            Args: { _target_id: string; _target_type: string }
-            Returns: string
-          }
-        | { Args: { target_id: string; target_type: string }; Returns: string }
+      toggle_bookmark: {
+        Args: { _target_id: string; _target_type: string }
+        Returns: string
+      }
       toggle_cart: {
         Args: { _item_id: string; _item_type: string; _quantity: number }
         Returns: string
@@ -809,10 +947,7 @@ export type Database = {
         Returns: undefined
       }
       update_brand_status: {
-        Args: {
-          _brand_id: string
-          _status: string
-        }
+        Args: { _brand_id: string; _status: string }
         Returns: undefined
       }
       update_customer_details: {

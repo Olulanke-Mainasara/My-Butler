@@ -5,10 +5,13 @@ export function ProductSkeleton() {
         <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
           {/* Product Images Skeleton */}
           <div className="space-y-4">
-            <div className="aspect-square rounded-2xl bg-gray-200 animate-pulse"></div>
+            <div className="aspect-square rounded-xl bg-gray-200 animate-pulse"></div>
             <div className="grid grid-cols-4 gap-3">
               {[...Array(4)].map((_, index) => (
-                <div key={index} className="aspect-square rounded-lg bg-gray-200 animate-pulse"></div>
+                <div
+                  key={index}
+                  className="aspect-square rounded-lg bg-gray-200 animate-pulse"
+                ></div>
               ))}
             </div>
           </div>
@@ -20,7 +23,10 @@ export function ProductSkeleton() {
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                    <div
+                      key={i}
+                      className="w-5 h-5 bg-gray-200 rounded animate-pulse"
+                    ></div>
                   ))}
                 </div>
                 <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -70,11 +76,14 @@ export function ProductSkeleton() {
 
         {/* Specifications Skeleton */}
         <div className="max-w-7xl mx-auto mt-16">
-          <div className="bg-white rounded-2xl p-8 shadow-sm border">
+          <div className="bg-white rounded-xl p-8 shadow-sm border">
             <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-6"></div>
             <div className="grid md:grid-cols-2 gap-6">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="flex justify-between py-3 border-b border-gray-100">
+                <div
+                  key={index}
+                  className="flex justify-between py-3 border-b border-gray-100"
+                >
                   <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
                   <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
                 </div>
@@ -84,5 +93,5 @@ export function ProductSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

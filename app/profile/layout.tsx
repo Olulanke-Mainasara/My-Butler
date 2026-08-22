@@ -77,7 +77,7 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
                 {customerProfile?.profile_picture ? (
                   <Image
                     src={customerProfile.profile_picture}
-                    className="w-16 h-16 rounded-full"
+                    className="w-16 h-16 rounded-full object-cover"
                     alt="Profile picture"
                     width={40}
                     height={40}

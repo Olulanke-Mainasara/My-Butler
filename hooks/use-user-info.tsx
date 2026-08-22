@@ -13,11 +13,11 @@ import {
 import { User } from "@supabase/supabase-js";
 import React, { useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { CustomerProfile } from "@/types/CustomerProfile";
-import { BrandProfile } from "@/types/BrandProfile";
-import { CartItem } from "@/types/CartItem";
-import { Notification } from "@/types/Notification";
-import { Bookmark } from "@/types/Bookmark";
+import { CustomerProfile } from "@/types/system-types/CustomerProfile";
+import { BrandProfile } from "@/types/system-types/BrandProfile";
+import { CartItem } from "@/types/system-types/CartItem";
+import { Notification } from "@/types/system-types/Notification";
+import { Bookmark } from "@/types/system-types/Bookmark";
 import { useQueryClient } from "@tanstack/react-query";
 import { ROLE_CUSTOMER, ROLE_BRAND } from "@/lib/roles";
 import { invalidateTable } from "@/lib/utils";
@@ -33,7 +33,7 @@ function useUserRealtime(user: User | null) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications" },
-        () => invalidateTable(queryClient, "notifications")
+        () => invalidateTable(queryClient, "notifications"),
       )
       .subscribe();
 
@@ -58,7 +58,7 @@ function useCatalogRealtime() {
       channel.on(
         "postgres_changes",
         { event: "*", schema: "public", table },
-        () => invalidateTable(queryClient, table)
+        () => invalidateTable(queryClient, table),
       );
     });
 
@@ -167,7 +167,7 @@ export function useUserInfo(): UseUserInfoReturn {
         } else if (event === "SIGNED_OUT") {
           setUserSession(null);
         }
-      }
+      },
     );
 
     return () => {

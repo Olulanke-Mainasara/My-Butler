@@ -17,7 +17,7 @@ export function CollectionSkeleton() {
 
       <div className="p-4">
         {/* Collection Info Skeleton */}
-        <div className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 md:p-12">
+        <div className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-xl p-8 md:p-12">
           <div className="h-4 w-48 bg-gray-200 rounded animate-pulse mb-4"></div>
           <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-4"></div>
           <div className="space-y-2">
@@ -41,7 +41,7 @@ export function CollectionSkeleton() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {[...Array(4)].map((_, index) => (
               <div key={index} className="space-y-4">
-                <div className="aspect-square rounded-2xl bg-gray-200 animate-pulse"></div>
+                <div className="aspect-square rounded-xl bg-gray-200 animate-pulse"></div>
                 <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
                 <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
               </div>
@@ -50,5 +50,5 @@ export function CollectionSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

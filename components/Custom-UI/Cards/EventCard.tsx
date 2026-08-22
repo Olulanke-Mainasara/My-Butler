@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Card, CardContent, CardTitle } from "@/components/Shad-UI/card";
-import { Event } from "@/types/Event";
+import { Event } from "@/types/system-types/Event";
 import { Link } from "next-view-transitions";
 import {
   buildItemSlugId,
@@ -66,7 +66,7 @@ export default function EventCard({
 
         <p>
           <span className="opacity-70">Location:</span>{" "}
-          {item.is_virtual ? "Online Event" : item.location ?? "No location"}
+          {item.is_virtual ? "Online Event" : (item.location ?? "No location")}
         </p>
 
         <p>

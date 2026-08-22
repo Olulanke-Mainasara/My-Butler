@@ -15,7 +15,7 @@ import { useTransitionRouter } from "next-view-transitions";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Json } from "@/supabase";
+import { Json } from "@/types/database.types";
 import { Icons } from "@/components/Custom-UI/icons";
 import { generateTitleFromUserMessage } from "./action";
 import { useQueryClient } from "@tanstack/react-query";
@@ -204,7 +204,7 @@ export default function ChatComponent() {
             <div
               className={`px-4 py-3 ${
                 message.role === "user"
-                  ? "bg-darkBackground text-white dark:bg-neutral-800 rounded-3xl rounded-tr-sm max-w-xs lg:max-w-sm"
+                  ? "bg-darkBackground text-white dark:bg-neutral-800 rounded-xl rounded-tr-sm max-w-xs lg:max-w-sm"
                   : ""
               }`}
             >

@@ -6,7 +6,7 @@ import { Link } from "next-view-transitions";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { getBookmarkedItems } from "@/lib/fetches";
 import CollectionCard from "@/components/Custom-UI/Cards/CollectionCard";
-import { Collection } from "@/types/Collection";
+import { Collection } from "@/types/system-types/Collection";
 import { useBookmarks } from "@/components/Providers/AllProviders";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { useMemo } from "react";
@@ -43,7 +43,7 @@ export default function Collections() {
         item !== null &&
         !("price" in item) &&
         !("author" in item) &&
-        !("location" in item)
+        !("location" in item),
     );
   }, [bookmarkItems]);
 
