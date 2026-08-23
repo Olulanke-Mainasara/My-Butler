@@ -32,9 +32,9 @@ const TopStoriesSection = ({
 
       {isLoadingNews ? (
         <LoadingSkeleton
-          length={5}
+          length={4}
           height="md:h-96"
-          className="md:grid-cols-3 xl:grid-cols-5"
+          className="md:grid-cols-3 xl:grid-cols-4"
         />
       ) : !news || news.length === 0 ? (
         <Empty className="border">

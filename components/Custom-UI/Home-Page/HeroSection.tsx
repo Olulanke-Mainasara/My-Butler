@@ -35,11 +35,7 @@ const HeroSection = ({ collections }: { collections: Collection[] }) => {
 
   return (
     <section className="mt-16 h-[calc(100dvh-4rem)] w-full bg-white relative overflow-hidden">
-      <Carousel
-        opts={{ align: "start", loop: true }}
-        setApi={setApi}
-        className="h-full"
-      >
+      <Carousel opts={{ align: "start" }} setApi={setApi} className="h-full">
         <CarouselContent className="ml-0 h-full">
           {collectionsToDisplay && collectionsToDisplay.length > 0 ? (
             collectionsToDisplay.map((collection) => (
@@ -104,8 +100,8 @@ const HeroSection = ({ collections }: { collections: Collection[] }) => {
             ),
           )}
         </div>
-        <CarouselPrevious className="left-4 md:left-8 border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white hidden md:flex" />
-        <CarouselNext className="right-4 md:right-8 border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white hidden md:flex" />
+        <CarouselPrevious className="left-5 hidden md:flex border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white" />
+        <CarouselNext className="right-5 border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white hidden md:flex" />
       </Carousel>
     </section>
   );

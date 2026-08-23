@@ -64,7 +64,7 @@ export default function OrderPage() {
   const items = order.order_items ?? [];
 
   return (
-    <div className="pt-24 px-4 md:px-5 pb-10 max-w-[theme(screens.md)] mx-auto space-y-6">
+    <div className="pt-24 px-4 md:px-5 pb-10 max-w-[--breakpoint-md] mx-auto space-y-6">
       <Suspense fallback={null}>
         <OrderStatusBanner status={order.status} />
       </Suspense>

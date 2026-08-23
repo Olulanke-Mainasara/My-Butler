@@ -24,7 +24,7 @@ const NewArrivalsSection = ({
       </h2>
 
       {isLoadingProducts ? (
-        <LoadingSkeleton length={4} height="md:h-[450px]" />
+        <LoadingSkeleton length={4} height="md:h-[400px]" />
       ) : !products || products.length === 0 ? (
         <Empty className="border">
           <EmptyHeader>

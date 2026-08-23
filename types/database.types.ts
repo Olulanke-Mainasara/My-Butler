@@ -97,6 +97,7 @@ export type Database = {
       }
       brands: {
         Row: {
+          banner_image: string | null
           commission_rate: number
           contact: string | null
           created_at: string | null
@@ -117,6 +118,7 @@ export type Database = {
           url: string | null
         }
         Insert: {
+          banner_image?: string | null
           commission_rate?: number
           contact?: string | null
           created_at?: string | null
@@ -137,6 +139,7 @@ export type Database = {
           url?: string | null
         }
         Update: {
+          banner_image?: string | null
           commission_rate?: number
           contact?: string | null
           created_at?: string | null

@@ -5,17 +5,22 @@ import { getBrandOrderItems } from "@/lib/fetches";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import LoadingSkeleton from "@/components/Custom-UI/Skeletons/LoadingSkeleton";
 import { Badge } from "@/components/Shad-UI/badge";
-import { convertRawDateToReadableDate } from "@/lib/utils";
+import {
+  convertRawDateToReadableDate,
+  convertRawPriceToReadablePrice,
+} from "@/lib/utils";
 
 export default function BrandOrdersPage() {
   const brandProfile = useBrandProfile();
 
   const { data: orderItems } = useQuery(
     getBrandOrderItems(brandProfile?.id || ""),
-    { enabled: !!brandProfile?.id }
+    { enabled: !!brandProfile?.id },
   );
 
-  const paidItems = orderItems?.filter((item) => item.orders?.status === "paid");
+  const paidItems = orderItems?.filter(
+    (item) => item.orders?.status === "paid",
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -46,19 +51,21 @@ export default function BrandOrdersPage() {
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant="outline">
-                  ${(item.unit_price * item.quantity).toFixed(2)}
+                  {convertRawPriceToReadablePrice(
+                    item.unit_price * item.quantity,
+                  )}
                 </Badge>
                 <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
                   Paid
                 </Badge>
                 <Badge
                   className={
-                    item.transfer_id
+                    item.order_id
                       ? "bg-green-100 text-green-800 hover:bg-green-200"
                       : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                   }
                 >
-                  {item.transfer_id ? "Paid out" : "Payout pending"}
+                  {item.order_id ? "Paid out" : "Payout pending"}
                 </Badge>
               </div>
             </div>

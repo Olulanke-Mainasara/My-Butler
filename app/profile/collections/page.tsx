@@ -86,7 +86,7 @@ export default function Collections() {
           </p>
         </div>
       ) : collections.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
           {collections.map((bookmark) => (
             <CollectionCard item={bookmark} key={bookmark.id} />
           ))}

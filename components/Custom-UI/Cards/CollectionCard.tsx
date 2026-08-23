@@ -18,19 +18,18 @@ export default function CollectionCard({ item }: { item?: Collection }) {
   return (
     <div>
       <Link href={relevantLink} prefetch={false} className="space-y-5">
-        <div className="relative h-96 w-full rounded-xl overflow-hidden">
+        <div className="relative h-96 xl:h-130 w-full rounded-xl overflow-hidden">
           <Image
             src={item.display_image ?? "/placeholder.svg"}
             alt={item.name}
             fill
             sizes="(max-width: 767px) 100vw, (max-width: 1200px) 33vw, 25vw"
-            className="object-cover"
+            className="object-cover hover:scale-105 transition-transform duration-300 ease-out"
           />
         </div>
 
         <div className="space-y-1">
-          <p className="md:text-xl">{item.name}</p>
-          <p className="text-sm text-muted-foreground">{item.description}</p>
+          <p className="md:text-xl text-center font-bold">{item.name}</p>
         </div>
       </Link>
     </div>

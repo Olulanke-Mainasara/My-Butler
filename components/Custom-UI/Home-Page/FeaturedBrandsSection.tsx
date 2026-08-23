@@ -37,7 +37,11 @@ const FeaturedBrandsSection = ({
         </div>
 
         {isLoadingBrands ? (
-          <LoadingSkeleton length={1} className="md:grid-cols-1 mt-8" />
+          <LoadingSkeleton
+            length={2}
+            className="mt-8 md:grid-cols-2 xl:grid-cols-2"
+            height="h-96 xl:h-130 "
+          />
         ) : !brands || brands.length === 0 ? (
           <Empty className="border mt-8">
             <EmptyHeader>

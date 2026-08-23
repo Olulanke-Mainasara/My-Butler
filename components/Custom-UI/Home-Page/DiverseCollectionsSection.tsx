@@ -31,7 +31,11 @@ const DiverseCollectionsSection = ({
       </div>
 
       {isLoadingCollections ? (
-        <LoadingSkeleton length={4} height="md:h-[450px]" />
+        <LoadingSkeleton
+          length={3}
+          className="xl:grid-cols-3"
+          height="h-96 xl:h-130"
+        />
       ) : !collections || collections.length === 0 ? (
         <Empty className="border">
           <EmptyHeader>
@@ -45,7 +49,7 @@ const DiverseCollectionsSection = ({
           </EmptyHeader>
         </Empty>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5 xl:gap-8">
           {collections.slice(0, 8).map((collection, index) => (
             <CollectionCard item={collection} key={index} />
           ))}

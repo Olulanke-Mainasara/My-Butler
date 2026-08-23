@@ -27,7 +27,7 @@ export const getBrandProfile = (userId: string) => {
   return supabase
     .from("brands")
     .select(
-      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, paystack_subaccount_code, payout_bank_code, payout_account_number, payout_account_name, payout_verified, commission_rate, created_at, updated_at",
+      "id, name, description, contact, email, location, profile_picture, supabase_user_id, url, status, paystack_subaccount_code, payout_bank_code, payout_account_number, payout_account_name, payout_verified, commission_rate, banner_image, created_at, updated_at",
     )
     .eq("id", userId)
     .single();

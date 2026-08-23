@@ -48,6 +48,13 @@ export default function ChatComponent() {
           messages: message.messages as unknown as Json[],
         });
 
+        console.log(error);
+
+        if (error && error.code === "42501") {
+          toast.info("This conversation is not being saved.");
+          return;
+        }
+
         if (error) {
           toast.error("Failed to save conversation.");
           return;

@@ -39,9 +39,9 @@ const AnticipatedEventsSection = ({
 
       {isLoadingEvents ? (
         <LoadingSkeleton
-          length={1}
+          length={2}
           height="h-[500px] md:h-[600px]"
-          className="md:grid-cols-1 px-4 md:px-5"
+          className="md:grid-cols-2 xl:grid-cols-2 px-4 md:px-5"
         />
       ) : !events || events.length === 0 ? (
         <Empty className="border dark:text-white px-4 md:px-5">
@@ -68,8 +68,8 @@ const AnticipatedEventsSection = ({
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="hidden md:flex left-4" />
-          <CarouselNext className="hidden md:flex right-4" />
+          <CarouselPrevious className="hidden md:flex left-5 border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white" />
+          <CarouselNext className="hidden md:flex right-5 border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white" />
         </Carousel>
       )}
     </section>

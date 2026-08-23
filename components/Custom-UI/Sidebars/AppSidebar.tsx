@@ -88,31 +88,40 @@ export function AppSidebar() {
       <SidebarContent className="gap-0 px-0">
         {groupedNavigation.map((group) => (
           <SidebarGroup key={group.id} className="pt-0 px-2">
-            <SidebarGroupLabel className="tracking-normal text-base text-neutral-500">
+            <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 px-2 pt-1">
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
-                {group.links.map((link) => (
-                  <SidebarMenuItem key={link.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === link.url}
-                      size={"default"}
-                      onClick={() => {
-                        toggleSidebar();
-                        router.push(`${link.url}`);
-                      }}
-                    >
-                      <Link href={link.url}>
-                        <span className="text-brandLight dark:text-brandDark text-sm">
-                          {React.cloneElement(link.icon, { size: 20 })}
-                        </span>
-                        <span>{link.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+              <SidebarMenu className="gap-1">
+                {group.links.map((link) => {
+                  const active = pathname === link.url;
+                  return (
+                    <SidebarMenuItem key={link.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={active}
+                        size={"default"}
+                        onClick={() => {
+                          toggleSidebar();
+                          router.push(`${link.url}`);
+                        }}
+                      >
+                        <Link href={link.url}>
+                          <span
+                            className={`shrink-0 ${
+                              active
+                                ? "text-brandLight dark:text-brandDark"
+                                : "text-neutral-500 dark:text-neutral-400"
+                            }`}
+                          >
+                            {React.cloneElement(link.icon, { size: 20 })}
+                          </span>
+                          <span>{link.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
             {group.id !== "4" && (
@@ -123,11 +132,11 @@ export function AppSidebar() {
 
         {isAdmin && (
           <SidebarGroup className="pt-0 px-2">
-            <SidebarGroupLabel className="tracking-normal text-base text-neutral-500">
+            <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 px-2 pt-1">
               Admin
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="gap-1">
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
@@ -139,10 +148,16 @@ export function AppSidebar() {
                     }}
                   >
                     <Link href="/admin">
-                      <span className="text-brandLight dark:text-brandDark text-sm">
+                      <span
+                        className={`shrink-0 ${
+                          pathname === "/admin"
+                            ? "text-brandLight dark:text-brandDark"
+                            : "text-amber-600 dark:text-amber-500"
+                        }`}
+                      >
                         <ShieldCheck size={20} />
                       </span>
-                      <span>Brand Review</span>
+                      <span>Admin Dashboard</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

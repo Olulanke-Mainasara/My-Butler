@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useCallback, KeyboardEvent } from "react";
-import { ArrowUp, Stars } from "lucide-react";
+import { ArrowUp, Info, Stars } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
 import { useLocalStorage } from "react-use";
 import { generateUUID } from "@/lib/utils";
+import { useCustomerProfile } from "@/components/Providers/UserProvider";
 
 const Butler = () => {
   const [prompt, setPrompt] = useState("");
   const [, setInput] = useLocalStorage("input");
   const [loading, setLoading] = useState(false);
   const router = useTransitionRouter();
+  const customerProfile = useCustomerProfile();
 
   const handleSubmit = useCallback(async () => {
     if (!prompt.trim() || loading) return;
@@ -28,7 +30,7 @@ const Butler = () => {
         handleSubmit();
       }
     },
-    [handleSubmit]
+    [handleSubmit],
   );
 
   return (
@@ -64,6 +66,12 @@ const Butler = () => {
           </button>
         </div>
       </div>
+      <p className="text-center text-sm lg:text-base opacity-70">
+        <Info className="inline-block mr-2 mb-1" size={16} />
+        {customerProfile
+          ? "Your conversations are saved and can be accessed in your profile."
+          : "Your conversations are not saved until you login."}
+      </p>
     </div>
   );
 };
